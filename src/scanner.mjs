@@ -218,6 +218,12 @@ function detectFrameworks({ packageJson, pyproject, cargoToml, goMod, files }) {
   if (deps["@nestjs/core"]) names.push("NestJS");
   if (deps.vitest) names.push("Vitest");
   if (deps.jest) names.push("Jest");
+  if (deps.playwright || deps["@playwright/test"] || files.some((file) => /^playwright\.config\.[cm]?[jt]s$/.test(file))) {
+    names.push("Playwright");
+  }
+  if (deps.storybook || Object.keys(deps).some((name) => name.startsWith("@storybook/")) || files.some((file) => /^\.storybook\/main\.[cm]?[jt]s$/.test(file))) {
+    names.push("Storybook");
+  }
   if (hasPythonTool(pyproject, "fastapi")) names.push("FastAPI");
   if (hasPythonTool(pyproject, "django")) names.push("Django");
   if (hasPythonTool(pyproject, "flask")) names.push("Flask");

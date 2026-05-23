@@ -54,6 +54,15 @@ test("scan detects monorepo workspace signals", async () => {
   assert.equal(profile.commands.test, "pnpm test");
 });
 
+test("scan detects frontend test and component tooling", async () => {
+  const profile = await scanRepo(fixture("frontend-tooling"));
+
+  assert.equal(profile.name, "fixture-frontend-tooling");
+  assert.ok(profile.frameworks.includes("Playwright"));
+  assert.ok(profile.frameworks.includes("Storybook"));
+  assert.equal(profile.commands.test, "npm run test");
+});
+
 test("generator plans canonical and shim files without writing", async () => {
   const profile = await scanRepo(fixture("node-app"));
   const artifacts = await planGeneratedArtifacts(profile, { targets: ["codex", "cursor"] });

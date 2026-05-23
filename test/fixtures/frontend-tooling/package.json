@@ -1,0 +1,13 @@
+{
+  "name": "fixture-frontend-tooling",
+  "scripts": {
+    "test": "playwright test",
+    "storybook": "storybook dev -p 6006"
+  },
+  "devDependencies": {
+    "@playwright/test": "latest",
+    "@storybook/react": "latest",
+    "storybook": "latest",
+    "typescript": "latest"
+  }
+}

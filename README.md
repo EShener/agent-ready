@@ -18,11 +18,21 @@ AI coding agents fail for boring reasons: they do not know the test command, the
 
 ## 60 Second Demo
 
+Use the GitHub Action immediately:
+
+```yaml
+- uses: EShener/agent-ready@main
+  with:
+    fail-under: 80
+```
+
+Use the CLI from GitHub until the npm package is published:
+
 ```bash
-npx agent-ready doctor
-npx agent-ready init --dry-run
-npx agent-ready score --fail-under 80
-npx agent-ready ci
+npx --yes github:EShener/agent-ready doctor
+npx --yes github:EShener/agent-ready init --dry-run
+npx --yes github:EShener/agent-ready score --fail-under 80
+npx --yes github:EShener/agent-ready ci
 ```
 
 Example output:
@@ -42,7 +52,7 @@ Top fixes:
 After review, generate the files:
 
 ```bash
-npx agent-ready init --targets codex,claude,cursor,gemini,copilot
+npx --yes github:EShener/agent-ready init --targets codex,claude,cursor,gemini,copilot
 ```
 
 ## What It Generates
@@ -188,7 +198,7 @@ jobs:
 Generate this workflow with:
 
 ```bash
-npx agent-ready ci > .github/workflows/agent-ready.yml
+npx --yes github:EShener/agent-ready ci > .github/workflows/agent-ready.yml
 ```
 
 ## Supported Detection
@@ -200,7 +210,7 @@ Current detectors cover common JavaScript/TypeScript, Python, Rust, Go, and mono
 - docs: README, architecture docs, ADR directories, existing agent docs
 - CI: GitHub Actions workflows
 - monorepos: npm/pnpm workspaces, Turborepo, Nx, Lerna, Rush
-- frameworks: React, Vite, Next.js, Vue, Astro, Svelte, Express, NestJS, FastAPI, Django, Flask, Pytest, Rust web frameworks, Gin
+- frameworks/tools: React, Vite, Next.js, Vue, Astro, Svelte, Express, NestJS, Playwright, Storybook, FastAPI, Django, Flask, Pytest, Rust web frameworks, Gin
 
 ## Design Principles
 
