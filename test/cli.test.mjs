@@ -85,6 +85,22 @@ test("doctor CLI emits a screenshot-friendly summary", async () => {
   assert.match(stdout, /Top fixes:|Status: ready/);
 });
 
+test("explain CLI emits an impact-ranked fix plan", async () => {
+  const { stdout } = await execFileAsync(process.execPath, [bin, "explain", "--root", fixture("empty-repo")], { cwd: root });
+
+  assert.match(stdout, /Agent Ready Fix Plan/);
+  assert.match(stdout, /\+25 \| missing-agents-md/);
+  assert.match(stdout, /Potential score:/);
+});
+
+test("explain CLI emits JSON when requested", async () => {
+  const { stdout } = await execFileAsync(process.execPath, [bin, "explain", "--root", fixture("empty-repo"), "--format", "json"], { cwd: root });
+  const payload = JSON.parse(stdout);
+
+  assert.equal(payload.repository.name, "empty-repo");
+  assert.equal(payload.items[0].ruleId, "missing-agents-md");
+});
+
 test("annotations CLI emits GitHub workflow commands", async () => {
   const { stdout } = await execFileAsync(process.execPath, [bin, "annotations", "--root", fixture("empty-repo")], { cwd: root });
 
@@ -110,7 +126,7 @@ test("benchmark CLI emits JSON when requested", async () => {
 
 test("ci CLI emits reusable GitHub Action workflow by default", async () => {
   const { stdout } = await execFileAsync(process.execPath, [bin, "ci", "--fail-under", "85"], { cwd: root });
-  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.6/);
+  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.7/);
   assert.match(stdout, /fail-under: 85/);
 });
 

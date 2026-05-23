@@ -119,6 +119,25 @@ ${rows}
 `;
 }
 
+export function renderExplanation(explanation) {
+  const rows = explanation.items.length
+    ? explanation.items.map((item) => `| +${item.points} | ${escapePipe(item.ruleId)} | ${item.severity} | ${escapePipe(item.file)} | ${escapePipe(item.why)} | ${escapePipe(item.fixSuggestion)} |`).join("\n")
+    : "| 0 | none | ok |  | No fixes needed. | Keep instructions compact and current. |";
+
+  return `# Agent Ready Fix Plan
+
+- Repository: ${explanation.repository.name}
+- Current score: ${explanation.score.current}/100 (${explanation.score.grade})
+- Potential score: ${explanation.score.potentialScore}/100 (+${explanation.score.potentialGain})
+
+${explanation.score.summary}
+
+| Impact | Rule | Severity | File | Why it matters | Fix |
+| ---: | --- | --- | --- | --- | --- |
+${rows}
+`;
+}
+
 export function renderMarkdownReport(profile, findings, score) {
   const commandRows = Object.entries(profile.commands)
     .filter(([, value]) => value)

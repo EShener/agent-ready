@@ -25,7 +25,7 @@ On a 2026-05-23 sample of six public AI/devtool repositories, the average Agent 
 Use the GitHub Action immediately:
 
 ```yaml
-- uses: EShener/agent-ready@v0.1.6
+- uses: EShener/agent-ready@v0.1.7
   with:
     fail-under: 80
 ```
@@ -34,6 +34,7 @@ Use the CLI from GitHub until the npm package is published:
 
 ```bash
 npx --yes github:EShener/agent-ready doctor
+npx --yes github:EShener/agent-ready explain
 npx --yes github:EShener/agent-ready fix --dry-run
 npx --yes github:EShener/agent-ready init --dry-run
 npx --yes github:EShener/agent-ready score --fail-under 80
@@ -151,6 +152,15 @@ agent-ready score --fail-under 80
 
 Use `--fail-under` in CI to fail a build when repository instructions regress.
 
+### `explain`
+
+Prints an impact-ranked fix plan with why each issue matters and how many points each fix can recover.
+
+```bash
+agent-ready explain
+agent-ready explain --format json
+```
+
 ### `report`
 
 Creates a Markdown or JSON report for issues, PRs, or README updates.
@@ -231,7 +241,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: EShener/agent-ready@v0.1.6
+      - uses: EShener/agent-ready@v0.1.7
         with:
           fail-under: 80
 ```

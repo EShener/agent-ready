@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.7
+
+- Added `agent-ready explain` for impact-ranked fix plans with estimated score recovery.
+- Added Markdown and JSON explanation output.
+
 ## 0.1.6
 
 - Added `agent-ready fix` to generate agent docs and install the CI readiness workflow in one command.

@@ -4,9 +4,10 @@ import path from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { benchmarkRepos } from "../src/benchmark.mjs";
+import { explainRepo } from "../src/explainer.mjs";
 import { buildAgentsMd, planGeneratedArtifacts } from "../src/generator.mjs";
 import { lintRepo, scoreRepo } from "../src/linter.mjs";
-import { renderAnnotations, renderBenchmarkReport, renderDoctor, renderMarkdownReport } from "../src/reporter.mjs";
+import { renderAnnotations, renderBenchmarkReport, renderDoctor, renderExplanation, renderMarkdownReport } from "../src/reporter.mjs";
 import { scanRepo } from "../src/scanner.mjs";
 import { renderCiWorkflow, writeCiWorkflow } from "../src/workflow.mjs";
 
@@ -122,6 +123,19 @@ test("markdown report includes commands, docs, and findings", async () => {
   assert.match(report, /npm run test/);
 });
 
+test("explanation report ranks fixes by score impact", async () => {
+  const profile = await scanRepo(fixture("empty-repo"));
+  const findings = await lintRepo(profile);
+  const score = scoreRepo(profile, findings);
+  const explanation = explainRepo(profile, findings, score);
+  const report = renderExplanation(explanation);
+
+  assert.equal(explanation.items[0].ruleId, "missing-agents-md");
+  assert.equal(explanation.items[0].points, 25);
+  assert.match(report, /Agent Ready Fix Plan/);
+  assert.match(report, /AI coding agents need one canonical handoff file/);
+});
+
 test("benchmark ranks multiple repositories and renders a leaderboard", async () => {
   const benchmark = await benchmarkRepos(["node-app", "bad-agent-docs"], { root: fixture("") });
   const report = renderBenchmarkReport(benchmark);
@@ -200,7 +214,7 @@ test("scan applies agent-ready.json command and doc overrides", async () => {
 });
 
 test("workflow renderer validates mode and fail-under values", () => {
-  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.6/);
+  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.7/);
   assert.match(renderCiWorkflow({ mode: "npx", failUnder: "70" }), /npx agent-ready score --fail-under 70/);
   assert.throws(() => renderCiWorkflow({ mode: "bad" }), /--mode/);
   assert.throws(() => renderCiWorkflow({ failUnder: "101" }), /--fail-under/);
