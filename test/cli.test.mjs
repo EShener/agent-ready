@@ -67,9 +67,25 @@ test("annotations CLI emits GitHub workflow commands", async () => {
   assert.match(stdout, /Run `agent-ready init --targets codex`/);
 });
 
+test("benchmark CLI emits a Markdown leaderboard", async () => {
+  const { stdout } = await execFileAsync(process.execPath, [bin, "benchmark", "test/fixtures/node-app", "test/fixtures/bad-agent-docs"], { cwd: root });
+
+  assert.match(stdout, /Agent Readiness Benchmark/);
+  assert.match(stdout, /\| 1 \| fixture-node-app \|/);
+  assert.match(stdout, /missing-agents-md/);
+});
+
+test("benchmark CLI emits JSON when requested", async () => {
+  const { stdout } = await execFileAsync(process.execPath, [bin, "benchmark", "--root", "test/fixtures", "node-app", "bad-agent-docs", "--format", "json"], { cwd: root });
+  const payload = JSON.parse(stdout);
+
+  assert.equal(payload.count, 2);
+  assert.equal(payload.repos[0].name, "fixture-node-app");
+});
+
 test("ci CLI emits reusable GitHub Action workflow by default", async () => {
   const { stdout } = await execFileAsync(process.execPath, [bin, "ci", "--fail-under", "85"], { cwd: root });
-  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.2/);
+  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.3/);
   assert.match(stdout, /fail-under: 85/);
 });
 

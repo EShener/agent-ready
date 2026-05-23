@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3
+
+- Added `benchmark` command for scoring multiple repositories and generating a Markdown leaderboard.
+
 ## 0.1.2
 
 - Added GitHub Actions annotations for readiness findings.

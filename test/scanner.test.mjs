@@ -3,9 +3,10 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
+import { benchmarkRepos } from "../src/benchmark.mjs";
 import { buildAgentsMd, planGeneratedArtifacts } from "../src/generator.mjs";
 import { lintRepo, scoreRepo } from "../src/linter.mjs";
-import { renderAnnotations, renderDoctor, renderMarkdownReport } from "../src/reporter.mjs";
+import { renderAnnotations, renderBenchmarkReport, renderDoctor, renderMarkdownReport } from "../src/reporter.mjs";
 import { scanRepo } from "../src/scanner.mjs";
 import { renderCiWorkflow } from "../src/workflow.mjs";
 
@@ -121,6 +122,18 @@ test("markdown report includes commands, docs, and findings", async () => {
   assert.match(report, /npm run test/);
 });
 
+test("benchmark ranks multiple repositories and renders a leaderboard", async () => {
+  const benchmark = await benchmarkRepos(["node-app", "bad-agent-docs"], { root: fixture("") });
+  const report = renderBenchmarkReport(benchmark);
+
+  assert.equal(benchmark.count, 2);
+  assert.equal(benchmark.repos[0].name, "fixture-node-app");
+  assert.ok(benchmark.repos[0].score > benchmark.repos[1].score);
+  assert.match(report, /Agent Readiness Benchmark/);
+  assert.match(report, /\| 1 \| fixture-node-app \|/);
+  assert.match(report, /missing-agents-md/);
+});
+
 test("GitHub annotations render findings with workflow command escaping", () => {
   const output = renderAnnotations([
     {
@@ -187,7 +200,7 @@ test("scan applies agent-ready.json command and doc overrides", async () => {
 });
 
 test("workflow renderer validates mode and fail-under values", () => {
-  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.2/);
+  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.3/);
   assert.match(renderCiWorkflow({ mode: "npx", failUnder: "70" }), /npx agent-ready score --fail-under 70/);
   assert.throws(() => renderCiWorkflow({ mode: "bad" }), /--mode/);
   assert.throws(() => renderCiWorkflow({ failUnder: "101" }), /--fail-under/);

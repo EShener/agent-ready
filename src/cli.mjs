@@ -1,8 +1,9 @@
 import { scanRepo } from "./scanner.mjs";
+import { benchmarkRepos } from "./benchmark.mjs";
 import { parseTargets, writeGeneratedArtifacts } from "./generator.mjs";
 import { promptInitOptions } from "./interactive.mjs";
 import { lintRepo, scoreRepo } from "./linter.mjs";
-import { renderAnnotations, renderBadge, renderDoctor, renderFindings, renderMarkdownReport, renderScanSummary, renderScore } from "./reporter.mjs";
+import { renderAnnotations, renderBadge, renderBenchmarkReport, renderDoctor, renderFindings, renderMarkdownReport, renderScanSummary, renderScore } from "./reporter.mjs";
 import { renderCiWorkflow } from "./workflow.mjs";
 
 const HELP = `agent-ready
@@ -18,6 +19,7 @@ Usage:
   agent-ready doctor [--root PATH] [--config PATH] [--format json|text] [--fail-under N]
   agent-ready report [--root PATH] [--config PATH] [--format markdown|json]
   agent-ready badge [--root PATH] [--config PATH] [--format markdown|url|json] [--fail-under N]
+  agent-ready benchmark [PATH...] [--root PATH] [--config PATH] [--format markdown|json]
   agent-ready ci [--mode action|npx] [--fail-under N]
 
 Examples:
@@ -29,10 +31,11 @@ Examples:
   npx agent-ready score --fail-under 80
   npx agent-ready ci
   npx agent-ready report --format markdown
+  npx agent-ready benchmark ../repo-a ../repo-b
 `;
 
 export async function runCli(argv) {
-  const { command, flags } = parseCli(argv);
+  const { command, args, flags } = parseCli(argv);
   if (!command || flags.help) {
     console.log(HELP);
     return;
@@ -123,6 +126,20 @@ export async function runCli(argv) {
     const score = scoreRepo(profile, findings);
     console.log(renderBadge(score, flags.format || "markdown"));
     applyFailUnder(score, flags["fail-under"]);
+    return;
+  }
+
+  if (command === "benchmark") {
+    const benchmark = await benchmarkRepos(args, {
+      root,
+      configPath: scanOptions.configPath,
+    });
+    if (flags.format === "json" || flags.json) {
+      console.log(JSON.stringify(benchmark, null, 2));
+    } else {
+      if (flags.format && flags.format !== "markdown") throw new Error("Benchmark format must be markdown or json.");
+      console.log(renderBenchmarkReport(benchmark));
+    }
     return;
   }
 

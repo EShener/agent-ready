@@ -86,6 +86,39 @@ export function renderBadge(score, format = "markdown") {
   return `![agent-ready](${url})`;
 }
 
+export function renderBenchmarkReport(benchmark) {
+  const rows = benchmark.repos.length
+    ? benchmark.repos.map((repo, index) => {
+        const frameworks = repo.frameworks.length ? repo.frameworks.join(", ") : "none";
+        const topFixes = repo.topFindings.length
+          ? repo.topFindings.map((finding) => finding.ruleId).join(", ")
+          : "ready";
+        return [
+          index + 1,
+          escapePipe(repo.name),
+          repo.score,
+          repo.grade,
+          escapePipe(repo.primaryLanguage),
+          escapePipe(frameworks),
+          repo.agentDocs,
+          repo.findings,
+          escapePipe(topFixes),
+        ].join(" | ");
+      }).map((row) => `| ${row} |`).join("\n")
+    : "| - | none | 0 | - | - | - | 0 | 0 | - |";
+
+  return `# Agent Readiness Benchmark
+
+- Repositories: ${benchmark.count}
+- Average score: ${benchmark.averageScore}/100
+- Generated: ${benchmark.generatedAt}
+
+| Rank | Repository | Score | Grade | Language | Frameworks | Agent docs | Findings | Top fixes |
+| --- | --- | ---: | --- | --- | --- | ---: | ---: | --- |
+${rows}
+`;
+}
+
 export function renderMarkdownReport(profile, findings, score) {
   const commandRows = Object.entries(profile.commands)
     .filter(([, value]) => value)

@@ -21,7 +21,7 @@ AI coding agents fail for boring reasons: they do not know the test command, the
 Use the GitHub Action immediately:
 
 ```yaml
-- uses: EShener/agent-ready@v0.1.2
+- uses: EShener/agent-ready@v0.1.3
   with:
     fail-under: 80
 ```
@@ -33,6 +33,7 @@ npx --yes github:EShener/agent-ready doctor
 npx --yes github:EShener/agent-ready init --dry-run
 npx --yes github:EShener/agent-ready score --fail-under 80
 npx --yes github:EShener/agent-ready ci
+npx --yes github:EShener/agent-ready benchmark ../repo-a ../repo-b
 ```
 
 Example output:
@@ -152,6 +153,16 @@ agent-ready badge --format json
 agent-ready badge --fail-under 80
 ```
 
+### `benchmark`
+
+Scores multiple local repositories and prints a shareable Markdown leaderboard.
+
+```bash
+agent-ready benchmark ../repo-a ../repo-b
+agent-ready benchmark --root ../work repo-a repo-b
+agent-ready benchmark --format json
+```
+
 ### `ci`
 
 Prints a ready-to-paste GitHub Actions workflow.
@@ -200,7 +211,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: EShener/agent-ready@v0.1.2
+      - uses: EShener/agent-ready@v0.1.3
         with:
           fail-under: 80
 ```

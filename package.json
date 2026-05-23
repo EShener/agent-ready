@@ -1,6 +1,6 @@
 {
   "name": "agent-ready",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Make any repository ready for AI coding agents in 60 seconds.",
   "type": "module",
   "bin": {
@@ -34,7 +34,7 @@
   "scripts": {
     "test": "node --test test/*.test.mjs",
     "lint": "npm run check",
-    "check": "node --check bin/agent-ready.mjs && node --check src/cli.mjs && node --check src/config.mjs && node --check src/generator.mjs && node --check src/interactive.mjs && node --check src/linter.mjs && node --check src/reporter.mjs && node --check src/scanner.mjs && node --check src/workflow.mjs"
+    "check": "node --check bin/agent-ready.mjs && node --check src/benchmark.mjs && node --check src/cli.mjs && node --check src/config.mjs && node --check src/generator.mjs && node --check src/interactive.mjs && node --check src/linter.mjs && node --check src/reporter.mjs && node --check src/scanner.mjs && node --check src/workflow.mjs"
   },
   "engines": {
     "node": ">=20"
