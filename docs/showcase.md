@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: EShener/agent-ready@v0.1.14
+      - uses: EShener/agent-ready@v0.1.15
         with:
           fail-under: 80
           comment: true
@@ -71,6 +71,7 @@ npx --yes github:EShener/agent-ready ci --comment --write
 npx --yes github:EShener/agent-ready doctor
 npx --yes github:EShener/agent-ready explain
 npx --yes github:EShener/agent-ready fix --dry-run
+npx --yes github:EShener/agent-ready fix --level team --dry-run
 npx --yes github:EShener/agent-ready fix
 npx --yes github:EShener/agent-ready comment
 ```

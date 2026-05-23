@@ -78,6 +78,19 @@ test("generator plans canonical and shim files without writing", async () => {
   assert.match(artifacts[1].content, /Use AGENTS\.md/);
 });
 
+test("generator plans staged readiness artifacts by fix level", async () => {
+  const profile = await scanRepo(fixture("node-app"));
+  const team = await planGeneratedArtifacts(profile, { targets: ["codex"], level: "team" });
+  const full = await planGeneratedArtifacts(profile, { targets: ["codex"], level: "full" });
+
+  assert.ok(team.some((item) => item.file === ".github/pull_request_template.md"));
+  assert.ok(team.some((item) => item.file === "docs/architecture.md"));
+  assert.equal(team.some((item) => item.file === ".env.example"), false);
+  assert.ok(full.some((item) => item.file === ".env.example"));
+  assert.ok(full.some((item) => item.file === ".github/ISSUE_TEMPLATE/agent-readiness.md"));
+  assert.match(full.find((item) => item.file === "docs/architecture.md").content, /fixture-node-app/);
+});
+
 test("AGENTS.md includes detected commands and safety boundaries", async () => {
   const profile = await scanRepo(fixture("node-app"));
   const content = buildAgentsMd(profile);
@@ -272,7 +285,7 @@ test("scan applies agent-ready.json command and doc overrides", async () => {
 });
 
 test("workflow renderer validates mode and fail-under values", () => {
-  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.14/);
+  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.15/);
   assert.match(renderCiWorkflow({ mode: "action", comment: true }), /comment: true/);
   assert.match(renderCiWorkflow({ mode: "action", comment: true }), /pull-requests: write/);
   assert.match(renderCiWorkflow({ mode: "npx", failUnder: "70" }), /npx agent-ready score --fail-under 70/);

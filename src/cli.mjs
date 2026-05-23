@@ -17,7 +17,7 @@ Make any repository ready for AI coding agents in 60 seconds.
 Usage:
   agent-ready scan [--root PATH] [--config PATH] [--format json|text]
   agent-ready init [--root PATH] [--config PATH] [--targets codex,claude,cursor,gemini,copilot] [--dry-run] [--force] [--interactive]
-  agent-ready fix [--root PATH] [--config PATH] [--targets codex,claude,cursor,gemini,copilot] [--dry-run] [--force] [--no-ci] [--mode action|npx] [--fail-under N]
+  agent-ready fix [--root PATH] [--config PATH] [--targets codex,claude,cursor,gemini,copilot] [--level basic|team|full] [--dry-run] [--force] [--no-ci] [--mode action|npx] [--fail-under N]
   agent-ready lint [--root PATH] [--config PATH] [--format json|text]
   agent-ready annotations [--root PATH] [--config PATH] [--format github|json]
   agent-ready score [--root PATH] [--config PATH] [--format json|text] [--fail-under N]
@@ -35,6 +35,7 @@ Examples:
   npx agent-ready scan
   npx agent-ready init --targets codex,claude,cursor
   npx agent-ready fix --dry-run
+  npx agent-ready fix --level team --dry-run
   npx agent-ready init --interactive
   npx agent-ready doctor
   npx agent-ready explain
@@ -91,6 +92,7 @@ export async function runCli(argv) {
     const targets = parseTargets(flags.targets || profile.config.targets.join(","));
     const results = await writeGeneratedArtifacts(profile, {
       targets,
+      level: flags.level || "basic",
       dryRun: Boolean(flags["dry-run"]),
       force: Boolean(flags.force),
     });

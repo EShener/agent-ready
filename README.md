@@ -31,7 +31,7 @@ On a 2026-05-23 sample of six public AI/devtool repositories, the average Agent 
 Use the GitHub Action immediately:
 
 ```yaml
-- uses: EShener/agent-ready@v0.1.14
+- uses: EShener/agent-ready@v0.1.15
   with:
     fail-under: 80
 ```
@@ -45,6 +45,7 @@ npx --yes github:EShener/agent-ready matrix
 npx --yes github:EShener/agent-ready comment
 npx --yes github:EShener/agent-ready compare --before before.json --after after.json
 npx --yes github:EShener/agent-ready fix --dry-run
+npx --yes github:EShener/agent-ready fix --level team --dry-run
 npx --yes github:EShener/agent-ready init --dry-run
 npx --yes github:EShener/agent-ready score --fail-under 80
 npx --yes github:EShener/agent-ready ci
@@ -119,9 +120,13 @@ agent-ready init --force
 
 Applies the safe generated fixes: agent instruction files plus the Agent Ready CI workflow. Existing files are skipped unless `--force` is provided.
 
+Use `--level team` to add collaboration starters such as PR templates, contributing docs, architecture docs, and an ADR. Use `--level full` to also add `.env.example`, CODEOWNERS, an agent-readiness issue template, and a security policy.
+
 ```bash
 agent-ready fix --dry-run
 agent-ready fix
+agent-ready fix --level team
+agent-ready fix --level full --dry-run
 agent-ready fix --targets codex,cursor --no-ci
 agent-ready fix --force
 ```
@@ -282,7 +287,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: EShener/agent-ready@v0.1.14
+      - uses: EShener/agent-ready@v0.1.15
         with:
           fail-under: 80
 ```
@@ -299,7 +304,7 @@ permissions:
 
 steps:
   - uses: actions/checkout@v4
-  - uses: EShener/agent-ready@v0.1.14
+  - uses: EShener/agent-ready@v0.1.15
     with:
       fail-under: 80
       comment: true

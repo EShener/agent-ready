@@ -62,6 +62,22 @@ test("fix CLI plans agent docs and CI workflow", async () => {
   await assert.rejects(fs.access(path.join(temp, "AGENTS.md")));
 });
 
+test("fix CLI can plan team and full readiness artifacts", async () => {
+  const temp = await fs.mkdtemp(path.join(os.tmpdir(), "agent-ready-fix-level-"));
+  await fs.writeFile(path.join(temp, "package.json"), JSON.stringify({ scripts: { test: "node --test", lint: "eslint ." } }), "utf8");
+
+  const team = await execFileAsync(process.execPath, [bin, "fix", "--root", temp, "--level", "team", "--dry-run", "--no-ci"], { cwd: root });
+  assert.match(team.stdout, /planned: \.github\/pull_request_template\.md/);
+  assert.match(team.stdout, /planned: docs\/architecture\.md/);
+  assert.match(team.stdout, /planned: docs\/adr\/0001-agent-readiness\.md/);
+  assert.doesNotMatch(team.stdout, /\.env\.example/);
+
+  const full = await execFileAsync(process.execPath, [bin, "fix", "--root", temp, "--level", "full", "--dry-run", "--no-ci"], { cwd: root });
+  assert.match(full.stdout, /planned: \.env\.example/);
+  assert.match(full.stdout, /planned: \.github\/CODEOWNERS/);
+  assert.match(full.stdout, /planned: \.github\/ISSUE_TEMPLATE\/agent-readiness\.md/);
+});
+
 test("fix CLI writes docs and can skip CI", async () => {
   const temp = await fs.mkdtemp(path.join(os.tmpdir(), "agent-ready-fix-write-"));
   await fs.writeFile(path.join(temp, "package.json"), JSON.stringify({ scripts: { test: "node --test" } }), "utf8");
@@ -206,7 +222,7 @@ test("benchmark CLI emits JSON when requested", async () => {
 
 test("ci CLI emits reusable GitHub Action workflow by default", async () => {
   const { stdout } = await execFileAsync(process.execPath, [bin, "ci", "--fail-under", "85"], { cwd: root });
-  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.14/);
+  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.15/);
   assert.match(stdout, /fail-under: 85/);
 });
 

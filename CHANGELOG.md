@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.15
+
+- Added `agent-ready fix --level basic|team|full` for staged repository readiness improvements.
+- Added generated team/full starter files for PR templates, contributing docs, architecture docs, ADRs, environment examples, CODEOWNERS, issue templates, and security policy.
+
 ## 0.1.14
 
 - Added `docs/showcase.md` with the demo GIF, PR comment example, copy-paste workflow, benchmark evidence, and launch snippet.

@@ -10,6 +10,53 @@ const TARGET_FILES = {
 };
 
 const DEFAULT_TARGETS = ["codex", "claude", "cursor", "gemini", "copilot"];
+const FIX_LEVELS = ["basic", "team", "full"];
+
+const TEAM_ARTIFACTS = [
+  {
+    target: "pull-request-template",
+    file: ".github/pull_request_template.md",
+    build: buildPullRequestTemplate,
+  },
+  {
+    target: "contributing",
+    file: "CONTRIBUTING.md",
+    build: buildContributingGuide,
+  },
+  {
+    target: "architecture",
+    file: "docs/architecture.md",
+    build: buildArchitectureDoc,
+  },
+  {
+    target: "agent-readiness-adr",
+    file: "docs/adr/0001-agent-readiness.md",
+    build: buildAgentReadinessAdr,
+  },
+];
+
+const FULL_ARTIFACTS = [
+  {
+    target: "env-example",
+    file: ".env.example",
+    build: buildEnvExample,
+  },
+  {
+    target: "codeowners",
+    file: ".github/CODEOWNERS",
+    build: buildCodeowners,
+  },
+  {
+    target: "agent-readiness-issue-template",
+    file: ".github/ISSUE_TEMPLATE/agent-readiness.md",
+    build: buildAgentReadinessIssueTemplate,
+  },
+  {
+    target: "security",
+    file: "SECURITY.md",
+    build: buildSecurityPolicy,
+  },
+];
 
 export function parseTargets(value) {
   if (!value) return DEFAULT_TARGETS;
@@ -19,8 +66,15 @@ export function parseTargets(value) {
   return [...new Set(targets)];
 }
 
+export function parseFixLevel(value) {
+  const level = String(value || "basic").trim().toLowerCase();
+  if (!FIX_LEVELS.includes(level)) throw new Error(`--level must be one of: ${FIX_LEVELS.join(", ")}.`);
+  return level;
+}
+
 export async function planGeneratedArtifacts(profile, options = {}) {
   const targets = options.targets || DEFAULT_TARGETS;
+  const level = options.level ? parseFixLevel(options.level) : "";
   const artifacts = [];
 
   for (const target of targets) {
@@ -32,6 +86,17 @@ export async function planGeneratedArtifacts(profile, options = {}) {
       absolute,
       exists: await pathExists(absolute),
       content: target === "codex" ? buildAgentsMd(profile) : buildTargetShim(target),
+    });
+  }
+
+  for (const artifact of collaborationArtifacts(level)) {
+    const absolute = path.join(profile.root, artifact.file);
+    artifacts.push({
+      target: artifact.target,
+      file: artifact.file,
+      absolute,
+      exists: await pathExists(absolute),
+      content: artifact.build(profile),
     });
   }
 
@@ -144,12 +209,184 @@ When suggesting code, preserve existing architecture, keep changes focused, and 
   return "Use AGENTS.md as the canonical repository instructions.\n";
 }
 
+function collaborationArtifacts(level) {
+  if (!level || level === "basic") return [];
+  if (level === "team") return TEAM_ARTIFACTS;
+  return [...TEAM_ARTIFACTS, ...FULL_ARTIFACTS];
+}
+
+function buildPullRequestTemplate(profile) {
+  return `## Summary
+
+- 
+
+## Agent Readiness
+
+- [ ] I read \`AGENTS.md\` before editing.
+- [ ] I kept changes scoped to the requested behavior.
+- [ ] I updated tests or docs for behavior changes.
+- [ ] I ran the relevant verification command.
+
+## Verification
+
+${verificationChecklist(profile)}
+`;
+}
+
+function buildContributingGuide(profile) {
+  const commands = commandLines(profile.commands) || "- Add install, test, lint, and build commands when available.";
+  return `# Contributing
+
+Thanks for improving ${profile.name}. Keep changes small, reviewable, and easy to verify.
+
+## Before You Start
+
+- Read \`README.md\` for project context.
+- Read \`AGENTS.md\` for repository-specific AI coding instructions.
+- Check open issues or pull requests for related work.
+
+## Development Commands
+
+${commands}
+
+## Pull Requests
+
+- Explain what changed and why.
+- Include tests or a clear reason when tests are not applicable.
+- Run the smallest relevant verification command before requesting review.
+- Do not include secrets, credentials, or local environment values.
+`;
+}
+
+function buildArchitectureDoc(profile) {
+  const frameworks = profile.frameworks.length ? profile.frameworks.join(", ") : "No framework detected yet";
+  const languages = profile.languages.length ? profile.languages.map((item) => item.name).join(", ") : profile.primaryLanguage;
+  return `# Architecture
+
+## Overview
+
+${profile.name} is primarily a ${profile.primaryLanguage} repository.
+
+## Technology
+
+- Languages: ${languages}
+- Frameworks/tools: ${frameworks}
+- Package manager: ${profile.packageManager}
+- Monorepo: ${profile.monorepo?.detected ? "yes" : "no"}
+
+## Repository Layout
+
+- Top-level structure: ${formatStructure(profile.structure)}
+
+## Runtime Flow
+
+Document the main execution path here.
+
+## Data Flow
+
+Document important inputs, outputs, storage, and external services here.
+
+## Verification
+
+${verificationChecklist(profile)}
+`;
+}
+
+function buildAgentReadinessAdr(profile) {
+  return `# ADR 0001: Use agent-ready Instructions
+
+## Status
+
+Accepted
+
+## Context
+
+AI coding agents need a reliable handoff file, known verification commands, and clear safety boundaries before editing ${profile.name}.
+
+## Decision
+
+Use \`AGENTS.md\` as the canonical repository instruction file. Tool-specific files such as \`CLAUDE.md\`, \`.cursor/rules/*.mdc\`, \`GEMINI.md\`, and \`.github/copilot-instructions.md\` should stay short and point back to \`AGENTS.md\`.
+
+## Consequences
+
+- Contributors and agents have one source of truth.
+- Verification commands are easier to keep current.
+- Duplicate tool instructions are less likely to drift.
+`;
+}
+
+function buildEnvExample() {
+  return `# Copy this file to .env for local development.
+# Do not commit real secrets or credentials.
+
+# EXAMPLE_API_URL=http://localhost:3000
+# EXAMPLE_API_KEY=replace-me
+`;
+}
+
+function buildCodeowners() {
+  return `# Replace the examples below with real owners for this repository.
+# See https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# * @your-org/maintainers
+# /docs/ @your-org/docs
+# /.github/ @your-org/platform
+`;
+}
+
+function buildAgentReadinessIssueTemplate() {
+  return `---
+name: Agent readiness gap
+about: Report missing instructions, verification, or safety boundaries for AI coding agents
+labels: agent-readiness
+---
+
+## Gap
+
+Describe what an AI coding agent could not understand or verify.
+
+## Expected Guidance
+
+Describe the command, document, safety rule, or workflow that should exist.
+
+## Evidence
+
+Paste relevant \`agent-ready doctor\`, \`agent-ready explain\`, or CI output.
+`;
+}
+
+function buildSecurityPolicy() {
+  return `# Security Policy
+
+## Reporting a Vulnerability
+
+Please do not open public issues for vulnerabilities. Contact the maintainers privately with:
+
+- A description of the issue
+- Steps to reproduce
+- Potential impact
+- Suggested mitigation, if known
+
+## Secrets
+
+Do not commit real credentials, tokens, private keys, or local environment files.
+`;
+}
+
 function commandLines(commands) {
   const ordered = ["install", "dev", "start", "build", "test", "lint", "format"];
   return ordered
     .filter((name) => commands[name])
     .map((name) => `- ${name}: \`${commands[name]}\``)
     .join("\n");
+}
+
+function verificationChecklist(profile) {
+  const ordered = ["test", "lint", "build", "format"];
+  const lines = ordered
+    .filter((name) => profile.commands[name])
+    .map((name) => `- [ ] \`${profile.commands[name]}\``);
+  return lines.length ? lines.join("\n") : "- [ ] Add the relevant verification command for this change.";
 }
 
 function formatStructure(structure) {
