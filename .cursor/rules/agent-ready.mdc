@@ -1,0 +1,8 @@
+---
+description: Repository instructions for AI coding agents
+alwaysApply: true
+---
+
+Use AGENTS.md as the canonical repository instructions.
+
+Keep generated code aligned with the existing project style and run the relevant verification command before handing off.

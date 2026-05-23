@@ -1,0 +1,11 @@
+{
+  "targets": ["codex", "cursor"],
+  "docs": {
+    "architecture": "docs/system.md",
+    "decisions": "docs/decisions"
+  },
+  "commands": {
+    "test": "npm run test:ci",
+    "lint": "npm run lint:ci"
+  }
+}

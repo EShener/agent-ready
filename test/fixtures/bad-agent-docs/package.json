@@ -1,0 +1,6 @@
+{
+  "name": "bad-agent-docs",
+  "scripts": {
+    "test": "node --test"
+  }
+}

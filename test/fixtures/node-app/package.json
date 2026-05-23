@@ -1,0 +1,19 @@
+{
+  "name": "fixture-node-app",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "vitest run",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "react": "latest",
+    "vite": "latest"
+  },
+  "devDependencies": {
+    "vitest": "latest"
+  }
+}

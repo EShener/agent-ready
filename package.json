@@ -1,0 +1,41 @@
+{
+  "name": "agent-ready",
+  "version": "0.1.0",
+  "description": "Make any repository ready for AI coding agents in 60 seconds.",
+  "type": "module",
+  "bin": {
+    "agent-ready": "./bin/agent-ready.mjs"
+  },
+  "files": [
+    "bin",
+    "src",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "LAUNCH.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    ".cursor/rules/agent-ready.mdc",
+    ".github/copilot-instructions.md"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "lint": "npm run check",
+    "check": "node --check bin/agent-ready.mjs && node --check src/cli.mjs && node --check src/config.mjs && node --check src/scanner.mjs && node --check src/generator.mjs && node --check src/linter.mjs && node --check src/reporter.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "ai-agents",
+    "codex",
+    "claude-code",
+    "cursor",
+    "gemini-cli",
+    "copilot",
+    "developer-tools"
+  ],
+  "license": "MIT"
+}

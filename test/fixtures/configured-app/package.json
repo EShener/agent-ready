@@ -1,0 +1,7 @@
+{
+  "name": "configured-app",
+  "scripts": {
+    "test:ci": "node --test",
+    "lint:ci": "node --check src/index.js"
+  }
+}
