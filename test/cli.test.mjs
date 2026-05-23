@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import { execFile, spawn } from "node:child_process";
+import fs from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
@@ -85,8 +87,24 @@ test("benchmark CLI emits JSON when requested", async () => {
 
 test("ci CLI emits reusable GitHub Action workflow by default", async () => {
   const { stdout } = await execFileAsync(process.execPath, [bin, "ci", "--fail-under", "85"], { cwd: root });
-  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.4/);
+  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.5/);
   assert.match(stdout, /fail-under: 85/);
+});
+
+test("ci CLI can write the reusable GitHub Action workflow", async () => {
+  const temp = await fs.mkdtemp(path.join(os.tmpdir(), "agent-ready-ci-"));
+  const target = path.join(temp, ".github", "workflows", "agent-ready.yml");
+
+  const dryRun = await execFileAsync(process.execPath, [bin, "ci", "--root", temp, "--write", "--dry-run", "--fail-under", "88"], { cwd: root });
+  assert.match(dryRun.stdout, /planned: \.github\/workflows\/agent-ready\.yml/);
+  await assert.rejects(fs.access(target));
+
+  const written = await execFileAsync(process.execPath, [bin, "ci", "--root", temp, "--write", "--fail-under", "88"], { cwd: root });
+  assert.match(written.stdout, /written: \.github\/workflows\/agent-ready\.yml/);
+  assert.match(await fs.readFile(target, "utf8"), /fail-under: 88/);
+
+  const skipped = await execFileAsync(process.execPath, [bin, "ci", "--root", temp, "--write"], { cwd: root });
+  assert.match(skipped.stdout, /skipped: \.github\/workflows\/agent-ready\.yml/);
 });
 
 test("ci CLI can emit npx-based workflow", async () => {

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.5
+
+- Added `agent-ready ci --write` for writing `.github/workflows/agent-ready.yml` directly.
+- Added CI workflow write safeguards with `--dry-run`, `--force`, and `--output`.
+
 ## 0.1.4
 
 - Added `BENCHMARK.md` with a reproducible public AI/devtool repository benchmark snapshot.

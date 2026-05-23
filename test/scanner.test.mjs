@@ -8,7 +8,7 @@ import { buildAgentsMd, planGeneratedArtifacts } from "../src/generator.mjs";
 import { lintRepo, scoreRepo } from "../src/linter.mjs";
 import { renderAnnotations, renderBenchmarkReport, renderDoctor, renderMarkdownReport } from "../src/reporter.mjs";
 import { scanRepo } from "../src/scanner.mjs";
-import { renderCiWorkflow } from "../src/workflow.mjs";
+import { renderCiWorkflow, writeCiWorkflow } from "../src/workflow.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const fixture = (name) => path.join(__dirname, "fixtures", name);
@@ -200,10 +200,38 @@ test("scan applies agent-ready.json command and doc overrides", async () => {
 });
 
 test("workflow renderer validates mode and fail-under values", () => {
-  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.4/);
+  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.5/);
   assert.match(renderCiWorkflow({ mode: "npx", failUnder: "70" }), /npx agent-ready score --fail-under 70/);
   assert.throws(() => renderCiWorkflow({ mode: "bad" }), /--mode/);
   assert.throws(() => renderCiWorkflow({ failUnder: "101" }), /--fail-under/);
+});
+
+test("workflow writer plans, writes, and skips generated CI files", async () => {
+  const temp = await fs.mkdtemp(path.join("/tmp", "agent-ready-workflow-"));
+  const target = path.join(temp, ".github", "workflows", "custom.yml");
+
+  assert.deepEqual(await writeCiWorkflow({ root: temp, output: ".github/workflows/custom.yml", dryRun: true }), {
+    action: "planned",
+    file: ".github/workflows/custom.yml",
+  });
+  await assert.rejects(fs.access(target));
+
+  assert.deepEqual(await writeCiWorkflow({ root: temp, output: ".github/workflows/custom.yml", failUnder: "77" }), {
+    action: "written",
+    file: ".github/workflows/custom.yml",
+  });
+  assert.match(await fs.readFile(target, "utf8"), /fail-under: 77/);
+
+  assert.deepEqual(await writeCiWorkflow({ root: temp, output: ".github/workflows/custom.yml" }), {
+    action: "skipped",
+    file: ".github/workflows/custom.yml",
+  });
+
+  assert.deepEqual(await writeCiWorkflow({ root: temp, output: ".github/workflows/custom.yml", failUnder: "66", force: true }), {
+    action: "written",
+    file: ".github/workflows/custom.yml",
+  });
+  assert.match(await fs.readFile(target, "utf8"), /fail-under: 66/);
 });
 
 test("reusable action writes a GitHub Step Summary before scoring", async () => {

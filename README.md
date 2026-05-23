@@ -25,7 +25,7 @@ On a 2026-05-23 sample of six public AI/devtool repositories, the average Agent 
 Use the GitHub Action immediately:
 
 ```yaml
-- uses: EShener/agent-ready@v0.1.4
+- uses: EShener/agent-ready@v0.1.5
   with:
     fail-under: 80
 ```
@@ -37,6 +37,7 @@ npx --yes github:EShener/agent-ready doctor
 npx --yes github:EShener/agent-ready init --dry-run
 npx --yes github:EShener/agent-ready score --fail-under 80
 npx --yes github:EShener/agent-ready ci
+npx --yes github:EShener/agent-ready ci --write --dry-run
 npx --yes github:EShener/agent-ready benchmark ../repo-a ../repo-b
 ```
 
@@ -173,6 +174,9 @@ Prints a ready-to-paste GitHub Actions workflow.
 
 ```bash
 agent-ready ci
+agent-ready ci --write
+agent-ready ci --write --dry-run
+agent-ready ci --write --force
 agent-ready ci --fail-under 90
 agent-ready ci --mode npx
 ```
@@ -215,7 +219,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: EShener/agent-ready@v0.1.4
+      - uses: EShener/agent-ready@v0.1.5
         with:
           fail-under: 80
 ```
@@ -226,6 +230,7 @@ Generate this workflow with:
 
 ```bash
 npx --yes github:EShener/agent-ready ci > .github/workflows/agent-ready.yml
+npx --yes github:EShener/agent-ready ci --write
 ```
 
 ## Supported Detection

@@ -4,7 +4,7 @@ import { parseTargets, writeGeneratedArtifacts } from "./generator.mjs";
 import { promptInitOptions } from "./interactive.mjs";
 import { lintRepo, scoreRepo } from "./linter.mjs";
 import { renderAnnotations, renderBadge, renderBenchmarkReport, renderDoctor, renderFindings, renderMarkdownReport, renderScanSummary, renderScore } from "./reporter.mjs";
-import { renderCiWorkflow } from "./workflow.mjs";
+import { renderCiWorkflow, writeCiWorkflow } from "./workflow.mjs";
 
 const HELP = `agent-ready
 
@@ -20,7 +20,7 @@ Usage:
   agent-ready report [--root PATH] [--config PATH] [--format markdown|json]
   agent-ready badge [--root PATH] [--config PATH] [--format markdown|url|json] [--fail-under N]
   agent-ready benchmark [PATH...] [--root PATH] [--config PATH] [--format markdown|json]
-  agent-ready ci [--mode action|npx] [--fail-under N]
+  agent-ready ci [--mode action|npx] [--fail-under N] [--write] [--dry-run] [--force] [--output PATH]
 
 Examples:
   npx agent-ready scan
@@ -30,6 +30,7 @@ Examples:
   npx agent-ready annotations
   npx agent-ready score --fail-under 80
   npx agent-ready ci
+  npx agent-ready ci --write
   npx agent-ready report --format markdown
   npx agent-ready benchmark ../repo-a ../repo-b
 `;
@@ -144,10 +145,22 @@ export async function runCli(argv) {
   }
 
   if (command === "ci") {
-    console.log(renderCiWorkflow({
+    const options = {
       failUnder: flags["fail-under"] ?? "80",
       mode: flags.mode || "action",
-    }));
+    };
+    if (flags.write) {
+      const result = await writeCiWorkflow({
+        ...options,
+        root,
+        output: typeof flags.output === "string" ? flags.output : undefined,
+        dryRun: Boolean(flags["dry-run"]),
+        force: Boolean(flags.force),
+      });
+      console.log(`${result.action}: ${result.file}`);
+      return;
+    }
+    console.log(renderCiWorkflow(options));
     return;
   }
 
