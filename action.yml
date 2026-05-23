@@ -47,6 +47,12 @@ runs:
           echo '```'
           echo
           if [ -n "${{ inputs.config }}" ]; then
+            node "$GITHUB_ACTION_PATH/bin/agent-ready.mjs" matrix --config "${{ inputs.config }}" --format markdown
+          else
+            node "$GITHUB_ACTION_PATH/bin/agent-ready.mjs" matrix --format markdown
+          fi
+          echo
+          if [ -n "${{ inputs.config }}" ]; then
             node "$GITHUB_ACTION_PATH/bin/agent-ready.mjs" report --config "${{ inputs.config }}" --format markdown
           else
             node "$GITHUB_ACTION_PATH/bin/agent-ready.mjs" report --format markdown

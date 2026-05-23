@@ -255,7 +255,7 @@ test("scan applies agent-ready.json command and doc overrides", async () => {
 });
 
 test("workflow renderer validates mode and fail-under values", () => {
-  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.9/);
+  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.10/);
   assert.match(renderCiWorkflow({ mode: "npx", failUnder: "70" }), /npx agent-ready score --fail-under 70/);
   assert.throws(() => renderCiWorkflow({ mode: "bad" }), /--mode/);
   assert.throws(() => renderCiWorkflow({ failUnder: "101" }), /--fail-under/);
@@ -297,6 +297,7 @@ test("reusable action writes a GitHub Step Summary before scoring", async () => 
   assert.match(action, /Annotate agent-ready findings/);
   assert.match(action, /annotations --config/);
   assert.match(action, /doctor --config/);
+  assert.match(action, /matrix --config/);
   assert.match(action, /report --config/);
   assert.match(action, /Score agent readiness/);
 });

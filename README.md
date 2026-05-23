@@ -25,7 +25,7 @@ On a 2026-05-23 sample of six public AI/devtool repositories, the average Agent 
 Use the GitHub Action immediately:
 
 ```yaml
-- uses: EShener/agent-ready@v0.1.9
+- uses: EShener/agent-ready@v0.1.10
   with:
     fail-under: 80
 ```
@@ -264,12 +264,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: EShener/agent-ready@v0.1.9
+      - uses: EShener/agent-ready@v0.1.10
         with:
           fail-under: 80
 ```
 
-The action writes a diagnosis and Markdown report to the GitHub Actions Step Summary, annotates readiness findings in the Actions UI, then fails the job when the score is below `fail-under`.
+The action writes a diagnosis, compatibility matrix, and Markdown report to the GitHub Actions Step Summary, annotates readiness findings in the Actions UI, then fails the job when the score is below `fail-under`.
 
 Generate this workflow with:
 

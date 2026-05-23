@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.10
+
+- Added the agent compatibility matrix to the reusable GitHub Action Step Summary.
+- Updated generated GitHub Action workflows to reference `v0.1.10`.
+
 ## 0.1.9
 
 - Added `agent-ready matrix` for a screenshot-friendly compatibility table across Codex, Cursor, Copilot, Claude Code, and Gemini CLI.
