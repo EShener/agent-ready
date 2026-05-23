@@ -25,7 +25,7 @@ On a 2026-05-23 sample of six public AI/devtool repositories, the average Agent 
 Use the GitHub Action immediately:
 
 ```yaml
-- uses: EShener/agent-ready@v0.1.10
+- uses: EShener/agent-ready@v0.1.11
   with:
     fail-under: 80
 ```
@@ -36,6 +36,7 @@ Use the CLI from GitHub until the npm package is published:
 npx --yes github:EShener/agent-ready doctor
 npx --yes github:EShener/agent-ready explain
 npx --yes github:EShener/agent-ready matrix
+npx --yes github:EShener/agent-ready comment
 npx --yes github:EShener/agent-ready compare --before before.json --after after.json
 npx --yes github:EShener/agent-ready fix --dry-run
 npx --yes github:EShener/agent-ready init --dry-run
@@ -172,6 +173,16 @@ agent-ready matrix
 agent-ready matrix --format json
 ```
 
+### `comment`
+
+Prints a concise GitHub-ready Markdown summary for PR comments, issues, discussions, and launch posts.
+
+```bash
+agent-ready comment
+agent-ready comment --max-fixes 5
+agent-ready comment --format json
+```
+
 ### `compare`
 
 Compares two readiness JSON files and prints a before/after score summary for PR comments, issues, and launch posts.
@@ -264,7 +275,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: EShener/agent-ready@v0.1.10
+      - uses: EShener/agent-ready@v0.1.11
         with:
           fail-under: 80
 ```

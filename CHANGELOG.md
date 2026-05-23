@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.11
+
+- Added `agent-ready comment` for GitHub-ready PR, issue, and discussion summaries.
+- Added structured JSON output for comment automation and launch workflows.
+
 ## 0.1.10
 
 - Added the agent compatibility matrix to the reusable GitHub Action Step Summary.

@@ -1,12 +1,13 @@
 import { scanRepo } from "./scanner.mjs";
 import { benchmarkRepos } from "./benchmark.mjs";
+import { buildShareComment } from "./comment.mjs";
 import { compareReadinessFiles } from "./compare.mjs";
 import { explainRepo } from "./explainer.mjs";
 import { parseTargets, writeGeneratedArtifacts } from "./generator.mjs";
 import { promptInitOptions } from "./interactive.mjs";
 import { lintRepo, scoreRepo } from "./linter.mjs";
 import { buildAgentMatrix } from "./matrix.mjs";
-import { renderAgentMatrix, renderAnnotations, renderBadge, renderBenchmarkReport, renderComparison, renderDoctor, renderExplanation, renderFindings, renderMarkdownReport, renderScanSummary, renderScore } from "./reporter.mjs";
+import { renderAgentMatrix, renderAnnotations, renderBadge, renderBenchmarkReport, renderComparison, renderDoctor, renderExplanation, renderFindings, renderMarkdownReport, renderScanSummary, renderScore, renderShareComment } from "./reporter.mjs";
 import { renderCiWorkflow, writeCiWorkflow } from "./workflow.mjs";
 
 const HELP = `agent-ready
@@ -22,6 +23,7 @@ Usage:
   agent-ready score [--root PATH] [--config PATH] [--format json|text] [--fail-under N]
   agent-ready explain [--root PATH] [--config PATH] [--format markdown|json]
   agent-ready matrix [--root PATH] [--config PATH] [--format markdown|json]
+  agent-ready comment [--root PATH] [--config PATH] [--format markdown|json] [--max-fixes N]
   agent-ready compare --before before.json --after after.json [--format markdown|json]
   agent-ready doctor [--root PATH] [--config PATH] [--format json|text] [--fail-under N]
   agent-ready report [--root PATH] [--config PATH] [--format markdown|json]
@@ -37,6 +39,7 @@ Examples:
   npx agent-ready doctor
   npx agent-ready explain
   npx agent-ready matrix
+  npx agent-ready comment
   npx agent-ready compare --before before.json --after after.json
   npx agent-ready annotations
   npx agent-ready score --fail-under 80
@@ -161,6 +164,24 @@ export async function runCli(argv) {
     } else {
       if (flags.format && flags.format !== "markdown") throw new Error("Matrix format must be markdown or json.");
       console.log(renderAgentMatrix(matrix));
+    }
+    return;
+  }
+
+  if (command === "comment") {
+    const profile = await scanRepo(root, scanOptions);
+    const findings = await lintRepo(profile);
+    const score = scoreRepo(profile, findings);
+    const matrix = buildAgentMatrix(profile);
+    const explanation = explainRepo(profile, findings, score);
+    const comment = buildShareComment(profile, findings, score, matrix, explanation, {
+      maxFixes: flags["max-fixes"],
+    });
+    if (flags.format === "json" || flags.json) {
+      console.log(JSON.stringify(comment, null, 2));
+    } else {
+      if (flags.format && flags.format !== "markdown") throw new Error("Comment format must be markdown or json.");
+      console.log(renderShareComment(comment));
     }
     return;
   }

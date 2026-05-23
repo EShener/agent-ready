@@ -125,6 +125,24 @@ test("matrix CLI emits JSON when requested", async () => {
   assert.equal(payload.entries[0].target, "codex");
 });
 
+test("comment CLI emits a GitHub-ready summary", async () => {
+  const { stdout } = await execFileAsync(process.execPath, [bin, "comment", "--root", fixture("empty-repo"), "--max-fixes", "2"], { cwd: root });
+
+  assert.match(stdout, /## Agent Ready/);
+  assert.match(stdout, /Agent compatibility:/);
+  assert.match(stdout, /Top Fixes/);
+  assert.match(stdout, /missing-agents-md/);
+});
+
+test("comment CLI emits JSON when requested", async () => {
+  const { stdout } = await execFileAsync(process.execPath, [bin, "comment", "--root", fixture("empty-repo"), "--format", "json"], { cwd: root });
+  const payload = JSON.parse(stdout);
+
+  assert.equal(payload.repository.name, "empty-repo");
+  assert.equal(payload.summary.compatibilityTotal, 5);
+  assert.ok(payload.topFixes.length > 0);
+});
+
 test("compare CLI emits a before and after readiness report", async () => {
   const temp = await fs.mkdtemp(path.join(os.tmpdir(), "agent-ready-compare-"));
   const before = path.join(temp, "before.json");
@@ -188,7 +206,7 @@ test("benchmark CLI emits JSON when requested", async () => {
 
 test("ci CLI emits reusable GitHub Action workflow by default", async () => {
   const { stdout } = await execFileAsync(process.execPath, [bin, "ci", "--fail-under", "85"], { cwd: root });
-  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.10/);
+  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.11/);
   assert.match(stdout, /fail-under: 85/);
 });
 

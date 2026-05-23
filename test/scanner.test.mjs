@@ -4,12 +4,13 @@ import path from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { benchmarkRepos } from "../src/benchmark.mjs";
+import { buildShareComment } from "../src/comment.mjs";
 import { compareReadiness } from "../src/compare.mjs";
 import { explainRepo } from "../src/explainer.mjs";
 import { buildAgentsMd, planGeneratedArtifacts } from "../src/generator.mjs";
 import { lintRepo, scoreRepo } from "../src/linter.mjs";
 import { buildAgentMatrix } from "../src/matrix.mjs";
-import { renderAgentMatrix, renderAnnotations, renderBenchmarkReport, renderComparison, renderDoctor, renderExplanation, renderMarkdownReport } from "../src/reporter.mjs";
+import { renderAgentMatrix, renderAnnotations, renderBenchmarkReport, renderComparison, renderDoctor, renderExplanation, renderMarkdownReport, renderShareComment } from "../src/reporter.mjs";
 import { scanRepo } from "../src/scanner.mjs";
 import { renderCiWorkflow, writeCiWorkflow } from "../src/workflow.mjs";
 
@@ -177,6 +178,22 @@ test("agent matrix summarizes tool compatibility", () => {
   assert.match(report, /Ready agents: 2\/5/);
 });
 
+test("share comment summarizes score, compatibility, and top fixes", async () => {
+  const profile = await scanRepo(fixture("empty-repo"));
+  const findings = await lintRepo(profile);
+  const score = scoreRepo(profile, findings);
+  const matrix = buildAgentMatrix(profile);
+  const explanation = explainRepo(profile, findings, score);
+  const comment = buildShareComment(profile, findings, score, matrix, explanation, { maxFixes: 2 });
+  const markdown = renderShareComment(comment);
+
+  assert.equal(comment.summary.status, "needs-work");
+  assert.equal(comment.topFixes.length, 2);
+  assert.match(markdown, /## Agent Ready/);
+  assert.match(markdown, /Agent compatibility:/);
+  assert.match(markdown, /missing-agents-md/);
+});
+
 test("benchmark ranks multiple repositories and renders a leaderboard", async () => {
   const benchmark = await benchmarkRepos(["node-app", "bad-agent-docs"], { root: fixture("") });
   const report = renderBenchmarkReport(benchmark);
@@ -255,7 +272,7 @@ test("scan applies agent-ready.json command and doc overrides", async () => {
 });
 
 test("workflow renderer validates mode and fail-under values", () => {
-  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.10/);
+  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.11/);
   assert.match(renderCiWorkflow({ mode: "npx", failUnder: "70" }), /npx agent-ready score --fail-under 70/);
   assert.throws(() => renderCiWorkflow({ mode: "bad" }), /--mode/);
   assert.throws(() => renderCiWorkflow({ failUnder: "101" }), /--fail-under/);
