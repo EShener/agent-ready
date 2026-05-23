@@ -4,7 +4,7 @@
   "description": "Make any repository ready for AI coding agents in 60 seconds.",
   "type": "module",
   "bin": {
-    "agent-ready": "./bin/agent-ready.mjs"
+    "agent-ready": "bin/agent-ready.mjs"
   },
   "files": [
     "bin",
