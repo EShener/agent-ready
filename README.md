@@ -93,6 +93,7 @@ Plans or writes agent instruction files. Existing files are skipped unless `--fo
 ```bash
 agent-ready init --dry-run
 agent-ready init --targets codex,claude,cursor
+agent-ready init --interactive
 agent-ready init --force
 ```
 
@@ -224,7 +225,6 @@ Current detectors cover common JavaScript/TypeScript, Python, Rust, Go, and mono
 
 - More framework detectors and fixture coverage
 - npm package publishing
-- `agent-ready init --interactive`
 - MCP server for editor and agent integrations
 - Repository badge automation
 - Benchmarks on real open-source repositories

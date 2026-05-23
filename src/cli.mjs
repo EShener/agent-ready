@@ -1,5 +1,6 @@
 import { scanRepo } from "./scanner.mjs";
 import { parseTargets, writeGeneratedArtifacts } from "./generator.mjs";
+import { promptInitOptions } from "./interactive.mjs";
 import { lintRepo, scoreRepo } from "./linter.mjs";
 import { renderBadge, renderDoctor, renderFindings, renderMarkdownReport, renderScanSummary, renderScore } from "./reporter.mjs";
 import { renderCiWorkflow } from "./workflow.mjs";
@@ -10,7 +11,7 @@ Make any repository ready for AI coding agents in 60 seconds.
 
 Usage:
   agent-ready scan [--root PATH] [--config PATH] [--format json|text]
-  agent-ready init [--root PATH] [--config PATH] [--targets codex,claude,cursor,gemini,copilot] [--dry-run] [--force]
+  agent-ready init [--root PATH] [--config PATH] [--targets codex,claude,cursor,gemini,copilot] [--dry-run] [--force] [--interactive]
   agent-ready lint [--root PATH] [--config PATH] [--format json|text]
   agent-ready score [--root PATH] [--config PATH] [--format json|text] [--fail-under N]
   agent-ready doctor [--root PATH] [--config PATH] [--format json|text] [--fail-under N]
@@ -21,6 +22,7 @@ Usage:
 Examples:
   npx agent-ready scan
   npx agent-ready init --targets codex,claude,cursor
+  npx agent-ready init --interactive
   npx agent-ready doctor
   npx agent-ready score --fail-under 80
   npx agent-ready ci
@@ -45,11 +47,17 @@ export async function runCli(argv) {
 
   if (command === "init") {
     const profile = await scanRepo(root, scanOptions);
-    const targets = parseTargets(flags.targets || profile.config.targets.join(","));
+    const initOptions = flags.interactive
+      ? await promptInitOptions(profile, flags)
+      : {
+          targets: parseTargets(flags.targets || profile.config.targets.join(",")),
+          dryRun: Boolean(flags["dry-run"]),
+          force: Boolean(flags.force),
+        };
     const results = await writeGeneratedArtifacts(profile, {
-      targets,
-      dryRun: Boolean(flags["dry-run"]),
-      force: Boolean(flags.force),
+      targets: initOptions.targets,
+      dryRun: initOptions.dryRun,
+      force: initOptions.force,
     });
     for (const result of results) {
       console.log(`${result.action}: ${result.file}`);

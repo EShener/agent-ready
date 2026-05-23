@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { execFile } from "node:child_process";
+import { execFile, spawn } from "node:child_process";
 import path from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
@@ -39,6 +39,15 @@ test("init CLI uses configured targets when --targets is omitted", async () => {
   assert.doesNotMatch(stdout, /CLAUDE\.md/);
 });
 
+test("init CLI interactive defaults to dry-run planning", async () => {
+  const { stdout } = await runWithInput(["init", "--root", fixture("node-app"), "--interactive"], "\n\n");
+
+  assert.match(stdout, /agent-ready init: fixture-node-app/);
+  assert.match(stdout, /Targets \[codex,claude,cursor,gemini,copilot\]/);
+  assert.match(stdout, /planned: AGENTS\.md/);
+  assert.match(stdout, /planned: CLAUDE\.md/);
+});
+
 test("badge CLI emits markdown badge", async () => {
   const { stdout } = await execFileAsync(process.execPath, [bin, "badge", "--root", fixture("node-app")], { cwd: root });
   assert.match(stdout, /!\[agent-ready\]\(https:\/\/img\.shields\.io\/badge\/agent--ready-/);
@@ -69,3 +78,23 @@ test("score CLI fail-under exits non-zero below threshold", async () => {
     /Command failed/,
   );
 });
+
+function runWithInput(args, input) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, [bin, ...args], { cwd: root, stdio: ["pipe", "pipe", "pipe"] });
+    let stdout = "";
+    let stderr = "";
+    child.stdout.on("data", (chunk) => {
+      stdout += chunk;
+    });
+    child.stderr.on("data", (chunk) => {
+      stderr += chunk;
+    });
+    child.on("error", reject);
+    child.on("close", (code) => {
+      if (code === 0) resolve({ stdout, stderr });
+      else reject(new Error(`Command failed with code ${code}\n${stdout}\n${stderr}`));
+    });
+    child.stdin.end(input);
+  });
+}
