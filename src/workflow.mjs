@@ -6,8 +6,10 @@ const DEFAULT_WORKFLOW_PATH = ".github/workflows/agent-ready.yml";
 export function renderCiWorkflow(options = {}) {
   const failUnder = normalizeFailUnder(options.failUnder ?? "80");
   const mode = options.mode || "action";
+  const comment = Boolean(options.comment);
+  if (comment && mode !== "action") throw new Error("--comment requires --mode action.");
   if (mode === "npx") return renderNpxWorkflow(failUnder);
-  if (mode === "action") return renderActionWorkflow(failUnder);
+  if (mode === "action") return renderActionWorkflow(failUnder, { comment });
   throw new Error("--mode must be action or npx.");
 }
 
@@ -28,28 +30,39 @@ export async function writeCiWorkflow(options = {}) {
   const content = renderCiWorkflow({
     failUnder: options.failUnder ?? "80",
     mode: options.mode || "action",
+    comment: Boolean(options.comment),
   });
   await writeText(absoluteOutput, content);
   return { action: "written", file: relativeOutput };
 }
 
-function renderActionWorkflow(failUnder) {
+function renderActionWorkflow(failUnder, options = {}) {
+  const permissions = options.comment
+    ? `
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+`
+    : "";
+  const commentInput = options.comment ? "          comment: true\n" : "";
   return `name: Agent Ready
 
 on:
   pull_request:
   push:
     branches: [main]
+${permissions}
 
 jobs:
   agent-ready:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: EShener/agent-ready@v0.1.11
+      - uses: EShener/agent-ready@v0.1.12
         with:
           fail-under: ${failUnder}
-`;
+${commentInput}`;
 }
 
 function renderNpxWorkflow(failUnder) {

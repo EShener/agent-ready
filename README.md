@@ -25,7 +25,7 @@ On a 2026-05-23 sample of six public AI/devtool repositories, the average Agent 
 Use the GitHub Action immediately:
 
 ```yaml
-- uses: EShener/agent-ready@v0.1.11
+- uses: EShener/agent-ready@v0.1.12
   with:
     fail-under: 80
 ```
@@ -42,6 +42,7 @@ npx --yes github:EShener/agent-ready fix --dry-run
 npx --yes github:EShener/agent-ready init --dry-run
 npx --yes github:EShener/agent-ready score --fail-under 80
 npx --yes github:EShener/agent-ready ci
+npx --yes github:EShener/agent-ready ci --comment
 npx --yes github:EShener/agent-ready ci --write --dry-run
 npx --yes github:EShener/agent-ready benchmark ../repo-a ../repo-b
 ```
@@ -275,17 +276,35 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: EShener/agent-ready@v0.1.11
+      - uses: EShener/agent-ready@v0.1.12
         with:
           fail-under: 80
 ```
 
 The action writes a diagnosis, compatibility matrix, and Markdown report to the GitHub Actions Step Summary, annotates readiness findings in the Actions UI, then fails the job when the score is below `fail-under`.
 
+To post or update a pull request comment, grant comment permissions and set `comment: true`:
+
+```yaml
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+steps:
+  - uses: actions/checkout@v4
+  - uses: EShener/agent-ready@v0.1.12
+    with:
+      fail-under: 80
+      comment: true
+```
+
 Generate this workflow with:
 
 ```bash
 npx --yes github:EShener/agent-ready ci > .github/workflows/agent-ready.yml
+npx --yes github:EShener/agent-ready ci --comment
+npx --yes github:EShener/agent-ready ci --comment --write
 npx --yes github:EShener/agent-ready ci --write
 ```
 

@@ -272,10 +272,13 @@ test("scan applies agent-ready.json command and doc overrides", async () => {
 });
 
 test("workflow renderer validates mode and fail-under values", () => {
-  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.11/);
+  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.12/);
+  assert.match(renderCiWorkflow({ mode: "action", comment: true }), /comment: true/);
+  assert.match(renderCiWorkflow({ mode: "action", comment: true }), /pull-requests: write/);
   assert.match(renderCiWorkflow({ mode: "npx", failUnder: "70" }), /npx agent-ready score --fail-under 70/);
   assert.throws(() => renderCiWorkflow({ mode: "bad" }), /--mode/);
   assert.throws(() => renderCiWorkflow({ failUnder: "101" }), /--fail-under/);
+  assert.throws(() => renderCiWorkflow({ mode: "npx", comment: true }), /--comment/);
 });
 
 test("workflow writer plans, writes, and skips generated CI files", async () => {
@@ -312,9 +315,14 @@ test("reusable action writes a GitHub Step Summary before scoring", async () => 
   assert.match(action, /Write agent-ready summary/);
   assert.match(action, /GITHUB_STEP_SUMMARY/);
   assert.match(action, /Annotate agent-ready findings/);
+  assert.match(action, /Comment on pull request/);
+  assert.match(action, /agent-ready-comment/);
+  assert.match(action, /issues\/\$PR_NUMBER\/comments/);
+  assert.match(action, /github-token/);
   assert.match(action, /annotations --config/);
   assert.match(action, /doctor --config/);
   assert.match(action, /matrix --config/);
+  assert.match(action, /comment --config/);
   assert.match(action, /report --config/);
   assert.match(action, /Score agent readiness/);
 });

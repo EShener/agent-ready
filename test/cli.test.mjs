@@ -206,8 +206,16 @@ test("benchmark CLI emits JSON when requested", async () => {
 
 test("ci CLI emits reusable GitHub Action workflow by default", async () => {
   const { stdout } = await execFileAsync(process.execPath, [bin, "ci", "--fail-under", "85"], { cwd: root });
-  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.11/);
+  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.12/);
   assert.match(stdout, /fail-under: 85/);
+});
+
+test("ci CLI can emit a pull request comment workflow", async () => {
+  const { stdout } = await execFileAsync(process.execPath, [bin, "ci", "--comment"], { cwd: root });
+
+  assert.match(stdout, /pull-requests: write/);
+  assert.match(stdout, /issues: write/);
+  assert.match(stdout, /comment: true/);
 });
 
 test("ci CLI can write the reusable GitHub Action workflow", async () => {

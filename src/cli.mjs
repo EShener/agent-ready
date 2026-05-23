@@ -29,7 +29,7 @@ Usage:
   agent-ready report [--root PATH] [--config PATH] [--format markdown|json]
   agent-ready badge [--root PATH] [--config PATH] [--format markdown|url|json] [--fail-under N]
   agent-ready benchmark [PATH...] [--root PATH] [--config PATH] [--format markdown|json]
-  agent-ready ci [--mode action|npx] [--fail-under N] [--write] [--dry-run] [--force] [--output PATH]
+  agent-ready ci [--mode action|npx] [--fail-under N] [--comment] [--write] [--dry-run] [--force] [--output PATH]
 
 Examples:
   npx agent-ready scan
@@ -45,6 +45,7 @@ Examples:
   npx agent-ready score --fail-under 80
   npx agent-ready ci
   npx agent-ready ci --write
+  npx agent-ready ci --comment
   npx agent-ready report --format markdown
   npx agent-ready benchmark ../repo-a ../repo-b
 `;
@@ -243,6 +244,7 @@ export async function runCli(argv) {
     const options = {
       failUnder: flags["fail-under"] ?? "80",
       mode: flags.mode || "action",
+      comment: Boolean(flags.comment),
     };
     if (flags.write) {
       const result = await writeCiWorkflow({

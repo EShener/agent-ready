@@ -19,6 +19,14 @@ inputs:
     description: Optional path to agent-ready.json, relative to the working directory.
     required: false
     default: ""
+  comment:
+    description: Post or update an agent-ready summary comment on pull requests.
+    required: false
+    default: "false"
+  github-token:
+    description: GitHub token used when comment is true.
+    required: false
+    default: ${{ github.token }}
 
 runs:
   using: composite
@@ -66,6 +74,42 @@ runs:
           node "$GITHUB_ACTION_PATH/bin/agent-ready.mjs" annotations --config "${{ inputs.config }}"
         else
           node "$GITHUB_ACTION_PATH/bin/agent-ready.mjs" annotations
+        fi
+    - name: Comment on pull request
+      if: ${{ inputs.comment == 'true' && github.event_name == 'pull_request' }}
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+        GH_REPO: ${{ github.repository }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+      run: |
+        if ! command -v gh >/dev/null 2>&1; then
+          echo "agent-ready comment skipped: GitHub CLI is not available."
+          exit 0
+        fi
+
+        if [ -z "${GH_TOKEN:-}" ]; then
+          echo "agent-ready comment skipped: github-token is empty."
+          exit 0
+        fi
+
+        body_file="$(mktemp)"
+        {
+          echo "<!-- agent-ready-comment -->"
+          echo
+          if [ -n "${{ inputs.config }}" ]; then
+            node "$GITHUB_ACTION_PATH/bin/agent-ready.mjs" comment --config "${{ inputs.config }}"
+          else
+            node "$GITHUB_ACTION_PATH/bin/agent-ready.mjs" comment
+          fi
+        } > "$body_file"
+
+        existing_id="$(gh api "repos/$GH_REPO/issues/$PR_NUMBER/comments" --jq '.[] | select(.body | contains("<!-- agent-ready-comment -->")) | .id' | head -n 1)"
+        if [ -n "$existing_id" ]; then
+          gh api --method PATCH "repos/$GH_REPO/issues/comments/$existing_id" -f body="$(cat "$body_file")" >/dev/null
+        else
+          gh api --method POST "repos/$GH_REPO/issues/$PR_NUMBER/comments" -f body="$(cat "$body_file")" >/dev/null
         fi
     - name: Score agent readiness
       shell: bash

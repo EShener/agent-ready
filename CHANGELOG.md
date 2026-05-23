@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.12
+
+- Added optional pull request comment publishing to the reusable GitHub Action.
+- Added `agent-ready ci --comment` to generate workflows with the required PR comment permissions.
+
 ## 0.1.11
 
 - Added `agent-ready comment` for GitHub-ready PR, issue, and discussion summaries.
