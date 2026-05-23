@@ -138,6 +138,36 @@ ${rows}
 `;
 }
 
+export function renderComparison(comparison) {
+  const sign = comparison.delta.score > 0 ? "+" : "";
+  const fixedRows = comparison.fixed.length
+    ? comparison.fixed.map((item) => `| ${escapePipe(item.ruleId)} | ${escapePipe(item.file)} | +${item.points || 0} | ${escapePipe(item.message)} |`).join("\n")
+    : "| none |  | 0 | No findings fixed. |";
+  const introducedRows = comparison.introduced.length
+    ? comparison.introduced.map((item) => `| ${escapePipe(item.ruleId)} | ${escapePipe(item.file)} | -${item.points || 0} | ${escapePipe(item.message)} |`).join("\n")
+    : "| none |  | 0 | No new findings. |";
+
+  return `# Agent Ready Comparison
+
+- Repository: ${comparison.after.name}
+- Score: ${comparison.before.score}/100 (${comparison.before.grade}) -> ${comparison.after.score}/100 (${comparison.after.grade}) (${sign}${comparison.delta.score})
+- Status: ${comparison.delta.status}
+- Fixed findings: ${comparison.delta.fixedFindings}
+- New findings: ${comparison.delta.introducedFindings}
+- Remaining findings: ${comparison.delta.remainingFindings}
+
+## Fixed Findings
+| Rule | File | Impact | Message |
+| --- | --- | ---: | --- |
+${fixedRows}
+
+## New Findings
+| Rule | File | Impact | Message |
+| --- | --- | ---: | --- |
+${introducedRows}
+`;
+}
+
 export function renderMarkdownReport(profile, findings, score) {
   const commandRows = Object.entries(profile.commands)
     .filter(([, value]) => value)

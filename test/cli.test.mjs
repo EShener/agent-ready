@@ -101,6 +101,44 @@ test("explain CLI emits JSON when requested", async () => {
   assert.equal(payload.items[0].ruleId, "missing-agents-md");
 });
 
+test("compare CLI emits a before and after readiness report", async () => {
+  const temp = await fs.mkdtemp(path.join(os.tmpdir(), "agent-ready-compare-"));
+  const before = path.join(temp, "before.json");
+  const after = path.join(temp, "after.json");
+  await fs.writeFile(before, JSON.stringify({
+    profile: { name: "demo" },
+    findings: [
+      { severity: "warning", ruleId: "missing-agents-md", file: "AGENTS.md", message: "Missing AGENTS.md canonical agent instructions." },
+    ],
+    score: { score: 75, grade: "B", deductions: [{ ruleId: "missing-agents-md", severity: "warning", points: 25, message: "Missing AGENTS.md canonical agent instructions." }] },
+  }), "utf8");
+  await fs.writeFile(after, JSON.stringify({
+    profile: { name: "demo" },
+    findings: [],
+    score: { score: 100, grade: "A", deductions: [] },
+  }), "utf8");
+
+  const { stdout } = await execFileAsync(process.execPath, [bin, "compare", "--before", before, "--after", after], { cwd: root });
+
+  assert.match(stdout, /Agent Ready Comparison/);
+  assert.match(stdout, /75\/100 \(B\) -> 100\/100 \(A\) \(\+25\)/);
+  assert.match(stdout, /missing-agents-md/);
+});
+
+test("compare CLI emits JSON when requested", async () => {
+  const temp = await fs.mkdtemp(path.join(os.tmpdir(), "agent-ready-compare-json-"));
+  const before = path.join(temp, "before.json");
+  const after = path.join(temp, "after.json");
+  await fs.writeFile(before, JSON.stringify({ score: 40, grade: "D", deductions: [{ ruleId: "missing-ci", severity: "info", points: 8 }] }), "utf8");
+  await fs.writeFile(after, JSON.stringify({ score: 48, grade: "D", deductions: [] }), "utf8");
+
+  const { stdout } = await execFileAsync(process.execPath, [bin, "compare", "--before", before, "--after", after, "--format", "json"], { cwd: root });
+  const payload = JSON.parse(stdout);
+
+  assert.equal(payload.delta.score, 8);
+  assert.equal(payload.delta.status, "improved");
+});
+
 test("annotations CLI emits GitHub workflow commands", async () => {
   const { stdout } = await execFileAsync(process.execPath, [bin, "annotations", "--root", fixture("empty-repo")], { cwd: root });
 
@@ -126,7 +164,7 @@ test("benchmark CLI emits JSON when requested", async () => {
 
 test("ci CLI emits reusable GitHub Action workflow by default", async () => {
   const { stdout } = await execFileAsync(process.execPath, [bin, "ci", "--fail-under", "85"], { cwd: root });
-  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.7/);
+  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.8/);
   assert.match(stdout, /fail-under: 85/);
 });
 

@@ -10,6 +10,7 @@
 - `bin/agent-ready.mjs`: CLI executable.
 - `src/scanner.mjs`: repository profiling and command detection.
 - `src/benchmark.mjs`: multi-repository score aggregation and benchmark data.
+- `src/compare.mjs`: before/after readiness JSON comparison.
 - `src/generator.mjs`: `AGENTS.md` and tool-specific shim generation.
 - `src/linter.mjs`: readiness rules and scoring inputs.
 - `src/reporter.mjs`: text, JSON, and Markdown output rendering.

@@ -1,10 +1,11 @@
 import { scanRepo } from "./scanner.mjs";
 import { benchmarkRepos } from "./benchmark.mjs";
+import { compareReadinessFiles } from "./compare.mjs";
 import { explainRepo } from "./explainer.mjs";
 import { parseTargets, writeGeneratedArtifacts } from "./generator.mjs";
 import { promptInitOptions } from "./interactive.mjs";
 import { lintRepo, scoreRepo } from "./linter.mjs";
-import { renderAnnotations, renderBadge, renderBenchmarkReport, renderDoctor, renderExplanation, renderFindings, renderMarkdownReport, renderScanSummary, renderScore } from "./reporter.mjs";
+import { renderAnnotations, renderBadge, renderBenchmarkReport, renderComparison, renderDoctor, renderExplanation, renderFindings, renderMarkdownReport, renderScanSummary, renderScore } from "./reporter.mjs";
 import { renderCiWorkflow, writeCiWorkflow } from "./workflow.mjs";
 
 const HELP = `agent-ready
@@ -19,6 +20,7 @@ Usage:
   agent-ready annotations [--root PATH] [--config PATH] [--format github|json]
   agent-ready score [--root PATH] [--config PATH] [--format json|text] [--fail-under N]
   agent-ready explain [--root PATH] [--config PATH] [--format markdown|json]
+  agent-ready compare --before before.json --after after.json [--format markdown|json]
   agent-ready doctor [--root PATH] [--config PATH] [--format json|text] [--fail-under N]
   agent-ready report [--root PATH] [--config PATH] [--format markdown|json]
   agent-ready badge [--root PATH] [--config PATH] [--format markdown|url|json] [--fail-under N]
@@ -32,6 +34,7 @@ Examples:
   npx agent-ready init --interactive
   npx agent-ready doctor
   npx agent-ready explain
+  npx agent-ready compare --before before.json --after after.json
   npx agent-ready annotations
   npx agent-ready score --fail-under 80
   npx agent-ready ci
@@ -143,6 +146,17 @@ export async function runCli(argv) {
     } else {
       if (flags.format && flags.format !== "markdown") throw new Error("Explain format must be markdown or json.");
       console.log(renderExplanation(explanation));
+    }
+    return;
+  }
+
+  if (command === "compare") {
+    const comparison = await compareReadinessFiles(flags.before, flags.after);
+    if (flags.format === "json" || flags.json) {
+      console.log(JSON.stringify(comparison, null, 2));
+    } else {
+      if (flags.format && flags.format !== "markdown") throw new Error("Compare format must be markdown or json.");
+      console.log(renderComparison(comparison));
     }
     return;
   }

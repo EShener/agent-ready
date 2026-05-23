@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.8
+
+- Added `agent-ready compare` for before/after readiness JSON comparisons.
+- Added Markdown and JSON comparison output for PR comments and launch material.
+
 ## 0.1.7
 
 - Added `agent-ready explain` for impact-ranked fix plans with estimated score recovery.
