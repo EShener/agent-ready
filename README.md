@@ -22,6 +22,7 @@ AI coding agents fail for boring reasons: they do not know the test command, the
 npx agent-ready doctor
 npx agent-ready init --dry-run
 npx agent-ready score --fail-under 80
+npx agent-ready ci
 ```
 
 Example output:
@@ -131,6 +132,16 @@ agent-ready badge --format json
 agent-ready badge --fail-under 80
 ```
 
+### `ci`
+
+Prints a ready-to-paste GitHub Actions workflow.
+
+```bash
+agent-ready ci
+agent-ready ci --fail-under 90
+agent-ready ci --mode npx
+```
+
 ## Configuration
 
 Add `agent-ready.json` when detected commands or docs need overrides.
@@ -154,23 +165,30 @@ Add `agent-ready.json` when detected commands or docs need overrides.
 
 ## CI Gate
 
-Use the score command as a lightweight quality gate:
+Use the reusable GitHub Action as a lightweight quality gate:
 
 ```yaml
 name: Agent Ready
 
 on:
   pull_request:
+  push:
+    branches: [main]
 
 jobs:
   agent-ready:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: EShener/agent-ready@main
         with:
-          node-version: 20
-      - run: npx agent-ready score --fail-under 80
+          fail-under: 80
+```
+
+Generate this workflow with:
+
+```bash
+npx agent-ready ci > .github/workflows/agent-ready.yml
 ```
 
 ## Supported Detection
@@ -194,7 +212,7 @@ Current detectors cover common JavaScript/TypeScript, Python, Rust, and Go repos
 ## Roadmap
 
 - More framework detectors and fixture coverage
-- GitHub Action wrapper
+- npm package publishing
 - `agent-ready init --interactive`
 - MCP server for editor and agent integrations
 - Repository badge automation

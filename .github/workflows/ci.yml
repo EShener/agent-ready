@@ -15,3 +15,11 @@ jobs:
       - run: npm install
       - run: npm run check
       - run: npm test
+
+  action-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./
+        with:
+          fail-under: 90

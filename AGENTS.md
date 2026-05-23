@@ -13,6 +13,7 @@
 - `src/linter.mjs`: readiness rules and scoring inputs.
 - `src/reporter.mjs`: text, JSON, and Markdown output rendering.
 - `src/config.mjs`: optional `agent-ready.json` loading and validation.
+- `src/workflow.mjs`: GitHub Actions workflow generation.
 - `test/`: Node test suite and repository fixtures.
 
 ## Commands

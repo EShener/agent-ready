@@ -2,6 +2,7 @@ import { scanRepo } from "./scanner.mjs";
 import { parseTargets, writeGeneratedArtifacts } from "./generator.mjs";
 import { lintRepo, scoreRepo } from "./linter.mjs";
 import { renderBadge, renderDoctor, renderFindings, renderMarkdownReport, renderScanSummary, renderScore } from "./reporter.mjs";
+import { renderCiWorkflow } from "./workflow.mjs";
 
 const HELP = `agent-ready
 
@@ -15,12 +16,14 @@ Usage:
   agent-ready doctor [--root PATH] [--config PATH] [--format json|text] [--fail-under N]
   agent-ready report [--root PATH] [--config PATH] [--format markdown|json]
   agent-ready badge [--root PATH] [--config PATH] [--format markdown|url|json] [--fail-under N]
+  agent-ready ci [--mode action|npx] [--fail-under N]
 
 Examples:
   npx agent-ready scan
   npx agent-ready init --targets codex,claude,cursor
   npx agent-ready doctor
   npx agent-ready score --fail-under 80
+  npx agent-ready ci
   npx agent-ready report --format markdown
 `;
 
@@ -98,6 +101,14 @@ export async function runCli(argv) {
     const score = scoreRepo(profile, findings);
     console.log(renderBadge(score, flags.format || "markdown"));
     applyFailUnder(score, flags["fail-under"]);
+    return;
+  }
+
+  if (command === "ci") {
+    console.log(renderCiWorkflow({
+      failUnder: flags["fail-under"] ?? "80",
+      mode: flags.mode || "action",
+    }));
     return;
   }
 

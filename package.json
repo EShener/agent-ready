@@ -9,6 +9,7 @@
   "files": [
     "bin",
     "src",
+    "action.yml",
     "README.md",
     "LICENSE",
     "CHANGELOG.md",
@@ -33,7 +34,7 @@
   "scripts": {
     "test": "node --test test/*.test.mjs",
     "lint": "npm run check",
-    "check": "node --check bin/agent-ready.mjs && node --check src/cli.mjs && node --check src/config.mjs && node --check src/scanner.mjs && node --check src/generator.mjs && node --check src/linter.mjs && node --check src/reporter.mjs"
+    "check": "node --check bin/agent-ready.mjs && node --check src/cli.mjs && node --check src/config.mjs && node --check src/scanner.mjs && node --check src/generator.mjs && node --check src/linter.mjs && node --check src/reporter.mjs && node --check src/workflow.mjs"
   },
   "engines": {
     "node": ">=20"

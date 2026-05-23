@@ -51,6 +51,18 @@ test("doctor CLI emits a screenshot-friendly summary", async () => {
   assert.match(stdout, /Top fixes:|Status: ready/);
 });
 
+test("ci CLI emits reusable GitHub Action workflow by default", async () => {
+  const { stdout } = await execFileAsync(process.execPath, [bin, "ci", "--fail-under", "85"], { cwd: root });
+  assert.match(stdout, /uses: EShener\/agent-ready@main/);
+  assert.match(stdout, /fail-under: 85/);
+});
+
+test("ci CLI can emit npx-based workflow", async () => {
+  const { stdout } = await execFileAsync(process.execPath, [bin, "ci", "--mode", "npx", "--fail-under", "75"], { cwd: root });
+  assert.match(stdout, /actions\/setup-node@v4/);
+  assert.match(stdout, /npx agent-ready score --fail-under 75/);
+});
+
 test("score CLI fail-under exits non-zero below threshold", async () => {
   await assert.rejects(
     execFileAsync(process.execPath, [bin, "score", "--root", fixture("empty-repo"), "--fail-under", "95"], { cwd: root }),

@@ -6,6 +6,7 @@ import { buildAgentsMd, planGeneratedArtifacts } from "../src/generator.mjs";
 import { lintRepo, scoreRepo } from "../src/linter.mjs";
 import { renderDoctor, renderMarkdownReport } from "../src/reporter.mjs";
 import { scanRepo } from "../src/scanner.mjs";
+import { renderCiWorkflow } from "../src/workflow.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const fixture = (name) => path.join(__dirname, "fixtures", name);
@@ -123,4 +124,11 @@ test("scan applies agent-ready.json command and doc overrides", async () => {
   assert.equal(profile.commands.lint, "npm run lint:ci");
   assert.equal(profile.docs.architecture, "docs/system.md");
   assert.equal(profile.docs.adrDirectory, "docs/decisions");
+});
+
+test("workflow renderer validates mode and fail-under values", () => {
+  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@main/);
+  assert.match(renderCiWorkflow({ mode: "npx", failUnder: "70" }), /npx agent-ready score --fail-under 70/);
+  assert.throws(() => renderCiWorkflow({ mode: "bad" }), /--mode/);
+  assert.throws(() => renderCiWorkflow({ failUnder: "101" }), /--fail-under/);
 });
