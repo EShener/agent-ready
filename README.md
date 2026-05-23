@@ -25,7 +25,7 @@ On a 2026-05-23 sample of six public AI/devtool repositories, the average Agent 
 Use the GitHub Action immediately:
 
 ```yaml
-- uses: EShener/agent-ready@v0.1.5
+- uses: EShener/agent-ready@v0.1.6
   with:
     fail-under: 80
 ```
@@ -34,6 +34,7 @@ Use the CLI from GitHub until the npm package is published:
 
 ```bash
 npx --yes github:EShener/agent-ready doctor
+npx --yes github:EShener/agent-ready fix --dry-run
 npx --yes github:EShener/agent-ready init --dry-run
 npx --yes github:EShener/agent-ready score --fail-under 80
 npx --yes github:EShener/agent-ready ci
@@ -101,6 +102,17 @@ agent-ready init --dry-run
 agent-ready init --targets codex,claude,cursor
 agent-ready init --interactive
 agent-ready init --force
+```
+
+### `fix`
+
+Applies the safe generated fixes: agent instruction files plus the Agent Ready CI workflow. Existing files are skipped unless `--force` is provided.
+
+```bash
+agent-ready fix --dry-run
+agent-ready fix
+agent-ready fix --targets codex,cursor --no-ci
+agent-ready fix --force
 ```
 
 ### `lint`
@@ -219,7 +231,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: EShener/agent-ready@v0.1.5
+      - uses: EShener/agent-ready@v0.1.6
         with:
           fail-under: 80
 ```

@@ -50,6 +50,29 @@ test("init CLI interactive defaults to dry-run planning", async () => {
   assert.match(stdout, /planned: CLAUDE\.md/);
 });
 
+test("fix CLI plans agent docs and CI workflow", async () => {
+  const temp = await fs.mkdtemp(path.join(os.tmpdir(), "agent-ready-fix-plan-"));
+  await fs.writeFile(path.join(temp, "package.json"), JSON.stringify({ scripts: { test: "node --test" } }), "utf8");
+
+  const { stdout } = await execFileAsync(process.execPath, [bin, "fix", "--root", temp, "--targets", "codex,copilot", "--dry-run", "--fail-under", "82"], { cwd: root });
+
+  assert.match(stdout, /planned: AGENTS\.md/);
+  assert.match(stdout, /planned: \.github\/copilot-instructions\.md/);
+  assert.match(stdout, /planned: \.github\/workflows\/agent-ready\.yml/);
+  await assert.rejects(fs.access(path.join(temp, "AGENTS.md")));
+});
+
+test("fix CLI writes docs and can skip CI", async () => {
+  const temp = await fs.mkdtemp(path.join(os.tmpdir(), "agent-ready-fix-write-"));
+  await fs.writeFile(path.join(temp, "package.json"), JSON.stringify({ scripts: { test: "node --test" } }), "utf8");
+
+  const { stdout } = await execFileAsync(process.execPath, [bin, "fix", "--root", temp, "--targets", "codex", "--no-ci"], { cwd: root });
+
+  assert.match(stdout, /created: AGENTS\.md/);
+  assert.match(await fs.readFile(path.join(temp, "AGENTS.md"), "utf8"), /Safety Boundaries/);
+  await assert.rejects(fs.access(path.join(temp, ".github", "workflows", "agent-ready.yml")));
+});
+
 test("badge CLI emits markdown badge", async () => {
   const { stdout } = await execFileAsync(process.execPath, [bin, "badge", "--root", fixture("node-app")], { cwd: root });
   assert.match(stdout, /!\[agent-ready\]\(https:\/\/img\.shields\.io\/badge\/agent--ready-/);
@@ -87,7 +110,7 @@ test("benchmark CLI emits JSON when requested", async () => {
 
 test("ci CLI emits reusable GitHub Action workflow by default", async () => {
   const { stdout } = await execFileAsync(process.execPath, [bin, "ci", "--fail-under", "85"], { cwd: root });
-  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.5/);
+  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.6/);
   assert.match(stdout, /fail-under: 85/);
 });
 

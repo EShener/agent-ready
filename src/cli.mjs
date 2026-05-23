@@ -13,6 +13,7 @@ Make any repository ready for AI coding agents in 60 seconds.
 Usage:
   agent-ready scan [--root PATH] [--config PATH] [--format json|text]
   agent-ready init [--root PATH] [--config PATH] [--targets codex,claude,cursor,gemini,copilot] [--dry-run] [--force] [--interactive]
+  agent-ready fix [--root PATH] [--config PATH] [--targets codex,claude,cursor,gemini,copilot] [--dry-run] [--force] [--no-ci] [--mode action|npx] [--fail-under N]
   agent-ready lint [--root PATH] [--config PATH] [--format json|text]
   agent-ready annotations [--root PATH] [--config PATH] [--format github|json]
   agent-ready score [--root PATH] [--config PATH] [--format json|text] [--fail-under N]
@@ -25,6 +26,7 @@ Usage:
 Examples:
   npx agent-ready scan
   npx agent-ready init --targets codex,claude,cursor
+  npx agent-ready fix --dry-run
   npx agent-ready init --interactive
   npx agent-ready doctor
   npx agent-ready annotations
@@ -67,6 +69,32 @@ export async function runCli(argv) {
     });
     for (const result of results) {
       console.log(`${result.action}: ${result.file}`);
+    }
+    return;
+  }
+
+  if (command === "fix") {
+    const profile = await scanRepo(root, scanOptions);
+    const targets = parseTargets(flags.targets || profile.config.targets.join(","));
+    const results = await writeGeneratedArtifacts(profile, {
+      targets,
+      dryRun: Boolean(flags["dry-run"]),
+      force: Boolean(flags.force),
+    });
+
+    for (const result of results) {
+      console.log(`${result.action}: ${result.file}`);
+    }
+
+    if (!flags["no-ci"]) {
+      const ciResult = await writeCiWorkflow({
+        root,
+        failUnder: flags["fail-under"] ?? "80",
+        mode: flags.mode || "action",
+        dryRun: Boolean(flags["dry-run"]),
+        force: Boolean(flags.force),
+      });
+      console.log(`${ciResult.action}: ${ciResult.file}`);
     }
     return;
   }

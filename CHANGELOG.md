@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.6
+
+- Added `agent-ready fix` to generate agent docs and install the CI readiness workflow in one command.
+- Added `--no-ci`, `--dry-run`, `--force`, and `--targets` support for the fix workflow.
+
 ## 0.1.5
 
 - Added `agent-ready ci --write` for writing `.github/workflows/agent-ready.yml` directly.
