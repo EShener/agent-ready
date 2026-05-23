@@ -85,7 +85,7 @@ test("benchmark CLI emits JSON when requested", async () => {
 
 test("ci CLI emits reusable GitHub Action workflow by default", async () => {
   const { stdout } = await execFileAsync(process.execPath, [bin, "ci", "--fail-under", "85"], { cwd: root });
-  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.3/);
+  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.4/);
   assert.match(stdout, /fail-under: 85/);
 });
 

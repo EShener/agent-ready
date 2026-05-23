@@ -16,12 +16,16 @@ AI coding agents fail for boring reasons: they do not know the test command, the
 
 `agent-ready` turns that tribal knowledge into a small, lintable repository contract.
 
+## Benchmark Snapshot
+
+On a 2026-05-23 sample of six public AI/devtool repositories, the average Agent Readiness Score was 28/100. See [BENCHMARK.md](BENCHMARK.md) for the reproducible leaderboard and sample commits.
+
 ## 60 Second Demo
 
 Use the GitHub Action immediately:
 
 ```yaml
-- uses: EShener/agent-ready@v0.1.3
+- uses: EShener/agent-ready@v0.1.4
   with:
     fail-under: 80
 ```
@@ -211,7 +215,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: EShener/agent-ready@v0.1.3
+      - uses: EShener/agent-ready@v0.1.4
         with:
           fail-under: 80
 ```

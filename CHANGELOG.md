@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.4
+
+- Added `BENCHMARK.md` with a reproducible public AI/devtool repository benchmark snapshot.
+- Added `benchmark:sample` and `benchmark:fixtures` scripts.
+
 ## 0.1.3
 
 - Added `benchmark` command for scoring multiple repositories and generating a Markdown leaderboard.
