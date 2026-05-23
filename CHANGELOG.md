@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.16
+
+- Added `agent-ready improve` for a closed-loop readiness upgrade workflow: scan, apply staged fixes, rescan, and report before/after score.
+- Added Markdown and JSON improvement reports with planned/applied files, CI workflow status, and remaining findings.
+
 ## 0.1.15
 
 - Added `agent-ready fix --level basic|team|full` for staged repository readiness improvements.

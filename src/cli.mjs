@@ -4,10 +4,11 @@ import { buildShareComment } from "./comment.mjs";
 import { compareReadinessFiles } from "./compare.mjs";
 import { explainRepo } from "./explainer.mjs";
 import { parseTargets, writeGeneratedArtifacts } from "./generator.mjs";
+import { improveRepo } from "./improver.mjs";
 import { promptInitOptions } from "./interactive.mjs";
 import { lintRepo, scoreRepo } from "./linter.mjs";
 import { buildAgentMatrix } from "./matrix.mjs";
-import { renderAgentMatrix, renderAnnotations, renderBadge, renderBenchmarkReport, renderComparison, renderDoctor, renderExplanation, renderFindings, renderMarkdownReport, renderScanSummary, renderScore, renderShareComment } from "./reporter.mjs";
+import { renderAgentMatrix, renderAnnotations, renderBadge, renderBenchmarkReport, renderComparison, renderDoctor, renderExplanation, renderFindings, renderImprovement, renderMarkdownReport, renderScanSummary, renderScore, renderShareComment } from "./reporter.mjs";
 import { renderCiWorkflow, writeCiWorkflow } from "./workflow.mjs";
 
 const HELP = `agent-ready
@@ -18,6 +19,7 @@ Usage:
   agent-ready scan [--root PATH] [--config PATH] [--format json|text]
   agent-ready init [--root PATH] [--config PATH] [--targets codex,claude,cursor,gemini,copilot] [--dry-run] [--force] [--interactive]
   agent-ready fix [--root PATH] [--config PATH] [--targets codex,claude,cursor,gemini,copilot] [--level basic|team|full] [--dry-run] [--force] [--no-ci] [--mode action|npx] [--fail-under N]
+  agent-ready improve [--root PATH] [--config PATH] [--targets codex,claude,cursor,gemini,copilot] [--level basic|team|full] [--format markdown|json] [--dry-run] [--force] [--no-ci] [--mode action|npx] [--fail-under N] [--comment]
   agent-ready lint [--root PATH] [--config PATH] [--format json|text]
   agent-ready annotations [--root PATH] [--config PATH] [--format github|json]
   agent-ready score [--root PATH] [--config PATH] [--format json|text] [--fail-under N]
@@ -36,6 +38,8 @@ Examples:
   npx agent-ready init --targets codex,claude,cursor
   npx agent-ready fix --dry-run
   npx agent-ready fix --level team --dry-run
+  npx agent-ready improve --dry-run
+  npx agent-ready improve --level team
   npx agent-ready init --interactive
   npx agent-ready doctor
   npx agent-ready explain
@@ -110,6 +114,30 @@ export async function runCli(argv) {
         force: Boolean(flags.force),
       });
       console.log(`${ciResult.action}: ${ciResult.file}`);
+    }
+    return;
+  }
+
+  if (command === "improve") {
+    const profile = await scanRepo(root, scanOptions);
+    const improvement = await improveRepo({
+      root,
+      configPath: scanOptions.configPath,
+      targets: parseTargets(flags.targets || profile.config.targets.join(",")),
+      level: flags.level || "basic",
+      dryRun: Boolean(flags["dry-run"]),
+      force: Boolean(flags.force),
+      noCi: Boolean(flags["no-ci"]),
+      mode: flags.mode || "action",
+      failUnder: flags["fail-under"] ?? "80",
+      comment: Boolean(flags.comment),
+    });
+
+    if (flags.format === "json" || flags.json) {
+      console.log(JSON.stringify(improvement, null, 2));
+    } else {
+      if (flags.format && flags.format !== "markdown") throw new Error("Improve format must be markdown or json.");
+      console.log(renderImprovement(improvement));
     }
     return;
   }

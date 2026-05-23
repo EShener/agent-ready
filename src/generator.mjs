@@ -261,11 +261,12 @@ ${commands}
 function buildArchitectureDoc(profile) {
   const frameworks = profile.frameworks.length ? profile.frameworks.join(", ") : "No framework detected yet";
   const languages = profile.languages.length ? profile.languages.map((item) => item.name).join(", ") : profile.primaryLanguage;
+  const modules = architectureModuleLines(profile);
   return `# Architecture
 
 ## Overview
 
-${profile.name} is primarily a ${profile.primaryLanguage} repository.
+${profile.name} is primarily a ${profile.primaryLanguage} repository. This document gives contributors and AI coding agents a quick map of the codebase before they make changes.
 
 ## Technology
 
@@ -273,23 +274,50 @@ ${profile.name} is primarily a ${profile.primaryLanguage} repository.
 - Frameworks/tools: ${frameworks}
 - Package manager: ${profile.packageManager}
 - Monorepo: ${profile.monorepo?.detected ? "yes" : "no"}
+- CI: ${profile.ci.githubActions.length ? profile.ci.githubActions.join(", ") : "No GitHub Actions workflows detected"}
 
 ## Repository Layout
 
 - Top-level structure: ${formatStructure(profile.structure)}
 
+${modules}
+
 ## Runtime Flow
 
-Document the main execution path here.
+1. A user or CI job runs a repository command, CLI entry point, application server, or workflow.
+2. The implementation reads repository files, package metadata, and optional configuration.
+3. Core modules perform detection, validation, generation, or application behavior.
+4. Output is written to stdout, generated files, tests, logs, or CI status depending on the command.
 
 ## Data Flow
 
-Document important inputs, outputs, storage, and external services here.
+- Inputs: source files, configuration files, command-line flags, package metadata, and CI environment variables.
+- Processing: keep parsing and validation deterministic so results are reproducible in local and CI runs.
+- Outputs: generated documentation, reports, build artifacts, test results, or workflow annotations.
+- External services: none unless the repository-specific commands documented above call them.
 
 ## Verification
 
 ${verificationChecklist(profile)}
 `;
+}
+
+function architectureModuleLines(profile) {
+  const entries = profile.structure.map((entry) => entry.name);
+  const lines = [];
+
+  if (entries.includes("bin")) lines.push("- `bin/`: command-line entry points.");
+  if (entries.includes("src")) lines.push("- `src/`: implementation modules and shared logic.");
+  if (entries.includes("test")) lines.push("- `test/`: automated tests and fixtures.");
+  if (entries.includes("docs")) lines.push("- `docs/`: user-facing documentation, examples, and ADRs.");
+  if (entries.includes("scripts")) lines.push("- `scripts/`: maintenance, benchmark, release, or asset-generation helpers.");
+  if (entries.includes(".github")) lines.push("- `.github/`: workflows, issue templates, pull request templates, and GitHub-specific instructions.");
+  if (entries.includes("app")) lines.push("- `app/`: application routes or runtime entry points.");
+  if (entries.includes("packages")) lines.push("- `packages/`: shared packages or workspace modules.");
+  if (entries.includes("apps")) lines.push("- `apps/`: deployable applications in the workspace.");
+
+  if (!lines.length) return "## Key Modules\n\n- Add module notes as the repository structure becomes more explicit.";
+  return `## Key Modules\n\n${lines.join("\n")}`;
 }
 
 function buildAgentReadinessAdr(profile) {

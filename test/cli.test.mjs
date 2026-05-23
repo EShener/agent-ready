@@ -89,6 +89,45 @@ test("fix CLI writes docs and can skip CI", async () => {
   await assert.rejects(fs.access(path.join(temp, ".github", "workflows", "agent-ready.yml")));
 });
 
+test("improve CLI dry-run reports planned changes without writing", async () => {
+  const temp = await fs.mkdtemp(path.join(os.tmpdir(), "agent-ready-improve-plan-"));
+  await fs.writeFile(path.join(temp, "package.json"), JSON.stringify({ name: "improve-demo", scripts: { test: "node --test", lint: "eslint ." } }), "utf8");
+
+  const { stdout } = await execFileAsync(process.execPath, [bin, "improve", "--root", temp, "--level", "team", "--dry-run", "--no-ci"], { cwd: root });
+
+  assert.match(stdout, /Agent Ready Improvement/);
+  assert.match(stdout, /Mode: dry-run/);
+  assert.match(stdout, /estimated \+\d+/);
+  assert.match(stdout, /\| planned \| AGENTS\.md \| codex \|/);
+  assert.match(stdout, /\| planned \| \.github\/pull_request_template\.md \| pull-request-template \|/);
+  await assert.rejects(fs.access(path.join(temp, "AGENTS.md")));
+});
+
+test("improve CLI applies changes and reports a score delta", async () => {
+  const temp = await fs.mkdtemp(path.join(os.tmpdir(), "agent-ready-improve-write-"));
+  await fs.writeFile(path.join(temp, "package.json"), JSON.stringify({ name: "improve-write", scripts: { test: "node --test" } }), "utf8");
+
+  const { stdout } = await execFileAsync(process.execPath, [bin, "improve", "--root", temp, "--targets", "codex", "--no-ci"], { cwd: root });
+
+  assert.match(stdout, /Agent Ready Improvement/);
+  assert.match(stdout, /Mode: applied/);
+  assert.match(stdout, /\| created \| AGENTS\.md \| codex \|/);
+  assert.match(stdout, /Score: \d+\/100 \([A-F]\) -> \d+\/100 \([A-F]\) \(\+\d+\)/);
+  assert.match(await fs.readFile(path.join(temp, "AGENTS.md"), "utf8"), /Project Overview/);
+});
+
+test("improve CLI emits JSON", async () => {
+  const { stdout } = await execFileAsync(process.execPath, [bin, "improve", "--root", fixture("empty-repo"), "--dry-run", "--format", "json", "--no-ci"], { cwd: root });
+  const payload = JSON.parse(stdout);
+
+  assert.equal(payload.schemaVersion, 1);
+  assert.equal(payload.mode, "dry-run");
+  assert.equal(payload.repository.name, "empty-repo");
+  assert.equal(typeof payload.score.before, "number");
+  assert.equal(payload.score.estimated, true);
+  assert.ok(Array.isArray(payload.artifacts));
+});
+
 test("badge CLI emits markdown badge", async () => {
   const { stdout } = await execFileAsync(process.execPath, [bin, "badge", "--root", fixture("node-app")], { cwd: root });
   assert.match(stdout, /!\[agent-ready\]\(https:\/\/img\.shields\.io\/badge\/agent--ready-/);
@@ -222,7 +261,7 @@ test("benchmark CLI emits JSON when requested", async () => {
 
 test("ci CLI emits reusable GitHub Action workflow by default", async () => {
   const { stdout } = await execFileAsync(process.execPath, [bin, "ci", "--fail-under", "85"], { cwd: root });
-  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.15/);
+  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.16/);
   assert.match(stdout, /fail-under: 85/);
 });
 

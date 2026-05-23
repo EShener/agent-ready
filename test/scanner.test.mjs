@@ -8,9 +8,10 @@ import { buildShareComment } from "../src/comment.mjs";
 import { compareReadiness } from "../src/compare.mjs";
 import { explainRepo } from "../src/explainer.mjs";
 import { buildAgentsMd, planGeneratedArtifacts } from "../src/generator.mjs";
+import { improveRepo } from "../src/improver.mjs";
 import { lintRepo, scoreRepo } from "../src/linter.mjs";
 import { buildAgentMatrix } from "../src/matrix.mjs";
-import { renderAgentMatrix, renderAnnotations, renderBenchmarkReport, renderComparison, renderDoctor, renderExplanation, renderMarkdownReport, renderShareComment } from "../src/reporter.mjs";
+import { renderAgentMatrix, renderAnnotations, renderBenchmarkReport, renderComparison, renderDoctor, renderExplanation, renderImprovement, renderMarkdownReport, renderShareComment } from "../src/reporter.mjs";
 import { scanRepo } from "../src/scanner.mjs";
 import { renderCiWorkflow, writeCiWorkflow } from "../src/workflow.mjs";
 
@@ -89,6 +90,7 @@ test("generator plans staged readiness artifacts by fix level", async () => {
   assert.ok(full.some((item) => item.file === ".env.example"));
   assert.ok(full.some((item) => item.file === ".github/ISSUE_TEMPLATE/agent-readiness.md"));
   assert.match(full.find((item) => item.file === "docs/architecture.md").content, /fixture-node-app/);
+  assert.doesNotMatch(full.find((item) => item.file === "docs/architecture.md").content, /Document the main execution path/);
 });
 
 test("AGENTS.md includes detected commands and safety boundaries", async () => {
@@ -171,6 +173,30 @@ test("comparison report summarizes score changes and fixed findings", () => {
   assert.equal(comparison.delta.fixedFindings, 1);
   assert.match(report, /Agent Ready Comparison/);
   assert.match(report, /Status: improved/);
+});
+
+test("improver plans safe changes and renders before/after reports", async () => {
+  const temp = await fs.mkdtemp(path.join("/tmp", "agent-ready-improver-"));
+  await fs.writeFile(path.join(temp, "package.json"), JSON.stringify({ name: "improver-demo", scripts: { test: "node --test" } }), "utf8");
+
+  const dryRun = await improveRepo({ root: temp, targets: ["codex"], dryRun: true, noCi: true });
+  const dryRunMarkdown = renderImprovement(dryRun);
+
+  assert.equal(dryRun.mode, "dry-run");
+  assert.equal(dryRun.score.estimated, true);
+  assert.ok(dryRun.score.delta > 0);
+  assert.deepEqual(dryRun.artifacts.map((item) => item.action), ["planned"]);
+  assert.match(dryRunMarkdown, /Agent Ready Improvement/);
+  assert.match(dryRunMarkdown, /estimated \+\d+/);
+  assert.match(dryRunMarkdown, /\| planned \| AGENTS\.md \| codex \|/);
+  await assert.rejects(fs.access(path.join(temp, "AGENTS.md")));
+
+  const applied = await improveRepo({ root: temp, targets: ["codex"], noCi: true });
+
+  assert.equal(applied.mode, "applied");
+  assert.ok(applied.score.delta > 0);
+  assert.equal(applied.artifacts[0].action, "created");
+  assert.match(await fs.readFile(path.join(temp, "AGENTS.md"), "utf8"), /Verification/);
 });
 
 test("agent matrix summarizes tool compatibility", () => {
@@ -285,7 +311,7 @@ test("scan applies agent-ready.json command and doc overrides", async () => {
 });
 
 test("workflow renderer validates mode and fail-under values", () => {
-  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.15/);
+  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.16/);
   assert.match(renderCiWorkflow({ mode: "action", comment: true }), /comment: true/);
   assert.match(renderCiWorkflow({ mode: "action", comment: true }), /pull-requests: write/);
   assert.match(renderCiWorkflow({ mode: "npx", failUnder: "70" }), /npx agent-ready score --fail-under 70/);

@@ -12,6 +12,12 @@ Make any repository ready for AI coding agents in 60 seconds.
 
 It is for developers using Codex, Claude Code, Cursor, Gemini CLI, GitHub Copilot, or any coding agent that needs repository instructions before editing safely.
 
+```bash
+npx --yes github:EShener/agent-ready improve --dry-run
+```
+
+Preview exactly which files will be added and the estimated score gain before anything is written.
+
 <p align="center">
   <img src="docs/assets/agent-ready-pr-comment.gif" alt="agent-ready posts a pull request comment with score, compatibility, and top fixes" width="820">
 </p>
@@ -31,7 +37,7 @@ On a 2026-05-23 sample of six public AI/devtool repositories, the average Agent 
 Use the GitHub Action immediately:
 
 ```yaml
-- uses: EShener/agent-ready@v0.1.15
+- uses: EShener/agent-ready@v0.1.16
   with:
     fail-under: 80
 ```
@@ -44,6 +50,8 @@ npx --yes github:EShener/agent-ready explain
 npx --yes github:EShener/agent-ready matrix
 npx --yes github:EShener/agent-ready comment
 npx --yes github:EShener/agent-ready compare --before before.json --after after.json
+npx --yes github:EShener/agent-ready improve --dry-run
+npx --yes github:EShener/agent-ready improve --level team
 npx --yes github:EShener/agent-ready fix --dry-run
 npx --yes github:EShener/agent-ready fix --level team --dry-run
 npx --yes github:EShener/agent-ready init --dry-run
@@ -129,6 +137,18 @@ agent-ready fix --level team
 agent-ready fix --level full --dry-run
 agent-ready fix --targets codex,cursor --no-ci
 agent-ready fix --force
+```
+
+### `improve`
+
+Runs scan, applies staged fixes, rescans, and prints a before/after improvement report. Use `--dry-run` to turn it into a safe launch-post screenshot that shows planned files without writing them.
+
+```bash
+agent-ready improve --dry-run
+agent-ready improve
+agent-ready improve --level team
+agent-ready improve --level full --comment
+agent-ready improve --format json
 ```
 
 ### `lint`
@@ -287,7 +307,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: EShener/agent-ready@v0.1.15
+      - uses: EShener/agent-ready@v0.1.16
         with:
           fail-under: 80
 ```
@@ -304,7 +324,7 @@ permissions:
 
 steps:
   - uses: actions/checkout@v4
-  - uses: EShener/agent-ready@v0.1.15
+  - uses: EShener/agent-ready@v0.1.16
     with:
       fail-under: 80
       comment: true
