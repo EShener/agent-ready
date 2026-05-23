@@ -2,7 +2,7 @@ import { scanRepo } from "./scanner.mjs";
 import { parseTargets, writeGeneratedArtifacts } from "./generator.mjs";
 import { promptInitOptions } from "./interactive.mjs";
 import { lintRepo, scoreRepo } from "./linter.mjs";
-import { renderBadge, renderDoctor, renderFindings, renderMarkdownReport, renderScanSummary, renderScore } from "./reporter.mjs";
+import { renderAnnotations, renderBadge, renderDoctor, renderFindings, renderMarkdownReport, renderScanSummary, renderScore } from "./reporter.mjs";
 import { renderCiWorkflow } from "./workflow.mjs";
 
 const HELP = `agent-ready
@@ -13,6 +13,7 @@ Usage:
   agent-ready scan [--root PATH] [--config PATH] [--format json|text]
   agent-ready init [--root PATH] [--config PATH] [--targets codex,claude,cursor,gemini,copilot] [--dry-run] [--force] [--interactive]
   agent-ready lint [--root PATH] [--config PATH] [--format json|text]
+  agent-ready annotations [--root PATH] [--config PATH] [--format github|json]
   agent-ready score [--root PATH] [--config PATH] [--format json|text] [--fail-under N]
   agent-ready doctor [--root PATH] [--config PATH] [--format json|text] [--fail-under N]
   agent-ready report [--root PATH] [--config PATH] [--format markdown|json]
@@ -24,6 +25,7 @@ Examples:
   npx agent-ready init --targets codex,claude,cursor
   npx agent-ready init --interactive
   npx agent-ready doctor
+  npx agent-ready annotations
   npx agent-ready score --fail-under 80
   npx agent-ready ci
   npx agent-ready report --format markdown
@@ -71,6 +73,18 @@ export async function runCli(argv) {
     if (flags.format === "json" || flags.json) console.log(JSON.stringify({ findings }, null, 2));
     else console.log(renderFindings(findings));
     if (findings.some((finding) => finding.severity === "error")) process.exitCode = 1;
+    return;
+  }
+
+  if (command === "annotations" || command === "annotate") {
+    const profile = await scanRepo(root, scanOptions);
+    const findings = await lintRepo(profile);
+    if (flags.format === "json" || flags.json) {
+      console.log(JSON.stringify({ findings }, null, 2));
+    } else {
+      if (flags.format && flags.format !== "github") throw new Error("Annotations format must be github or json.");
+      console.log(renderAnnotations(findings));
+    }
     return;
   }
 

@@ -21,7 +21,7 @@ AI coding agents fail for boring reasons: they do not know the test command, the
 Use the GitHub Action immediately:
 
 ```yaml
-- uses: EShener/agent-ready@v0.1.1
+- uses: EShener/agent-ready@v0.1.2
   with:
     fail-under: 80
 ```
@@ -113,6 +113,15 @@ agent-ready lint
 agent-ready lint --format json
 ```
 
+### `annotations`
+
+Prints GitHub Actions workflow commands for readiness findings, so CI can show warnings and notices inline.
+
+```bash
+agent-ready annotations
+agent-ready annotations --format json
+```
+
 ### `score`
 
 Prints a 0-100 Agent Readiness Score with explainable deductions.
@@ -191,12 +200,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: EShener/agent-ready@v0.1.1
+      - uses: EShener/agent-ready@v0.1.2
         with:
           fail-under: 80
 ```
 
-The action writes a diagnosis and Markdown report to the GitHub Actions Step Summary, then fails the job when the score is below `fail-under`.
+The action writes a diagnosis and Markdown report to the GitHub Actions Step Summary, annotates readiness findings in the Actions UI, then fails the job when the score is below `fail-under`.
 
 Generate this workflow with:
 

@@ -60,9 +60,16 @@ test("doctor CLI emits a screenshot-friendly summary", async () => {
   assert.match(stdout, /Top fixes:|Status: ready/);
 });
 
+test("annotations CLI emits GitHub workflow commands", async () => {
+  const { stdout } = await execFileAsync(process.execPath, [bin, "annotations", "--root", fixture("empty-repo")], { cwd: root });
+
+  assert.match(stdout, /::warning file=AGENTS\.md,title=missing-agents-md::/);
+  assert.match(stdout, /Run `agent-ready init --targets codex`/);
+});
+
 test("ci CLI emits reusable GitHub Action workflow by default", async () => {
   const { stdout } = await execFileAsync(process.execPath, [bin, "ci", "--fail-under", "85"], { cwd: root });
-  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.1/);
+  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.2/);
   assert.match(stdout, /fail-under: 85/);
 });
 

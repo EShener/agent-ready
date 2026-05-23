@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2
+
+- Added GitHub Actions annotations for readiness findings.
+
 ## 0.1.1
 
 - Added `init --interactive` for guided setup.

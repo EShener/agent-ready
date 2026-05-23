@@ -5,7 +5,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { buildAgentsMd, planGeneratedArtifacts } from "../src/generator.mjs";
 import { lintRepo, scoreRepo } from "../src/linter.mjs";
-import { renderDoctor, renderMarkdownReport } from "../src/reporter.mjs";
+import { renderAnnotations, renderDoctor, renderMarkdownReport } from "../src/reporter.mjs";
 import { scanRepo } from "../src/scanner.mjs";
 import { renderCiWorkflow } from "../src/workflow.mjs";
 
@@ -121,6 +121,34 @@ test("markdown report includes commands, docs, and findings", async () => {
   assert.match(report, /npm run test/);
 });
 
+test("GitHub annotations render findings with workflow command escaping", () => {
+  const output = renderAnnotations([
+    {
+      severity: "warning",
+      ruleId: "path:rule,one",
+      file: "docs/a:b,c.md",
+      message: "Use 100% coverage\nwhen practical.",
+      fixSuggestion: "Update docs, then run: npm test",
+    },
+    {
+      severity: "info",
+      ruleId: "missing-ci",
+      file: ".github/workflows",
+      message: "No CI workflow was detected.",
+      fixSuggestion: "Add CI.",
+    },
+  ]);
+
+  assert.match(output, /^::warning file=docs\/a%3Ab%2Cc\.md,title=path%3Arule%2Cone::/);
+  assert.match(output, /100%25 coverage%0Awhen practical/);
+  assert.match(output, /run: npm test/);
+  assert.match(output, /::notice file=\.github\/workflows,title=missing-ci::/);
+});
+
+test("GitHub annotations emit a notice when there are no findings", () => {
+  assert.equal(renderAnnotations([]), "::notice title=agent-ready::No findings.");
+});
+
 test("doctor report includes score and next action", async () => {
   const profile = await scanRepo(fixture("empty-repo"));
   const findings = await lintRepo(profile);
@@ -159,7 +187,7 @@ test("scan applies agent-ready.json command and doc overrides", async () => {
 });
 
 test("workflow renderer validates mode and fail-under values", () => {
-  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.1/);
+  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.2/);
   assert.match(renderCiWorkflow({ mode: "npx", failUnder: "70" }), /npx agent-ready score --fail-under 70/);
   assert.throws(() => renderCiWorkflow({ mode: "bad" }), /--mode/);
   assert.throws(() => renderCiWorkflow({ failUnder: "101" }), /--fail-under/);
@@ -170,6 +198,8 @@ test("reusable action writes a GitHub Step Summary before scoring", async () => 
 
   assert.match(action, /Write agent-ready summary/);
   assert.match(action, /GITHUB_STEP_SUMMARY/);
+  assert.match(action, /Annotate agent-ready findings/);
+  assert.match(action, /annotations --config/);
   assert.match(action, /doctor --config/);
   assert.match(action, /report --config/);
   assert.match(action, /Score agent readiness/);

@@ -19,6 +19,19 @@ export function renderFindings(findings) {
     .join("\n");
 }
 
+export function renderAnnotations(findings) {
+  if (!findings.length) return "::notice title=agent-ready::No findings.";
+  return findings.map((finding) => {
+    const level = annotationLevel(finding.severity);
+    const properties = [
+      `file=${escapeAnnotationProperty(finding.file || ".")}`,
+      `title=${escapeAnnotationProperty(finding.ruleId)}`,
+    ].join(",");
+    const message = escapeAnnotationMessage(`${finding.message} Fix: ${finding.fixSuggestion}`);
+    return `::${level} ${properties}::${message}`;
+  }).join("\n");
+}
+
 export function renderScore(score) {
   const lines = [
     `Agent Readiness Score: ${score.score}/100 (${score.grade})`,
@@ -112,6 +125,25 @@ ${findingRows}
 
 function escapePipe(value) {
   return String(value).replace(/\|/g, "\\|");
+}
+
+function annotationLevel(severity) {
+  if (severity === "error") return "error";
+  if (severity === "info") return "notice";
+  return "warning";
+}
+
+function escapeAnnotationMessage(value) {
+  return String(value)
+    .replace(/%/g, "%25")
+    .replace(/\r/g, "%0D")
+    .replace(/\n/g, "%0A");
+}
+
+function escapeAnnotationProperty(value) {
+  return escapeAnnotationMessage(value)
+    .replace(/:/g, "%3A")
+    .replace(/,/g, "%2C");
 }
 
 function formatMonorepo(monorepo) {
