@@ -30,6 +30,7 @@ export async function scanRepo(root = process.cwd(), options = {}) {
     cargoToml,
     goMod,
     readmeText,
+    pnpmWorkspace,
     files,
     structure,
   ] = await Promise.all([
@@ -38,6 +39,7 @@ export async function scanRepo(root = process.cwd(), options = {}) {
     readTextIfExists(path.join(absoluteRoot, "Cargo.toml")),
     readTextIfExists(path.join(absoluteRoot, "go.mod")),
     readTextIfExists(path.join(absoluteRoot, "README.md")),
+    readTextIfExists(path.join(absoluteRoot, "pnpm-workspace.yaml")),
     walkFiles(absoluteRoot),
     topLevelEntries(absoluteRoot),
   ]);
@@ -70,6 +72,7 @@ export async function scanRepo(root = process.cwd(), options = {}) {
     languages: languageCounts,
     primaryLanguage: languageCounts[0]?.name || "Unknown",
     frameworks: detectFrameworks({ packageJson, pyproject, cargoToml, goMod, files }),
+    monorepo: detectMonorepo({ packageJson, pnpmWorkspace, files }),
     packageManager,
     commands,
     ci,
@@ -106,6 +109,7 @@ function countLanguages(files) {
 async function detectPackageManager(root) {
   const checks = [
     ["pnpm", "pnpm-lock.yaml"],
+    ["pnpm", "pnpm-workspace.yaml"],
     ["yarn", "yarn.lock"],
     ["bun", "bun.lockb"],
     ["bun", "bun.lock"],
@@ -222,6 +226,50 @@ function detectFrameworks({ packageJson, pyproject, cargoToml, goMod, files }) {
   if (/github\.com\/gin-gonic\/gin/i.test(goMod)) names.push("Gin");
   if (files.some((file) => /^src\/app\//.test(file))) names.push("Next.js App Router");
   return unique(names);
+}
+
+function detectMonorepo({ packageJson, pnpmWorkspace, files }) {
+  const workspacePatterns = unique([
+    ...packageWorkspacePatterns(packageJson),
+    ...pnpmWorkspacePatterns(pnpmWorkspace),
+  ]);
+  const tools = [];
+  if (files.includes("pnpm-workspace.yaml")) tools.push("pnpm workspaces");
+  if (packageJson?.workspaces) tools.push("package workspaces");
+  if (files.includes("turbo.json")) tools.push("Turborepo");
+  if (files.includes("nx.json")) tools.push("Nx");
+  if (files.includes("lerna.json")) tools.push("Lerna");
+  if (files.includes("rush.json")) tools.push("Rush");
+
+  return {
+    detected: Boolean(workspacePatterns.length || tools.length),
+    tools: unique(tools),
+    workspaces: workspacePatterns,
+  };
+}
+
+function packageWorkspacePatterns(packageJson) {
+  const workspaces = packageJson?.workspaces;
+  if (Array.isArray(workspaces)) return workspaces.filter((item) => typeof item === "string");
+  if (Array.isArray(workspaces?.packages)) return workspaces.packages.filter((item) => typeof item === "string");
+  return [];
+}
+
+function pnpmWorkspacePatterns(text) {
+  if (!text) return [];
+  const lines = text.split("\n");
+  const patterns = [];
+  let inPackages = false;
+  for (const line of lines) {
+    if (/^\s*packages\s*:\s*$/.test(line)) {
+      inPackages = true;
+      continue;
+    }
+    if (inPackages && /^\S/.test(line)) break;
+    const match = line.match(/^\s*-\s*["']?([^"'\n#]+)["']?\s*(?:#.*)?$/);
+    if (inPackages && match) patterns.push(match[1].trim());
+  }
+  return patterns;
 }
 
 async function detectAgentDocs(root) {

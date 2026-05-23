@@ -5,6 +5,7 @@ export function renderScanSummary(profile) {
     `Primary language: ${profile.primaryLanguage}`,
     `Languages: ${profile.languages.map((item) => `${item.name} (${item.files})`).join(", ") || "none"}`,
     `Frameworks: ${profile.frameworks.join(", ") || "none"}`,
+    `Monorepo: ${formatMonorepo(profile.monorepo)}`,
     `Package manager: ${profile.packageManager}`,
     `Commands: ${Object.entries(profile.commands).filter(([, value]) => value).map(([key, value]) => `${key}=${value}`).join("; ") || "none"}`,
     `Agent docs: ${profile.agentDocs.map((doc) => doc.file).join(", ") || "none"}`,
@@ -38,6 +39,7 @@ export function renderDoctor(profile, findings, score) {
     `agent-ready doctor: ${profile.name}`,
     `Score: ${score.score}/100 (${score.grade})`,
     `Primary language: ${profile.primaryLanguage}`,
+    `Monorepo: ${formatMonorepo(profile.monorepo)}`,
     `Commands: ${Object.entries(profile.commands).filter(([, value]) => value).map(([key, value]) => `${key}=${value}`).join("; ") || "none"}`,
     `Agent docs: ${profile.agentDocs.map((doc) => doc.file).join(", ") || "none"}`,
     "",
@@ -88,6 +90,7 @@ export function renderMarkdownReport(profile, findings, score) {
 - Score: ${score.score}/100 (${score.grade})
 - Primary language: ${profile.primaryLanguage}
 - Frameworks: ${profile.frameworks.join(", ") || "none"}
+- Monorepo: ${formatMonorepo(profile.monorepo)}
 - Package manager: ${profile.packageManager}
 
 ${score.summary}
@@ -109,6 +112,13 @@ ${findingRows}
 
 function escapePipe(value) {
   return String(value).replace(/\|/g, "\\|");
+}
+
+function formatMonorepo(monorepo) {
+  if (!monorepo?.detected) return "none";
+  const tools = monorepo.tools.length ? monorepo.tools.join(", ") : "workspaces";
+  const workspaces = monorepo.workspaces.length ? ` (${monorepo.workspaces.join(", ")})` : "";
+  return `${tools}${workspaces}`;
 }
 
 function badgeColor(score) {

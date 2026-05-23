@@ -7,6 +7,7 @@
 - Added `doctor` command for a compact diagnosis and screenshot-friendly summary.
 - Added `ci` command for generating a ready-to-paste GitHub Actions workflow.
 - Added reusable GitHub Action support via `uses: EShener/agent-ready@main`.
+- Added monorepo/workspace detection for npm workspaces, pnpm workspaces, Turborepo, Nx, Lerna, and Rush.
 - Added readiness linter with actionable findings.
 - Added explainable Agent Readiness Score.
 - Added Markdown/JSON reports.

@@ -193,12 +193,13 @@ npx agent-ready ci > .github/workflows/agent-ready.yml
 
 ## Supported Detection
 
-Current detectors cover common JavaScript/TypeScript, Python, Rust, and Go repositories:
+Current detectors cover common JavaScript/TypeScript, Python, Rust, Go, and monorepo repositories:
 
 - package manager: npm, pnpm, yarn, bun, pip, cargo, go
 - commands: install, dev, start, build, test, lint, format
 - docs: README, architecture docs, ADR directories, existing agent docs
 - CI: GitHub Actions workflows
+- monorepos: npm/pnpm workspaces, Turborepo, Nx, Lerna, Rush
 - frameworks: React, Vite, Next.js, Vue, Astro, Svelte, Express, NestJS, FastAPI, Django, Flask, Pytest, Rust web frameworks, Gin
 
 ## Design Principles

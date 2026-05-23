@@ -41,6 +41,19 @@ test("scan detects Python, Rust, and Go repositories", async () => {
   assert.equal(go.commands.test, "go test ./...");
 });
 
+test("scan detects monorepo workspace signals", async () => {
+  const profile = await scanRepo(fixture("monorepo"));
+
+  assert.equal(profile.name, "fixture-monorepo");
+  assert.equal(profile.monorepo.detected, true);
+  assert.ok(profile.monorepo.tools.includes("package workspaces"));
+  assert.ok(profile.monorepo.tools.includes("pnpm workspaces"));
+  assert.ok(profile.monorepo.tools.includes("Turborepo"));
+  assert.deepEqual(profile.monorepo.workspaces, ["apps/*", "packages/*"]);
+  assert.equal(profile.packageManager, "pnpm");
+  assert.equal(profile.commands.test, "pnpm test");
+});
+
 test("generator plans canonical and shim files without writing", async () => {
   const profile = await scanRepo(fixture("node-app"));
   const artifacts = await planGeneratedArtifacts(profile, { targets: ["codex", "cursor"] });
@@ -57,6 +70,15 @@ test("AGENTS.md includes detected commands and safety boundaries", async () => {
   assert.match(content, /test: `npm run test`/);
   assert.match(content, /Safety Boundaries/);
   assert.match(content, /Verification/);
+});
+
+test("AGENTS.md includes monorepo details when detected", async () => {
+  const profile = await scanRepo(fixture("monorepo"));
+  const content = buildAgentsMd(profile);
+
+  assert.match(content, /Monorepo:/);
+  assert.match(content, /Turborepo/);
+  assert.match(content, /apps\/\*/);
 });
 
 test("lint detects missing agent docs and stale references", async () => {

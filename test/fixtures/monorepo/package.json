@@ -1,0 +1,12 @@
+{
+  "name": "fixture-monorepo",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "test": "turbo test",
+    "lint": "turbo lint"
+  },
+  "devDependencies": {
+    "turbo": "latest"
+  }
+}

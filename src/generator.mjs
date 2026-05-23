@@ -63,6 +63,9 @@ export function buildAgentsMd(profile) {
   const ci = profile.ci.githubActions.length ? profile.ci.githubActions.join(", ") : "No GitHub Actions workflows detected";
   const architecture = profile.docs.architecture || "Not found";
   const adr = profile.docs.adrDirectory || "Not found";
+  const monorepo = profile.monorepo?.detected
+    ? `${profile.monorepo.tools.join(", ") || "workspaces"} (${profile.monorepo.workspaces.join(", ") || "patterns not declared"})`
+    : "Not detected";
 
   return `# AGENTS.md
 
@@ -71,6 +74,7 @@ export function buildAgentsMd(profile) {
 - Primary language: ${profile.primaryLanguage}
 - Languages: ${languages}
 - Frameworks/tools: ${frameworks}
+- Monorepo: ${monorepo}
 - CI: ${ci}
 
 ## Repository Layout
