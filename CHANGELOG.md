@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.14
+
+- Added `docs/showcase.md` with the demo GIF, PR comment example, copy-paste workflow, benchmark evidence, and launch snippet.
+- Added a README showcase link for faster project evaluation by new visitors.
+
 ## 0.1.13
 
 - Added a README demo GIF showing the pull request comment workflow.

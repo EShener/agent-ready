@@ -6,6 +6,8 @@ Make any repository ready for AI coding agents in 60 seconds.
 ![agent-ready](https://img.shields.io/badge/agent--ready-100%2F100-brightgreen)
 ![license](https://img.shields.io/badge/license-MIT-blue)
 
+[Showcase](docs/showcase.md) · [Benchmark](BENCHMARK.md) · [Launch notes](LAUNCH.md)
+
 `agent-ready` is a zero-dependency CLI that scans a codebase, generates canonical AI agent instructions, checks them for drift and missing verification steps, and gives the repository an explainable Agent Readiness Score.
 
 It is for developers using Codex, Claude Code, Cursor, Gemini CLI, GitHub Copilot, or any coding agent that needs repository instructions before editing safely.
@@ -29,7 +31,7 @@ On a 2026-05-23 sample of six public AI/devtool repositories, the average Agent 
 Use the GitHub Action immediately:
 
 ```yaml
-- uses: EShener/agent-ready@v0.1.13
+- uses: EShener/agent-ready@v0.1.14
   with:
     fail-under: 80
 ```
@@ -280,7 +282,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: EShener/agent-ready@v0.1.13
+      - uses: EShener/agent-ready@v0.1.14
         with:
           fail-under: 80
 ```
@@ -297,7 +299,7 @@ permissions:
 
 steps:
   - uses: actions/checkout@v4
-  - uses: EShener/agent-ready@v0.1.13
+  - uses: EShener/agent-ready@v0.1.14
     with:
       fail-under: 80
       comment: true
