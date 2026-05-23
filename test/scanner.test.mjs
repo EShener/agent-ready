@@ -8,7 +8,8 @@ import { compareReadiness } from "../src/compare.mjs";
 import { explainRepo } from "../src/explainer.mjs";
 import { buildAgentsMd, planGeneratedArtifacts } from "../src/generator.mjs";
 import { lintRepo, scoreRepo } from "../src/linter.mjs";
-import { renderAnnotations, renderBenchmarkReport, renderComparison, renderDoctor, renderExplanation, renderMarkdownReport } from "../src/reporter.mjs";
+import { buildAgentMatrix } from "../src/matrix.mjs";
+import { renderAgentMatrix, renderAnnotations, renderBenchmarkReport, renderComparison, renderDoctor, renderExplanation, renderMarkdownReport } from "../src/reporter.mjs";
 import { scanRepo } from "../src/scanner.mjs";
 import { renderCiWorkflow, writeCiWorkflow } from "../src/workflow.mjs";
 
@@ -158,6 +159,24 @@ test("comparison report summarizes score changes and fixed findings", () => {
   assert.match(report, /Status: improved/);
 });
 
+test("agent matrix summarizes tool compatibility", () => {
+  const matrix = buildAgentMatrix({
+    name: "demo",
+    root: "/repo",
+    agentDocs: [
+      { target: "codex", file: "AGENTS.md" },
+      { target: "cursor", file: ".cursor/rules/agent-ready.mdc" },
+    ],
+  });
+  const report = renderAgentMatrix(matrix);
+
+  assert.equal(matrix.summary.ready, 2);
+  assert.equal(matrix.entries.find((entry) => entry.target === "cursor").mode, "shim");
+  assert.equal(matrix.entries.find((entry) => entry.target === "claude").status, "missing");
+  assert.match(report, /Agent Compatibility Matrix/);
+  assert.match(report, /Ready agents: 2\/5/);
+});
+
 test("benchmark ranks multiple repositories and renders a leaderboard", async () => {
   const benchmark = await benchmarkRepos(["node-app", "bad-agent-docs"], { root: fixture("") });
   const report = renderBenchmarkReport(benchmark);
@@ -236,7 +255,7 @@ test("scan applies agent-ready.json command and doc overrides", async () => {
 });
 
 test("workflow renderer validates mode and fail-under values", () => {
-  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.8/);
+  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.9/);
   assert.match(renderCiWorkflow({ mode: "npx", failUnder: "70" }), /npx agent-ready score --fail-under 70/);
   assert.throws(() => renderCiWorkflow({ mode: "bad" }), /--mode/);
   assert.throws(() => renderCiWorkflow({ failUnder: "101" }), /--fail-under/);

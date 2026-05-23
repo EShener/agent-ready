@@ -101,6 +101,30 @@ test("explain CLI emits JSON when requested", async () => {
   assert.equal(payload.items[0].ruleId, "missing-agents-md");
 });
 
+test("matrix CLI emits an agent compatibility table", async () => {
+  const temp = await fs.mkdtemp(path.join(os.tmpdir(), "agent-ready-matrix-"));
+  await fs.writeFile(path.join(temp, "package.json"), JSON.stringify({ name: "matrix-demo" }), "utf8");
+  await fs.writeFile(path.join(temp, "AGENTS.md"), "# AGENTS.md\n", "utf8");
+  await fs.mkdir(path.join(temp, ".cursor", "rules"), { recursive: true });
+  await fs.writeFile(path.join(temp, ".cursor", "rules", "agent-ready.mdc"), "Use AGENTS.md.\n", "utf8");
+
+  const { stdout } = await execFileAsync(process.execPath, [bin, "matrix", "--root", temp], { cwd: root });
+
+  assert.match(stdout, /Agent Compatibility Matrix/);
+  assert.match(stdout, /Ready agents: 2\/5/);
+  assert.match(stdout, /OpenAI Codex/);
+  assert.match(stdout, /Cursor/);
+  assert.match(stdout, /Claude Code \| missing/);
+});
+
+test("matrix CLI emits JSON when requested", async () => {
+  const { stdout } = await execFileAsync(process.execPath, [bin, "matrix", "--root", fixture("empty-repo"), "--format", "json"], { cwd: root });
+  const payload = JSON.parse(stdout);
+
+  assert.equal(payload.summary.total, 5);
+  assert.equal(payload.entries[0].target, "codex");
+});
+
 test("compare CLI emits a before and after readiness report", async () => {
   const temp = await fs.mkdtemp(path.join(os.tmpdir(), "agent-ready-compare-"));
   const before = path.join(temp, "before.json");
@@ -164,7 +188,7 @@ test("benchmark CLI emits JSON when requested", async () => {
 
 test("ci CLI emits reusable GitHub Action workflow by default", async () => {
   const { stdout } = await execFileAsync(process.execPath, [bin, "ci", "--fail-under", "85"], { cwd: root });
-  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.8/);
+  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.9/);
   assert.match(stdout, /fail-under: 85/);
 });
 

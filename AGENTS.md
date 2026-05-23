@@ -13,6 +13,7 @@
 - `src/compare.mjs`: before/after readiness JSON comparison.
 - `src/generator.mjs`: `AGENTS.md` and tool-specific shim generation.
 - `src/linter.mjs`: readiness rules and scoring inputs.
+- `src/matrix.mjs`: AI coding agent compatibility matrix generation.
 - `src/reporter.mjs`: text, JSON, and Markdown output rendering.
 - `src/config.mjs`: optional `agent-ready.json` loading and validation.
 - `src/explainer.mjs`: impact-ranked fix plan data for `explain`.

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.9
+
+- Added `agent-ready matrix` for a screenshot-friendly compatibility table across Codex, Cursor, Copilot, Claude Code, and Gemini CLI.
+- Added Markdown and JSON matrix output for README badges, launch posts, and CI summaries.
+
 ## 0.1.8
 
 - Added `agent-ready compare` for before/after readiness JSON comparisons.

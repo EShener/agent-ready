@@ -168,6 +168,25 @@ ${introducedRows}
 `;
 }
 
+export function renderAgentMatrix(matrix) {
+  const rows = matrix.entries.map((entry) => {
+    const files = entry.files.length ? entry.files.map((file) => `\`${file}\``).join(", ") : entry.expectedFiles.map((file) => `\`${file}\``).join(", ");
+    return `| ${escapePipe(entry.agent)} | ${entry.status} | ${entry.mode} | ${files} | ${escapePipe(entry.nextAction)} |`;
+  }).join("\n");
+  const canonical = matrix.summary.canonicalSource ? `\`${matrix.summary.canonicalSource}\`` : "not found";
+
+  return `# Agent Compatibility Matrix
+
+- Repository: ${matrix.repository.name}
+- Ready agents: ${matrix.summary.ready}/${matrix.summary.total}
+- Canonical source: ${canonical}
+
+| Agent | Status | Mode | Files | Next action |
+| --- | --- | --- | --- | --- |
+${rows}
+`;
+}
+
 export function renderMarkdownReport(profile, findings, score) {
   const commandRows = Object.entries(profile.commands)
     .filter(([, value]) => value)

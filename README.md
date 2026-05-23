@@ -25,7 +25,7 @@ On a 2026-05-23 sample of six public AI/devtool repositories, the average Agent 
 Use the GitHub Action immediately:
 
 ```yaml
-- uses: EShener/agent-ready@v0.1.8
+- uses: EShener/agent-ready@v0.1.9
   with:
     fail-under: 80
 ```
@@ -35,6 +35,7 @@ Use the CLI from GitHub until the npm package is published:
 ```bash
 npx --yes github:EShener/agent-ready doctor
 npx --yes github:EShener/agent-ready explain
+npx --yes github:EShener/agent-ready matrix
 npx --yes github:EShener/agent-ready compare --before before.json --after after.json
 npx --yes github:EShener/agent-ready fix --dry-run
 npx --yes github:EShener/agent-ready init --dry-run
@@ -162,6 +163,15 @@ agent-ready explain
 agent-ready explain --format json
 ```
 
+### `matrix`
+
+Prints a compatibility matrix for Codex, Cursor, GitHub Copilot, Claude Code, and Gemini CLI.
+
+```bash
+agent-ready matrix
+agent-ready matrix --format json
+```
+
 ### `compare`
 
 Compares two readiness JSON files and prints a before/after score summary for PR comments, issues, and launch posts.
@@ -254,7 +264,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: EShener/agent-ready@v0.1.8
+      - uses: EShener/agent-ready@v0.1.9
         with:
           fail-under: 80
 ```

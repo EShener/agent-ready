@@ -5,7 +5,8 @@ import { explainRepo } from "./explainer.mjs";
 import { parseTargets, writeGeneratedArtifacts } from "./generator.mjs";
 import { promptInitOptions } from "./interactive.mjs";
 import { lintRepo, scoreRepo } from "./linter.mjs";
-import { renderAnnotations, renderBadge, renderBenchmarkReport, renderComparison, renderDoctor, renderExplanation, renderFindings, renderMarkdownReport, renderScanSummary, renderScore } from "./reporter.mjs";
+import { buildAgentMatrix } from "./matrix.mjs";
+import { renderAgentMatrix, renderAnnotations, renderBadge, renderBenchmarkReport, renderComparison, renderDoctor, renderExplanation, renderFindings, renderMarkdownReport, renderScanSummary, renderScore } from "./reporter.mjs";
 import { renderCiWorkflow, writeCiWorkflow } from "./workflow.mjs";
 
 const HELP = `agent-ready
@@ -20,6 +21,7 @@ Usage:
   agent-ready annotations [--root PATH] [--config PATH] [--format github|json]
   agent-ready score [--root PATH] [--config PATH] [--format json|text] [--fail-under N]
   agent-ready explain [--root PATH] [--config PATH] [--format markdown|json]
+  agent-ready matrix [--root PATH] [--config PATH] [--format markdown|json]
   agent-ready compare --before before.json --after after.json [--format markdown|json]
   agent-ready doctor [--root PATH] [--config PATH] [--format json|text] [--fail-under N]
   agent-ready report [--root PATH] [--config PATH] [--format markdown|json]
@@ -34,6 +36,7 @@ Examples:
   npx agent-ready init --interactive
   npx agent-ready doctor
   npx agent-ready explain
+  npx agent-ready matrix
   npx agent-ready compare --before before.json --after after.json
   npx agent-ready annotations
   npx agent-ready score --fail-under 80
@@ -146,6 +149,18 @@ export async function runCli(argv) {
     } else {
       if (flags.format && flags.format !== "markdown") throw new Error("Explain format must be markdown or json.");
       console.log(renderExplanation(explanation));
+    }
+    return;
+  }
+
+  if (command === "matrix") {
+    const profile = await scanRepo(root, scanOptions);
+    const matrix = buildAgentMatrix(profile);
+    if (flags.format === "json" || flags.json) {
+      console.log(JSON.stringify(matrix, null, 2));
+    } else {
+      if (flags.format && flags.format !== "markdown") throw new Error("Matrix format must be markdown or json.");
+      console.log(renderAgentMatrix(matrix));
     }
     return;
   }
