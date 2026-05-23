@@ -10,6 +10,10 @@ Make any repository ready for AI coding agents in 60 seconds.
 
 It is for developers using Codex, Claude Code, Cursor, Gemini CLI, GitHub Copilot, or any coding agent that needs repository instructions before editing safely.
 
+<p align="center">
+  <img src="docs/assets/agent-ready-pr-comment.gif" alt="agent-ready posts a pull request comment with score, compatibility, and top fixes" width="820">
+</p>
+
 ## Why This Exists
 
 AI coding agents fail for boring reasons: they do not know the test command, they miss local safety rules, they read stale instructions, or every tool has its own duplicated guidance.
@@ -25,7 +29,7 @@ On a 2026-05-23 sample of six public AI/devtool repositories, the average Agent 
 Use the GitHub Action immediately:
 
 ```yaml
-- uses: EShener/agent-ready@v0.1.12
+- uses: EShener/agent-ready@v0.1.13
   with:
     fail-under: 80
 ```
@@ -276,7 +280,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: EShener/agent-ready@v0.1.12
+      - uses: EShener/agent-ready@v0.1.13
         with:
           fail-under: 80
 ```
@@ -293,7 +297,7 @@ permissions:
 
 steps:
   - uses: actions/checkout@v4
-  - uses: EShener/agent-ready@v0.1.12
+  - uses: EShener/agent-ready@v0.1.13
     with:
       fail-under: 80
       comment: true

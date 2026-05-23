@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.13
+
+- Added a README demo GIF showing the pull request comment workflow.
+- Added a reproducible demo asset renderer at `scripts/render-demo-gif.py`.
+
 ## 0.1.12
 
 - Added optional pull request comment publishing to the reusable GitHub Action.
