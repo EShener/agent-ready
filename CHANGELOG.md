@@ -4,6 +4,7 @@
 
 - Added repository scanner for common JavaScript/TypeScript, Python, Rust, and Go projects.
 - Added `init` generation for `AGENTS.md`, Claude, Cursor, Gemini, and Copilot instruction files.
+- Added `doctor` command for a compact diagnosis and screenshot-friendly summary.
 - Added readiness linter with actionable findings.
 - Added explainable Agent Readiness Score.
 - Added Markdown/JSON reports.

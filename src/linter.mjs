@@ -130,6 +130,7 @@ async function findStalePathReferences(root, file, text) {
   const candidates = extractBacktickPaths(text);
   for (const candidate of candidates) {
     if (candidate === file) continue;
+    if (candidate === "agent-ready.json") continue;
     const absolute = path.join(root, candidate);
     if (!await pathExists(absolute)) {
       findings.push(finding("warning", "stale-path-reference", `${file} references missing path "${candidate}".`, file, "Update or remove the stale path reference."));

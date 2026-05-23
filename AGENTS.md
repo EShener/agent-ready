@@ -12,6 +12,7 @@
 - `src/generator.mjs`: `AGENTS.md` and tool-specific shim generation.
 - `src/linter.mjs`: readiness rules and scoring inputs.
 - `src/reporter.mjs`: text, JSON, and Markdown output rendering.
+- `src/config.mjs`: optional `agent-ready.json` loading and validation.
 - `test/`: Node test suite and repository fixtures.
 
 ## Commands
@@ -35,5 +36,6 @@
 ## Verification
 - Run `npm run check` after syntax-level changes.
 - Run `npm test` after scanner, generator, linter, reporter, or CLI behavior changes.
+- Run `node bin/agent-ready.mjs doctor` before release-facing documentation changes.
 - For generated docs changes, run `node bin/agent-ready.mjs init --dry-run`.
 - If a verification command cannot run locally, document the exact reason.

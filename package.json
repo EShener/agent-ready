@@ -13,6 +13,8 @@
     "LICENSE",
     "CHANGELOG.md",
     "CONTRIBUTING.md",
+    "CODE_OF_CONDUCT.md",
+    "SECURITY.md",
     "LAUNCH.md",
     "AGENTS.md",
     "CLAUDE.md",
@@ -20,6 +22,14 @@
     ".cursor/rules/agent-ready.mdc",
     ".github/copilot-instructions.md"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EShener/agent-ready.git"
+  },
+  "homepage": "https://github.com/EShener/agent-ready#readme",
+  "bugs": {
+    "url": "https://github.com/EShener/agent-ready/issues"
+  },
   "scripts": {
     "test": "node --test test/*.test.mjs",
     "lint": "npm run check",
@@ -30,12 +40,17 @@
   },
   "keywords": [
     "ai-agents",
+    "agentic-coding",
+    "agents-md",
     "codex",
     "claude-code",
     "cursor",
     "gemini-cli",
     "copilot",
-    "developer-tools"
+    "developer-tools",
+    "cli",
+    "github-copilot",
+    "mcp"
   ],
   "license": "MIT"
 }

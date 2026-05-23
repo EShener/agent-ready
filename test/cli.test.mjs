@@ -44,6 +44,13 @@ test("badge CLI emits markdown badge", async () => {
   assert.match(stdout, /!\[agent-ready\]\(https:\/\/img\.shields\.io\/badge\/agent--ready-/);
 });
 
+test("doctor CLI emits a screenshot-friendly summary", async () => {
+  const { stdout } = await execFileAsync(process.execPath, [bin, "doctor", "--root", fixture("node-app")], { cwd: root });
+  assert.match(stdout, /agent-ready doctor: fixture-node-app/);
+  assert.match(stdout, /Score:/);
+  assert.match(stdout, /Top fixes:|Status: ready/);
+});
+
 test("score CLI fail-under exits non-zero below threshold", async () => {
   await assert.rejects(
     execFileAsync(process.execPath, [bin, "score", "--root", fixture("empty-repo"), "--fail-under", "95"], { cwd: root }),

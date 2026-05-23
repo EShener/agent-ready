@@ -4,7 +4,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { buildAgentsMd, planGeneratedArtifacts } from "../src/generator.mjs";
 import { lintRepo, scoreRepo } from "../src/linter.mjs";
-import { renderMarkdownReport } from "../src/reporter.mjs";
+import { renderDoctor, renderMarkdownReport } from "../src/reporter.mjs";
 import { scanRepo } from "../src/scanner.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -86,6 +86,24 @@ test("markdown report includes commands, docs, and findings", async () => {
   assert.match(report, /Agent Readiness Report/);
   assert.match(report, /fixture-node-app/);
   assert.match(report, /npm run test/);
+});
+
+test("doctor report includes score and next action", async () => {
+  const profile = await scanRepo(fixture("empty-repo"));
+  const findings = await lintRepo(profile);
+  const score = scoreRepo(profile, findings);
+  const output = renderDoctor(profile, findings, score);
+
+  assert.match(output, /agent-ready doctor:/);
+  assert.match(output, /Top fixes:/);
+  assert.match(output, /agent-ready init --dry-run/);
+});
+
+test("optional agent-ready.json references do not count as stale paths", async () => {
+  const profile = await scanRepo(path.join(__dirname, ".."));
+  const findings = await lintRepo(profile);
+
+  assert.equal(findings.some((finding) => finding.ruleId === "stale-path-reference" && finding.message.includes("agent-ready.json")), false);
 });
 
 test("shim docs that reference AGENTS.md do not need duplicate sections", async () => {

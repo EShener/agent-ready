@@ -22,6 +22,7 @@ npm test
 
 ```bash
 node bin/agent-ready.mjs scan --root test/fixtures/node-app
+node bin/agent-ready.mjs doctor --root test/fixtures/node-app
 node bin/agent-ready.mjs init --root test/fixtures/node-app --dry-run
 node bin/agent-ready.mjs report --root test/fixtures/node-app
 node bin/agent-ready.mjs badge --root test/fixtures/node-app

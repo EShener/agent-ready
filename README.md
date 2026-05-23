@@ -2,52 +2,87 @@
 
 Make any repository ready for AI coding agents in 60 seconds.
 
+[![CI](https://github.com/EShener/agent-ready/actions/workflows/ci.yml/badge.svg)](https://github.com/EShener/agent-ready/actions/workflows/ci.yml)
 ![agent-ready](https://img.shields.io/badge/agent--ready-100%2F100-brightgreen)
+![license](https://img.shields.io/badge/license-MIT-blue)
 
-`agent-ready` is a zero-dependency CLI that scans a codebase, generates canonical AI agent instructions, checks the instructions for drift and missing verification steps, and gives the repository an Agent Readiness Score.
+`agent-ready` is a zero-dependency CLI that scans a codebase, generates canonical AI agent instructions, checks them for drift and missing verification steps, and gives the repository an explainable Agent Readiness Score.
 
-## Quick Start
+It is for developers using Codex, Claude Code, Cursor, Gemini CLI, GitHub Copilot, or any coding agent that needs repository instructions before editing safely.
+
+## Why This Exists
+
+AI coding agents fail for boring reasons: they do not know the test command, they miss local safety rules, they read stale instructions, or every tool has its own duplicated guidance.
+
+`agent-ready` turns that tribal knowledge into a small, lintable repository contract.
+
+## 60 Second Demo
 
 ```bash
-npx agent-ready scan
+npx agent-ready doctor
+npx agent-ready init --dry-run
+npx agent-ready score --fail-under 80
+```
+
+Example output:
+
+```text
+agent-ready doctor: my-app
+Score: 72/100 (C)
+Primary language: TypeScript
+Commands: install=npm install; test=npm run test
+Agent docs: none
+
+Top fixes:
+- [warning] Missing AGENTS.md canonical agent instructions.
+  Run `agent-ready init --targets codex`.
+```
+
+After review, generate the files:
+
+```bash
 npx agent-ready init --targets codex,claude,cursor,gemini,copilot
-npx agent-ready lint
-npx agent-ready score
-npx agent-ready badge
 ```
 
-For local development in this repository:
+## What It Generates
 
-```bash
-node bin/agent-ready.mjs scan --root test/fixtures/node-app
-node bin/agent-ready.mjs init --root test/fixtures/node-app --dry-run
-npm test
-```
+- `AGENTS.md` as the canonical source of truth
+- `CLAUDE.md`
+- `.cursor/rules/agent-ready.mdc`
+- `GEMINI.md`
+- `.github/copilot-instructions.md`
+
+The tool-specific files are intentionally small shims that point back to `AGENTS.md`, so instructions do not drift across tools.
 
 ## Commands
+
+### `doctor`
+
+Runs scan, lint, and score together. This is the best first command and the best screenshot for issues.
+
+```bash
+agent-ready doctor
+agent-ready doctor --format json
+agent-ready doctor --fail-under 80
+```
 
 ### `scan`
 
 Detects languages, frameworks, package manager, CI, standard commands, existing agent docs, README, and top-level structure.
 
 ```bash
+agent-ready scan
 agent-ready scan --format json
 ```
 
 ### `init`
 
-Generates agent instruction files:
-
-- `AGENTS.md` for Codex and generic agents
-- `CLAUDE.md`
-- `.cursor/rules/agent-ready.mdc`
-- `GEMINI.md`
-- `.github/copilot-instructions.md`
-
-Existing files are skipped unless `--force` is provided.
+Plans or writes agent instruction files. Existing files are skipped unless `--force` is provided.
 
 ```bash
-agent-ready init --targets codex,claude,cursor --dry-run
+agent-ready init --dry-run
+agent-ready init --targets codex,claude,cursor
+agent-ready init --force
 ```
 
 ### `lint`
@@ -62,6 +97,7 @@ Finds missing or risky agent readiness gaps:
 - Drift-prone duplicate agent docs
 
 ```bash
+agent-ready lint
 agent-ready lint --format json
 ```
 
@@ -137,9 +173,15 @@ jobs:
       - run: npx agent-ready score --fail-under 80
 ```
 
-## Launch Assets
+## Supported Detection
 
-See `LAUNCH.md` for repository setup, demo checklist, and copy for Show HN or social posts.
+Current detectors cover common JavaScript/TypeScript, Python, Rust, and Go repositories:
+
+- package manager: npm, pnpm, yarn, bun, pip, cargo, go
+- commands: install, dev, start, build, test, lint, format
+- docs: README, architecture docs, ADR directories, existing agent docs
+- CI: GitHub Actions workflows
+- frameworks: React, Vite, Next.js, Vue, Astro, Svelte, Express, NestJS, FastAPI, Django, Flask, Pytest, Rust web frameworks, Gin
 
 ## Design Principles
 
@@ -149,11 +191,30 @@ See `LAUNCH.md` for repository setup, demo checklist, and copy for Show HN or so
 - Verification-first: agents should know how to run the smallest relevant checks.
 - Compact context: instructions should be short enough to fit naturally into agent context.
 
-## Development
+## Roadmap
+
+- More framework detectors and fixture coverage
+- GitHub Action wrapper
+- `agent-ready init --interactive`
+- MCP server for editor and agent integrations
+- Repository badge automation
+- Benchmarks on real open-source repositories
+
+## Contributing
+
+Good first issues:
+
+- Add a detector for a framework you use.
+- Add a fixture for a repository shape that currently scores poorly.
+- Improve a lint rule with a clearer fix suggestion.
+- Add support for another agent instruction target.
+
+Run checks before opening a PR:
 
 ```bash
-npm test
 npm run check
+npm test
+node bin/agent-ready.mjs score --fail-under 90
 ```
 
-The implementation uses only Node.js built-ins so it can run anywhere Node 20+ is available.
+See `CONTRIBUTING.md` and `LAUNCH.md` for contributor and launch notes.

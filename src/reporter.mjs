@@ -33,6 +33,32 @@ export function renderScore(score) {
   return lines.join("\n");
 }
 
+export function renderDoctor(profile, findings, score) {
+  const lines = [
+    `agent-ready doctor: ${profile.name}`,
+    `Score: ${score.score}/100 (${score.grade})`,
+    `Primary language: ${profile.primaryLanguage}`,
+    `Commands: ${Object.entries(profile.commands).filter(([, value]) => value).map(([key, value]) => `${key}=${value}`).join("; ") || "none"}`,
+    `Agent docs: ${profile.agentDocs.map((doc) => doc.file).join(", ") || "none"}`,
+    "",
+  ];
+
+  if (!findings.length) {
+    lines.push("Status: ready");
+    lines.push("Next: keep AGENTS.md short, current, and verified in CI.");
+    return lines.join("\n");
+  }
+
+  lines.push("Top fixes:");
+  for (const finding of findings.slice(0, 5)) {
+    lines.push(`- [${finding.severity}] ${finding.message}`);
+    lines.push(`  ${finding.fixSuggestion}`);
+  }
+  lines.push("");
+  lines.push("Next: run `agent-ready init --dry-run`, apply the relevant files, then run `agent-ready score` again.");
+  return lines.join("\n");
+}
+
 export function renderBadge(score, format = "markdown") {
   const encodedScore = encodeURIComponent(`${score.score}/100`);
   const color = badgeColor(score.score);

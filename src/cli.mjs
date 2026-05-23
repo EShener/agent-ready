@@ -1,7 +1,7 @@
 import { scanRepo } from "./scanner.mjs";
 import { parseTargets, writeGeneratedArtifacts } from "./generator.mjs";
 import { lintRepo, scoreRepo } from "./linter.mjs";
-import { renderBadge, renderFindings, renderMarkdownReport, renderScanSummary, renderScore } from "./reporter.mjs";
+import { renderBadge, renderDoctor, renderFindings, renderMarkdownReport, renderScanSummary, renderScore } from "./reporter.mjs";
 
 const HELP = `agent-ready
 
@@ -12,12 +12,14 @@ Usage:
   agent-ready init [--root PATH] [--config PATH] [--targets codex,claude,cursor,gemini,copilot] [--dry-run] [--force]
   agent-ready lint [--root PATH] [--config PATH] [--format json|text]
   agent-ready score [--root PATH] [--config PATH] [--format json|text] [--fail-under N]
+  agent-ready doctor [--root PATH] [--config PATH] [--format json|text] [--fail-under N]
   agent-ready report [--root PATH] [--config PATH] [--format markdown|json]
   agent-ready badge [--root PATH] [--config PATH] [--format markdown|url|json] [--fail-under N]
 
 Examples:
   npx agent-ready scan
   npx agent-ready init --targets codex,claude,cursor
+  npx agent-ready doctor
   npx agent-ready score --fail-under 80
   npx agent-ready report --format markdown
 `;
@@ -67,6 +69,16 @@ export async function runCli(argv) {
     const score = scoreRepo(profile, findings);
     if (flags.format === "json" || flags.json) console.log(JSON.stringify(score, null, 2));
     else console.log(renderScore(score));
+    applyFailUnder(score, flags["fail-under"]);
+    return;
+  }
+
+  if (command === "doctor") {
+    const profile = await scanRepo(root, scanOptions);
+    const findings = await lintRepo(profile);
+    const score = scoreRepo(profile, findings);
+    if (flags.format === "json" || flags.json) console.log(JSON.stringify({ profile, findings, score }, null, 2));
+    else console.log(renderDoctor(profile, findings, score));
     applyFailUnder(score, flags["fail-under"]);
     return;
   }
