@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import fs from "node:fs/promises";
 import path from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
@@ -162,4 +163,14 @@ test("workflow renderer validates mode and fail-under values", () => {
   assert.match(renderCiWorkflow({ mode: "npx", failUnder: "70" }), /npx agent-ready score --fail-under 70/);
   assert.throws(() => renderCiWorkflow({ mode: "bad" }), /--mode/);
   assert.throws(() => renderCiWorkflow({ failUnder: "101" }), /--fail-under/);
+});
+
+test("reusable action writes a GitHub Step Summary before scoring", async () => {
+  const action = await fs.readFile(path.join(__dirname, "..", "action.yml"), "utf8");
+
+  assert.match(action, /Write agent-ready summary/);
+  assert.match(action, /GITHUB_STEP_SUMMARY/);
+  assert.match(action, /doctor --config/);
+  assert.match(action, /report --config/);
+  assert.match(action, /Score agent readiness/);
 });

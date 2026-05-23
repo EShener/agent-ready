@@ -27,6 +27,31 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version: 20
+    - name: Write agent-ready summary
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        if [ -z "${GITHUB_STEP_SUMMARY:-}" ]; then
+          exit 0
+        fi
+
+        {
+          echo "## Agent Ready"
+          echo
+          echo '```text'
+          if [ -n "${{ inputs.config }}" ]; then
+            node "$GITHUB_ACTION_PATH/bin/agent-ready.mjs" doctor --config "${{ inputs.config }}"
+          else
+            node "$GITHUB_ACTION_PATH/bin/agent-ready.mjs" doctor
+          fi
+          echo '```'
+          echo
+          if [ -n "${{ inputs.config }}" ]; then
+            node "$GITHUB_ACTION_PATH/bin/agent-ready.mjs" report --config "${{ inputs.config }}" --format markdown
+          else
+            node "$GITHUB_ACTION_PATH/bin/agent-ready.mjs" report --format markdown
+          fi
+        } >> "$GITHUB_STEP_SUMMARY"
     - name: Score agent readiness
       shell: bash
       working-directory: ${{ inputs.working-directory }}

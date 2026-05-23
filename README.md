@@ -196,6 +196,8 @@ jobs:
           fail-under: 80
 ```
 
+The action writes a diagnosis and Markdown report to the GitHub Actions Step Summary, then fails the job when the score is below `fail-under`.
+
 Generate this workflow with:
 
 ```bash

@@ -3,6 +3,7 @@
 ## 0.1.1
 
 - Added `init --interactive` for guided setup.
+- Added GitHub Actions Step Summary output to the reusable action.
 
 ## 0.1.0
 
