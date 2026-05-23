@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: EShener/agent-ready@main
+      - uses: EShener/agent-ready@v0.1.0
         with:
           fail-under: ${failUnder}
 `;
