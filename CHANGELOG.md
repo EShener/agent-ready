@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.18
+
+- Added `agent-ready leaderboard` for share-ready multi-repository readiness rankings.
+- Added common readiness gap aggregation so teams can see repeated issues across repositories.
+
 ## 0.1.17
 
 - Added `agent-ready improve --format issue` to turn readiness improvements into a GitHub-ready task checklist.

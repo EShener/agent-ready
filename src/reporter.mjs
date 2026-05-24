@@ -119,6 +119,55 @@ ${rows}
 `;
 }
 
+export function renderLeaderboard(benchmark) {
+  const rows = benchmark.repos.length
+    ? benchmark.repos.map((repo, index) => {
+        const topFix = repo.topFindings[0]?.ruleId || "ready";
+        return `| ${index + 1} | ${escapePipe(repo.name)} | ${repo.score}/100 | ${repo.grade} | ${repo.agentDocs} | ${repo.findings} | ${escapePipe(topFix)} |`;
+      }).join("\n")
+    : "| - | none | 0/100 | - | 0 | 0 | - |";
+  const gapRows = benchmark.commonFindings?.length
+    ? benchmark.commonFindings.map((item) => `| ${item.count} | ${escapePipe(item.ruleId)} | ${item.severity} | ${escapePipe(item.fixSuggestion)} |`).join("\n")
+    : "| 0 | none | ok | No common readiness gaps. |";
+  const best = benchmark.repos[0];
+  const weakest = benchmark.repos[benchmark.repos.length - 1];
+  const bestLine = best ? `${best.name} (${best.score}/100)` : "none";
+  const weakestLine = weakest ? `${weakest.name} (${weakest.score}/100)` : "none";
+
+  return `# Agent Readiness Leaderboard
+
+- Repositories scanned: ${benchmark.count}
+- Average score: ${benchmark.averageScore}/100
+- Ready repositories: ${benchmark.readyCount || 0}
+- Needs work: ${benchmark.needsWorkCount || 0}
+- Best: ${escapePipe(bestLine)}
+- Biggest opportunity: ${escapePipe(weakestLine)}
+- Generated: ${benchmark.generatedAt}
+
+## Ranking
+| Rank | Repository | Score | Grade | Agent docs | Findings | Top fix |
+| --- | --- | ---: | --- | ---: | ---: | --- |
+${rows}
+
+## Most Common Gaps
+| Repos | Rule | Severity | Suggested fix |
+| ---: | --- | --- | --- |
+${gapRows}
+
+## Share Snippet
+
+AI coding agents work better when repositories document commands, safety boundaries, and verification paths.
+
+This scan covered ${benchmark.count} repositories. Average Agent Readiness Score: ${benchmark.averageScore}/100. Most common gap: ${benchmark.commonFindings?.[0]?.ruleId || "none"}.
+
+Run:
+
+\`\`\`bash
+npx --yes github:EShener/agent-ready leaderboard <repo-a> <repo-b>
+\`\`\`
+`;
+}
+
 export function renderExplanation(explanation) {
   const rows = explanation.items.length
     ? explanation.items.map((item) => `| +${item.points} | ${escapePipe(item.ruleId)} | ${item.severity} | ${escapePipe(item.file)} | ${escapePipe(item.why)} | ${escapePipe(item.fixSuggestion)} |`).join("\n")

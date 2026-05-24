@@ -8,7 +8,7 @@ import { improveRepo } from "./improver.mjs";
 import { promptInitOptions } from "./interactive.mjs";
 import { lintRepo, scoreRepo } from "./linter.mjs";
 import { buildAgentMatrix } from "./matrix.mjs";
-import { renderAgentMatrix, renderAnnotations, renderBadge, renderBenchmarkReport, renderComparison, renderDoctor, renderExplanation, renderFindings, renderImprovement, renderImprovementIssue, renderMarkdownReport, renderScanSummary, renderScore, renderShareComment } from "./reporter.mjs";
+import { renderAgentMatrix, renderAnnotations, renderBadge, renderBenchmarkReport, renderComparison, renderDoctor, renderExplanation, renderFindings, renderImprovement, renderImprovementIssue, renderLeaderboard, renderMarkdownReport, renderScanSummary, renderScore, renderShareComment } from "./reporter.mjs";
 import { renderCiWorkflow, writeCiWorkflow } from "./workflow.mjs";
 
 const HELP = `agent-ready
@@ -31,6 +31,7 @@ Usage:
   agent-ready report [--root PATH] [--config PATH] [--format markdown|json]
   agent-ready badge [--root PATH] [--config PATH] [--format markdown|url|json] [--fail-under N]
   agent-ready benchmark [PATH...] [--root PATH] [--config PATH] [--format markdown|json]
+  agent-ready leaderboard [PATH...] [--root PATH] [--config PATH] [--format markdown|json]
   agent-ready ci [--mode action|npx] [--fail-under N] [--comment] [--write] [--dry-run] [--force] [--output PATH]
 
 Examples:
@@ -53,6 +54,7 @@ Examples:
   npx agent-ready ci --comment
   npx agent-ready report --format markdown
   npx agent-ready benchmark ../repo-a ../repo-b
+  npx agent-ready leaderboard ../repo-a ../repo-b
 `;
 
 export async function runCli(argv) {
@@ -266,6 +268,20 @@ export async function runCli(argv) {
     } else {
       if (flags.format && flags.format !== "markdown") throw new Error("Benchmark format must be markdown or json.");
       console.log(renderBenchmarkReport(benchmark));
+    }
+    return;
+  }
+
+  if (command === "leaderboard") {
+    const benchmark = await benchmarkRepos(args, {
+      root,
+      configPath: scanOptions.configPath,
+    });
+    if (flags.format === "json" || flags.json) {
+      console.log(JSON.stringify(benchmark, null, 2));
+    } else {
+      if (flags.format && flags.format !== "markdown") throw new Error("Leaderboard format must be markdown or json.");
+      console.log(renderLeaderboard(benchmark));
     }
     return;
   }

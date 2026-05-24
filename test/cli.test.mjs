@@ -269,9 +269,26 @@ test("benchmark CLI emits JSON when requested", async () => {
   assert.equal(payload.repos[0].name, "fixture-node-app");
 });
 
+test("leaderboard CLI emits a shareable Markdown leaderboard", async () => {
+  const { stdout } = await execFileAsync(process.execPath, [bin, "leaderboard", "test/fixtures/node-app", "test/fixtures/bad-agent-docs"], { cwd: root });
+
+  assert.match(stdout, /Agent Readiness Leaderboard/);
+  assert.match(stdout, /Most Common Gaps/);
+  assert.match(stdout, /Share Snippet/);
+  assert.match(stdout, /missing-agents-md/);
+});
+
+test("leaderboard CLI emits JSON when requested", async () => {
+  const { stdout } = await execFileAsync(process.execPath, [bin, "leaderboard", "--root", "test/fixtures", "node-app", "bad-agent-docs", "--format", "json"], { cwd: root });
+  const payload = JSON.parse(stdout);
+
+  assert.equal(payload.count, 2);
+  assert.ok(payload.commonFindings.some((finding) => finding.ruleId === "missing-agents-md"));
+});
+
 test("ci CLI emits reusable GitHub Action workflow by default", async () => {
   const { stdout } = await execFileAsync(process.execPath, [bin, "ci", "--fail-under", "85"], { cwd: root });
-  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.17/);
+  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.18/);
   assert.match(stdout, /fail-under: 85/);
 });
 

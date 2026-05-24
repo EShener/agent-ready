@@ -7,12 +7,14 @@ export async function benchmarkRepos(targets = [], options = {}) {
   const configPath = typeof options.configPath === "string" ? options.configPath : undefined;
   const selectedTargets = targets.length ? targets : [baseRoot];
   const repos = [];
+  const allFindings = [];
 
   for (const target of selectedTargets) {
     const repoRoot = path.resolve(baseRoot, target);
     const profile = await scanRepo(repoRoot, { configPath });
     const findings = await lintRepo(profile);
     const score = scoreRepo(profile, findings);
+    allFindings.push(...findings);
     repos.push({
       name: profile.name,
       root: profile.root,
@@ -44,6 +46,9 @@ export async function benchmarkRepos(targets = [], options = {}) {
     generatedAt: new Date().toISOString(),
     count: repos.length,
     averageScore: averageScore(repos),
+    readyCount: repos.filter((repo) => repo.score >= 90).length,
+    needsWorkCount: repos.filter((repo) => repo.score < 75).length,
+    commonFindings: summarizeFindings(allFindings),
     repos,
   };
 }
@@ -57,4 +62,21 @@ function formatDisplayPath(repoRoot, baseRoot) {
   const relative = path.relative(baseRoot, repoRoot);
   if (!relative) return ".";
   return relative.startsWith("..") ? repoRoot : relative.split(path.sep).join("/");
+}
+
+function summarizeFindings(findings) {
+  const counts = new Map();
+  for (const finding of findings) {
+    const current = counts.get(finding.ruleId) || {
+      ruleId: finding.ruleId,
+      severity: finding.severity,
+      count: 0,
+      fixSuggestion: finding.fixSuggestion,
+    };
+    current.count += 1;
+    counts.set(finding.ruleId, current);
+  }
+  return [...counts.values()]
+    .sort((a, b) => b.count - a.count || a.ruleId.localeCompare(b.ruleId))
+    .slice(0, 10);
 }
