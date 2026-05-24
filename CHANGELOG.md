@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.19
+
+- Added `agent-ready roadmap` to turn multi-repository readiness gaps into a phased cleanup plan.
+- Added affected repository lists to common finding aggregation for team planning.
+
 ## 0.1.18
 
 - Added `agent-ready leaderboard` for share-ready multi-repository readiness rankings.

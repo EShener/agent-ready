@@ -37,7 +37,7 @@ On a 2026-05-23 sample of six public AI/devtool repositories, the average Agent 
 Use the GitHub Action immediately:
 
 ```yaml
-- uses: EShener/agent-ready@v0.1.18
+- uses: EShener/agent-ready@v0.1.19
   with:
     fail-under: 80
 ```
@@ -62,6 +62,7 @@ npx --yes github:EShener/agent-ready ci --comment
 npx --yes github:EShener/agent-ready ci --write --dry-run
 npx --yes github:EShener/agent-ready benchmark ../repo-a ../repo-b
 npx --yes github:EShener/agent-ready leaderboard ../repo-a ../repo-b
+npx --yes github:EShener/agent-ready roadmap ../repo-a ../repo-b
 ```
 
 Example output:
@@ -269,6 +270,16 @@ agent-ready leaderboard --root ../work repo-a repo-b
 agent-ready leaderboard --format json
 ```
 
+### `roadmap`
+
+Turns a multi-repository scan into a phased readiness cleanup roadmap for team planning.
+
+```bash
+agent-ready roadmap ../repo-a ../repo-b
+agent-ready roadmap --root ../work repo-a repo-b
+agent-ready roadmap --format json
+```
+
 ### `ci`
 
 Prints a ready-to-paste GitHub Actions workflow.
@@ -320,7 +331,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: EShener/agent-ready@v0.1.18
+      - uses: EShener/agent-ready@v0.1.19
         with:
           fail-under: 80
 ```
@@ -337,7 +348,7 @@ permissions:
 
 steps:
   - uses: actions/checkout@v4
-  - uses: EShener/agent-ready@v0.1.18
+  - uses: EShener/agent-ready@v0.1.19
     with:
       fail-under: 80
       comment: true

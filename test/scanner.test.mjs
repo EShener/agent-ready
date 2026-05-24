@@ -11,7 +11,7 @@ import { buildAgentsMd, planGeneratedArtifacts } from "../src/generator.mjs";
 import { improveRepo } from "../src/improver.mjs";
 import { lintRepo, scoreRepo } from "../src/linter.mjs";
 import { buildAgentMatrix } from "../src/matrix.mjs";
-import { renderAgentMatrix, renderAnnotations, renderBenchmarkReport, renderComparison, renderDoctor, renderExplanation, renderImprovement, renderImprovementIssue, renderLeaderboard, renderMarkdownReport, renderShareComment } from "../src/reporter.mjs";
+import { renderAgentMatrix, renderAnnotations, renderBenchmarkReport, renderComparison, renderDoctor, renderExplanation, renderImprovement, renderImprovementIssue, renderLeaderboard, renderMarkdownReport, renderRoadmap, renderShareComment } from "../src/reporter.mjs";
 import { scanRepo } from "../src/scanner.mjs";
 import { renderCiWorkflow, writeCiWorkflow } from "../src/workflow.mjs";
 
@@ -241,16 +241,20 @@ test("benchmark ranks multiple repositories and renders a leaderboard", async ()
   const benchmark = await benchmarkRepos(["node-app", "bad-agent-docs"], { root: fixture("") });
   const report = renderBenchmarkReport(benchmark);
   const leaderboard = renderLeaderboard(benchmark);
+  const roadmap = renderRoadmap(benchmark);
 
   assert.equal(benchmark.count, 2);
   assert.equal(benchmark.repos[0].name, "fixture-node-app");
   assert.ok(benchmark.repos[0].score > benchmark.repos[1].score);
   assert.ok(benchmark.commonFindings.some((finding) => finding.ruleId === "missing-agents-md"));
+  assert.deepEqual(benchmark.commonFindings.find((finding) => finding.ruleId === "missing-agents-md").repositories.sort(), ["bad-agent-docs", "fixture-node-app"]);
   assert.match(report, /Agent Readiness Benchmark/);
   assert.match(report, /\| 1 \| fixture-node-app \|/);
   assert.match(report, /missing-agents-md/);
   assert.match(leaderboard, /Agent Readiness Leaderboard/);
   assert.match(leaderboard, /Most Common Gaps/);
+  assert.match(roadmap, /Agent Readiness Roadmap/);
+  assert.match(roadmap, /Phase 1: Establish Agent Handoff/);
 });
 
 test("GitHub annotations render findings with workflow command escaping", () => {
@@ -319,7 +323,7 @@ test("scan applies agent-ready.json command and doc overrides", async () => {
 });
 
 test("workflow renderer validates mode and fail-under values", () => {
-  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.18/);
+  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.19/);
   assert.match(renderCiWorkflow({ mode: "action", comment: true }), /comment: true/);
   assert.match(renderCiWorkflow({ mode: "action", comment: true }), /pull-requests: write/);
   assert.match(renderCiWorkflow({ mode: "npx", failUnder: "70" }), /npx agent-ready score --fail-under 70/);

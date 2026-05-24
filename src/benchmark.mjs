@@ -14,7 +14,7 @@ export async function benchmarkRepos(targets = [], options = {}) {
     const profile = await scanRepo(repoRoot, { configPath });
     const findings = await lintRepo(profile);
     const score = scoreRepo(profile, findings);
-    allFindings.push(...findings);
+    allFindings.push(...findings.map((finding) => ({ ...finding, repository: profile.name })));
     repos.push({
       name: profile.name,
       root: profile.root,
@@ -72,11 +72,14 @@ function summarizeFindings(findings) {
       severity: finding.severity,
       count: 0,
       fixSuggestion: finding.fixSuggestion,
+      repositories: new Set(),
     };
     current.count += 1;
+    current.repositories.add(finding.repository);
     counts.set(finding.ruleId, current);
   }
   return [...counts.values()]
+    .map((item) => ({ ...item, repositories: [...item.repositories].sort() }))
     .sort((a, b) => b.count - a.count || a.ruleId.localeCompare(b.ruleId))
     .slice(0, 10);
 }
