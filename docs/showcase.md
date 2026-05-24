@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: EShener/agent-ready@v0.1.16
+      - uses: EShener/agent-ready@v0.1.17
         with:
           fail-under: 80
           comment: true
@@ -71,6 +71,7 @@ npx --yes github:EShener/agent-ready ci --comment --write
 npx --yes github:EShener/agent-ready doctor
 npx --yes github:EShener/agent-ready explain
 npx --yes github:EShener/agent-ready improve --level team --dry-run
+npx --yes github:EShener/agent-ready improve --dry-run --format issue
 npx --yes github:EShener/agent-ready fix --dry-run
 npx --yes github:EShener/agent-ready fix --level team --dry-run
 npx --yes github:EShener/agent-ready fix
@@ -97,5 +98,5 @@ agent-ready adds a score, AGENTS.md generation, CI annotations, a compatibility 
 
 Try it:
 
-npx --yes github:EShener/agent-ready improve --dry-run
+npx --yes github:EShener/agent-ready improve --dry-run --format issue
 ```

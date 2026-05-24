@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.17
+
+- Added `agent-ready improve --format issue` to turn readiness improvements into a GitHub-ready task checklist.
+- Updated launch and showcase examples so maintainers can copy a contributor-friendly issue body directly from the CLI.
+
 ## 0.1.16
 
 - Added `agent-ready improve` for a closed-loop readiness upgrade workflow: scan, apply staged fixes, rescan, and report before/after score.

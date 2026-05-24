@@ -11,7 +11,7 @@ import { buildAgentsMd, planGeneratedArtifacts } from "../src/generator.mjs";
 import { improveRepo } from "../src/improver.mjs";
 import { lintRepo, scoreRepo } from "../src/linter.mjs";
 import { buildAgentMatrix } from "../src/matrix.mjs";
-import { renderAgentMatrix, renderAnnotations, renderBenchmarkReport, renderComparison, renderDoctor, renderExplanation, renderImprovement, renderMarkdownReport, renderShareComment } from "../src/reporter.mjs";
+import { renderAgentMatrix, renderAnnotations, renderBenchmarkReport, renderComparison, renderDoctor, renderExplanation, renderImprovement, renderImprovementIssue, renderMarkdownReport, renderShareComment } from "../src/reporter.mjs";
 import { scanRepo } from "../src/scanner.mjs";
 import { renderCiWorkflow, writeCiWorkflow } from "../src/workflow.mjs";
 
@@ -181,6 +181,7 @@ test("improver plans safe changes and renders before/after reports", async () =>
 
   const dryRun = await improveRepo({ root: temp, targets: ["codex"], dryRun: true, noCi: true });
   const dryRunMarkdown = renderImprovement(dryRun);
+  const dryRunIssue = renderImprovementIssue(dryRun);
 
   assert.equal(dryRun.mode, "dry-run");
   assert.equal(dryRun.score.estimated, true);
@@ -189,6 +190,9 @@ test("improver plans safe changes and renders before/after reports", async () =>
   assert.match(dryRunMarkdown, /Agent Ready Improvement/);
   assert.match(dryRunMarkdown, /estimated \+\d+/);
   assert.match(dryRunMarkdown, /\| planned \| AGENTS\.md \| codex \|/);
+  assert.match(dryRunIssue, /Improve agent readiness for improver-demo/);
+  assert.match(dryRunIssue, /- \[ \] Add `AGENTS\.md`/);
+  assert.match(dryRunIssue, /Verification/);
   await assert.rejects(fs.access(path.join(temp, "AGENTS.md")));
 
   const applied = await improveRepo({ root: temp, targets: ["codex"], noCi: true });
@@ -311,7 +315,7 @@ test("scan applies agent-ready.json command and doc overrides", async () => {
 });
 
 test("workflow renderer validates mode and fail-under values", () => {
-  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.16/);
+  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.17/);
   assert.match(renderCiWorkflow({ mode: "action", comment: true }), /comment: true/);
   assert.match(renderCiWorkflow({ mode: "action", comment: true }), /pull-requests: write/);
   assert.match(renderCiWorkflow({ mode: "npx", failUnder: "70" }), /npx agent-ready score --fail-under 70/);

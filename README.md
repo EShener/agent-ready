@@ -37,7 +37,7 @@ On a 2026-05-23 sample of six public AI/devtool repositories, the average Agent 
 Use the GitHub Action immediately:
 
 ```yaml
-- uses: EShener/agent-ready@v0.1.16
+- uses: EShener/agent-ready@v0.1.17
   with:
     fail-under: 80
 ```
@@ -51,6 +51,7 @@ npx --yes github:EShener/agent-ready matrix
 npx --yes github:EShener/agent-ready comment
 npx --yes github:EShener/agent-ready compare --before before.json --after after.json
 npx --yes github:EShener/agent-ready improve --dry-run
+npx --yes github:EShener/agent-ready improve --dry-run --format issue
 npx --yes github:EShener/agent-ready improve --level team
 npx --yes github:EShener/agent-ready fix --dry-run
 npx --yes github:EShener/agent-ready fix --level team --dry-run
@@ -141,13 +142,14 @@ agent-ready fix --force
 
 ### `improve`
 
-Runs scan, applies staged fixes, rescans, and prints a before/after improvement report. Use `--dry-run` to turn it into a safe launch-post screenshot that shows planned files without writing them.
+Runs scan, applies staged fixes, rescans, and prints a before/after improvement report. Use `--dry-run` to turn it into a safe launch-post screenshot that shows planned files without writing them. Use `--format issue` to create a GitHub-ready checklist for contributors.
 
 ```bash
 agent-ready improve --dry-run
 agent-ready improve
 agent-ready improve --level team
 agent-ready improve --level full --comment
+agent-ready improve --dry-run --format issue
 agent-ready improve --format json
 ```
 
@@ -307,7 +309,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: EShener/agent-ready@v0.1.16
+      - uses: EShener/agent-ready@v0.1.17
         with:
           fail-under: 80
 ```
@@ -324,7 +326,7 @@ permissions:
 
 steps:
   - uses: actions/checkout@v4
-  - uses: EShener/agent-ready@v0.1.16
+  - uses: EShener/agent-ready@v0.1.17
     with:
       fail-under: 80
       comment: true
