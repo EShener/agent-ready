@@ -11,6 +11,7 @@
 - Added Rails and Laravel detection with Bundler and Composer command inference.
 - Expanded real-world readiness snapshots with SvelteKit, Nuxt, Rails, and Laravel examples.
 - Added Spring Boot detection with Maven and Gradle wrapper command inference.
+- Added a detector coverage table grouped by ecosystem.
 
 ## 0.1.25
 
