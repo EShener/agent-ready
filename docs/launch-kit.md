@@ -19,12 +19,12 @@ Use it when a repo needs clear instructions for Codex, Claude Code, Cursor, Gemi
 
 AI coding agents fail when repositories do not tell them how to build, test, and stay safe.
 
-`agent-ready` adds an Agent Readiness Score, generates `AGENTS.md`, checks for instruction drift, creates CI annotations, posts PR summaries, and now turns multi-repo scans into leaderboards and cleanup roadmaps.
+`agent-ready` adds an Agent Readiness Score, generates `AGENTS.md`, checks for instruction drift, creates CI annotations, posts PR summaries, and provides `oss`, `team`, and `enterprise` presets for fast setup.
 
 Try it:
 
 ```bash
-npx --yes github:EShener/agent-ready improve --dry-run
+npx --yes github:EShener/agent-ready improve --preset team --dry-run
 ```
 
 ## Community Post
@@ -50,11 +50,12 @@ It can:
 - create CI annotations and PR comments
 - compare before/after readiness scores
 - produce multi-repo leaderboards and phased cleanup roadmaps
+- apply `oss`, `team`, or `enterprise` presets when you want a full starter plan
 
 Quick start:
 
 ```bash
-npx --yes github:EShener/agent-ready improve --dry-run
+npx --yes github:EShener/agent-ready improve --preset team --dry-run
 ```
 
 Repo: https://github.com/EShener/agent-ready
@@ -68,7 +69,7 @@ AI coding agents should not have to rediscover every repo from scratch.
 `agent-ready` scans a codebase, scores its readiness for coding agents, generates `AGENTS.md`, and shows exactly what to fix next.
 
 ```bash
-npx --yes github:EShener/agent-ready improve --dry-run
+npx --yes github:EShener/agent-ready improve --preset team --dry-run
 ```
 
 https://github.com/EShener/agent-ready
@@ -103,7 +104,7 @@ I noticed this repo may benefit from explicit AI coding agent instructions.
 Dry-run command:
 
 ```bash
-npx --yes github:EShener/agent-ready improve --dry-run --format issue
+npx --yes github:EShener/agent-ready improve --preset team --dry-run --format issue
 ```
 
 No network calls or API keys are required by the CLI.
@@ -114,7 +115,8 @@ No network calls or API keys are required by the CLI.
 - [ ] Add GitHub topics: `ai-agents`, `agents-md`, `agentic-coding`, `developer-tools`, `github-action`, `codex`, `cursor`, `claude-code`.
 - [ ] Share the short pitch in one builder community.
 - [ ] Share the benchmark evidence with one screenshot or GIF.
-- [ ] Open 3-5 helpful issues in relevant repos using `improve --dry-run --format issue`.
+- [ ] Open 3-5 helpful issues in relevant repos using `improve --preset team --dry-run --format issue`.
+- [ ] Share the preset quick start: `improve --preset team --dry-run`.
 - [ ] Ask early users which detector or framework support is missing.
 - [ ] Convert repeated feedback into small good-first issues.
 
@@ -123,3 +125,4 @@ No network calls or API keys are required by the CLI.
 - Do not claim npm install is available until the package is actually published.
 - Do not claim a repository was changed unless `agent-ready fix` or `agent-ready improve` was actually applied.
 - Do not claim official support from any coding-agent vendor.
+- Keep outreach project-focused; do not invent affiliation, endorsement, or personal usage.

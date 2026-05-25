@@ -3,7 +3,7 @@
 Command:
 
 ```bash
-npx --yes github:EShener/agent-ready improve --dry-run --format issue
+npx --yes github:EShener/agent-ready improve --preset team --dry-run --format issue
 ```
 
 Example output:
@@ -14,10 +14,11 @@ Example output:
 ## Score
 
 - Current: 40/100 (D)
-- Target: 65/100 (C) (estimated +25)
-- Findings: 5 -> 4
+- Target: 73/100 (C) (estimated +33)
+- Findings: 5 -> 3
 - Mode: dry-run
-- Level: basic
+- Preset: team
+- Level: team
 
 ## Planned Work
 
@@ -26,12 +27,16 @@ Example output:
 - [ ] Add `.cursor/rules/agent-ready.mdc` (cursor)
 - [ ] Add `GEMINI.md` (gemini)
 - [ ] Add `.github/copilot-instructions.md` (copilot)
+- [ ] Add `.github/pull_request_template.md` (pull-request-template)
+- [ ] Add `CONTRIBUTING.md` (contributing)
+- [ ] Add `docs/architecture.md` (architecture)
+- [ ] Add `docs/adr/0001-agent-readiness.md` (agent-readiness-adr)
+- [ ] Add `.github/workflows/agent-ready.yml` (ci)
 
 ## Remaining Follow-Ups
 
 - [ ] Add a README with install, usage, and contribution basics. (missing-readme, `README.md`)
 - [ ] Add a test script or configure the test command in agent-ready.json. (missing-test-command, `package.json`)
-- [ ] Add CI so agents can trust the verification path. (missing-ci, `.github/workflows`)
 - [ ] Add a lint script if the project has automated style checks. (missing-lint-command, `package.json`)
 
 ## Verification

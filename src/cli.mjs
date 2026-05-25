@@ -4,11 +4,12 @@ import { buildShareComment } from "./comment.mjs";
 import { compareReadinessFiles } from "./compare.mjs";
 import { buildExamplesCatalog } from "./examples.mjs";
 import { explainRepo } from "./explainer.mjs";
-import { parseTargets, writeGeneratedArtifacts } from "./generator.mjs";
+import { parseFixLevel, parseTargets, writeGeneratedArtifacts } from "./generator.mjs";
 import { improveRepo } from "./improver.mjs";
 import { promptInitOptions } from "./interactive.mjs";
 import { lintRepo, scoreRepo } from "./linter.mjs";
 import { buildAgentMatrix } from "./matrix.mjs";
+import { resolvePreset } from "./presets.mjs";
 import { renderAgentMatrix, renderAnnotations, renderBadge, renderBenchmarkReport, renderComparison, renderDoctor, renderExamplesCatalog, renderExplanation, renderFindings, renderImprovement, renderImprovementIssue, renderLeaderboard, renderMarkdownReport, renderRoadmap, renderScanSummary, renderScore, renderShareComment, renderSnapshot } from "./reporter.mjs";
 import { snapshotRepo, writeSnapshotFile } from "./snapshot.mjs";
 import { renderCiWorkflow, writeCiWorkflow } from "./workflow.mjs";
@@ -19,9 +20,9 @@ Make any repository ready for AI coding agents in 60 seconds.
 
 Usage:
   agent-ready scan [--root PATH] [--config PATH] [--format json|text]
-  agent-ready init [--root PATH] [--config PATH] [--targets codex,claude,cursor,gemini,copilot] [--dry-run] [--force] [--interactive]
-  agent-ready fix [--root PATH] [--config PATH] [--targets codex,claude,cursor,gemini,copilot] [--level basic|team|full] [--dry-run] [--force] [--no-ci] [--mode action|npx] [--fail-under N]
-  agent-ready improve [--root PATH] [--config PATH] [--targets codex,claude,cursor,gemini,copilot] [--level basic|team|full] [--format markdown|issue|json] [--dry-run] [--force] [--no-ci] [--mode action|npx] [--fail-under N] [--comment]
+  agent-ready init [--root PATH] [--config PATH] [--preset oss|team|enterprise] [--targets codex,claude,cursor,gemini,copilot] [--level basic|team|full] [--dry-run] [--force] [--interactive]
+  agent-ready fix [--root PATH] [--config PATH] [--preset oss|team|enterprise] [--targets codex,claude,cursor,gemini,copilot] [--level basic|team|full] [--dry-run] [--force] [--no-ci] [--mode action|npx] [--fail-under N] [--comment]
+  agent-ready improve [--root PATH] [--config PATH] [--preset oss|team|enterprise] [--targets codex,claude,cursor,gemini,copilot] [--level basic|team|full] [--format markdown|issue|json] [--dry-run] [--force] [--no-ci] [--mode action|npx] [--fail-under N] [--comment]
   agent-ready lint [--root PATH] [--config PATH] [--format json|text]
   agent-ready annotations [--root PATH] [--config PATH] [--format github|json]
   agent-ready score [--root PATH] [--config PATH] [--format json|text] [--fail-under N]
@@ -42,9 +43,12 @@ Usage:
 Examples:
   npx agent-ready scan
   npx agent-ready init --targets codex,claude,cursor
+  npx agent-ready init --preset oss --dry-run
   npx agent-ready fix --dry-run
+  npx agent-ready fix --preset team --dry-run
   npx agent-ready fix --level team --dry-run
   npx agent-ready improve --dry-run
+  npx agent-ready improve --preset team --dry-run
   npx agent-ready improve --level team
   npx agent-ready init --interactive
   npx agent-ready doctor
@@ -83,15 +87,19 @@ export async function runCli(argv) {
 
   if (command === "init") {
     const profile = await scanRepo(root, scanOptions);
+    const preset = resolvePreset(flags.preset);
     const initOptions = flags.interactive
       ? await promptInitOptions(profile, flags)
       : {
-          targets: parseTargets(flags.targets || profile.config.targets.join(",")),
+          targets: parseTargets(flags.targets || preset?.targets.join(",") || profile.config.targets.join(",")),
+          level: flags.level || preset?.level,
           dryRun: Boolean(flags["dry-run"]),
           force: Boolean(flags.force),
         };
+    const level = initOptions.level || preset?.level ? parseFixLevel(initOptions.level || preset?.level) : undefined;
     const results = await writeGeneratedArtifacts(profile, {
       targets: initOptions.targets,
+      level,
       dryRun: initOptions.dryRun,
       force: initOptions.force,
     });
@@ -103,10 +111,15 @@ export async function runCli(argv) {
 
   if (command === "fix") {
     const profile = await scanRepo(root, scanOptions);
-    const targets = parseTargets(flags.targets || profile.config.targets.join(","));
+    const preset = resolvePreset(flags.preset);
+    const mode = flags.mode || "action";
+    const targets = parseTargets(flags.targets || preset?.targets.join(",") || profile.config.targets.join(","));
+    const level = parseFixLevel(flags.level || preset?.level || "basic");
+    const writeCi = shouldWriteCi(flags, preset);
+    const comment = shouldComment(flags, preset, mode);
     const results = await writeGeneratedArtifacts(profile, {
       targets,
-      level: flags.level || "basic",
+      level,
       dryRun: Boolean(flags["dry-run"]),
       force: Boolean(flags.force),
     });
@@ -115,11 +128,12 @@ export async function runCli(argv) {
       console.log(`${result.action}: ${result.file}`);
     }
 
-    if (!flags["no-ci"]) {
+    if (writeCi) {
       const ciResult = await writeCiWorkflow({
         root,
         failUnder: flags["fail-under"] ?? "80",
-        mode: flags.mode || "action",
+        mode,
+        comment,
         dryRun: Boolean(flags["dry-run"]),
         force: Boolean(flags.force),
       });
@@ -130,17 +144,23 @@ export async function runCli(argv) {
 
   if (command === "improve") {
     const profile = await scanRepo(root, scanOptions);
+    const preset = resolvePreset(flags.preset);
+    const mode = flags.mode || "action";
+    const level = parseFixLevel(flags.level || preset?.level || "basic");
+    const noCi = !shouldWriteCi(flags, preset);
+    const comment = shouldComment(flags, preset, mode);
     const improvement = await improveRepo({
       root,
       configPath: scanOptions.configPath,
-      targets: parseTargets(flags.targets || profile.config.targets.join(",")),
-      level: flags.level || "basic",
+      preset: preset?.name,
+      targets: parseTargets(flags.targets || preset?.targets.join(",") || profile.config.targets.join(",")),
+      level,
       dryRun: Boolean(flags["dry-run"]),
       force: Boolean(flags.force),
-      noCi: Boolean(flags["no-ci"]),
-      mode: flags.mode || "action",
+      noCi,
+      mode,
       failUnder: flags["fail-under"] ?? "80",
-      comment: Boolean(flags.comment),
+      comment,
     });
 
     if (flags.format === "json" || flags.json) {
@@ -372,6 +392,32 @@ function applyFailUnder(score, failUnder) {
     throw new Error("--fail-under must be a number between 0 and 100.");
   }
   if (score.score < threshold) process.exitCode = 1;
+}
+
+function shouldWriteCi(flags, preset) {
+  if (hasFlag(flags, "no-ci")) return !parseBooleanFlag(flags["no-ci"]);
+  if (preset) return Boolean(preset.ci);
+  return true;
+}
+
+function shouldComment(flags, preset, mode) {
+  const explicit = hasFlag(flags, "comment");
+  const comment = explicit ? parseBooleanFlag(flags.comment) : Boolean(preset?.comment);
+  if (comment && mode === "npx" && !explicit) return false;
+  return comment;
+}
+
+function parseBooleanFlag(value) {
+  if (value === undefined || value === true) return true;
+  if (value === false) return false;
+  const normalized = String(value).trim().toLowerCase();
+  if (["false", "0", "no", "off"].includes(normalized)) return false;
+  if (["true", "1", "yes", "on"].includes(normalized)) return true;
+  return Boolean(value);
+}
+
+function hasFlag(flags, key) {
+  return Object.prototype.hasOwnProperty.call(flags, key);
 }
 
 export function parseCli(argv) {

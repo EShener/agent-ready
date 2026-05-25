@@ -3,7 +3,7 @@
 Command:
 
 ```bash
-npx --yes github:EShener/agent-ready improve --dry-run
+npx --yes github:EShener/agent-ready improve --preset team --dry-run
 ```
 
 Example output:
@@ -13,9 +13,10 @@ Example output:
 
 - Repository: empty-repo
 - Mode: dry-run
-- Level: basic
-- Score: 40/100 (D) -> 65/100 (C) (estimated +25)
-- Findings: 5 -> 4
+- Preset: team
+- Level: team
+- Score: 40/100 (D) -> 73/100 (C) (estimated +33)
+- Findings: 5 -> 3
 
 ## Changes
 | Action | File | Target |
@@ -25,13 +26,17 @@ Example output:
 | planned | .cursor/rules/agent-ready.mdc | cursor |
 | planned | GEMINI.md | gemini |
 | planned | .github/copilot-instructions.md | copilot |
+| planned | .github/pull_request_template.md | pull-request-template |
+| planned | CONTRIBUTING.md | contributing |
+| planned | docs/architecture.md | architecture |
+| planned | docs/adr/0001-agent-readiness.md | agent-readiness-adr |
+| planned | .github/workflows/agent-ready.yml | ci |
 
 ## Remaining Findings
 | Severity | Rule | File | Next action |
 | --- | --- | --- | --- |
 | warning | missing-readme | README.md | Add a README with install, usage, and contribution basics. |
 | warning | missing-test-command | package.json | Add a test script or configure the test command in agent-ready.json. |
-| info | missing-ci | .github/workflows | Add CI so agents can trust the verification path. |
 | info | missing-lint-command | package.json | Add a lint script if the project has automated style checks. |
 ```
 

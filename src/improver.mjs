@@ -39,6 +39,7 @@ export async function improveRepo(options = {}) {
       name: beforeProfile.name,
       root: beforeProfile.root,
     },
+    preset: options.preset || null,
     mode: options.dryRun ? "dry-run" : "applied",
     level: options.level || "basic",
     score: {

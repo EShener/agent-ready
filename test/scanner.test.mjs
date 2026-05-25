@@ -12,6 +12,7 @@ import { buildAgentsMd, planGeneratedArtifacts } from "../src/generator.mjs";
 import { improveRepo } from "../src/improver.mjs";
 import { lintRepo, scoreRepo } from "../src/linter.mjs";
 import { buildAgentMatrix } from "../src/matrix.mjs";
+import { resolvePreset } from "../src/presets.mjs";
 import { renderAgentMatrix, renderAnnotations, renderBenchmarkReport, renderComparison, renderDoctor, renderExamplesCatalog, renderExplanation, renderImprovement, renderImprovementIssue, renderLeaderboard, renderMarkdownReport, renderRoadmap, renderShareComment } from "../src/reporter.mjs";
 import { scanRepo } from "../src/scanner.mjs";
 import { snapshotRepo } from "../src/snapshot.mjs";
@@ -93,6 +94,19 @@ test("generator plans staged readiness artifacts by fix level", async () => {
   assert.ok(full.some((item) => item.file === ".github/ISSUE_TEMPLATE/agent-readiness.md"));
   assert.match(full.find((item) => item.file === "docs/architecture.md").content, /fixture-node-app/);
   assert.doesNotMatch(full.find((item) => item.file === "docs/architecture.md").content, /Document the main execution path/);
+});
+
+test("readiness presets resolve opinionated setup defaults", () => {
+  const oss = resolvePreset("oss");
+  const team = resolvePreset("team");
+  const enterprise = resolvePreset("enterprise");
+
+  assert.equal(oss.level, "team");
+  assert.equal(oss.comment, false);
+  assert.equal(team.comment, true);
+  assert.equal(enterprise.level, "full");
+  assert.deepEqual(enterprise.targets, ["codex", "claude", "cursor", "gemini", "copilot"]);
+  assert.throws(() => resolvePreset("unknown"), /--preset/);
 });
 
 test("AGENTS.md includes detected commands and safety boundaries", async () => {
@@ -344,7 +358,7 @@ test("scan applies agent-ready.json command and doc overrides", async () => {
 });
 
 test("workflow renderer validates mode and fail-under values", () => {
-  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.21/);
+  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.22/);
   assert.match(renderCiWorkflow({ mode: "action", comment: true }), /comment: true/);
   assert.match(renderCiWorkflow({ mode: "action", comment: true }), /pull-requests: write/);
   assert.match(renderCiWorkflow({ mode: "npx", failUnder: "70" }), /npx agent-ready score --fail-under 70/);

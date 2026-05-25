@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: EShener/agent-ready@v0.1.21
+      - uses: EShener/agent-ready@v0.1.22
         with:
           fail-under: 80
           comment: true
@@ -71,9 +71,11 @@ npx --yes github:EShener/agent-ready ci --comment --write
 npx --yes github:EShener/agent-ready doctor
 npx --yes github:EShener/agent-ready examples
 npx --yes github:EShener/agent-ready explain
+npx --yes github:EShener/agent-ready improve --preset team --dry-run
 npx --yes github:EShener/agent-ready improve --level team --dry-run
-npx --yes github:EShener/agent-ready improve --dry-run --format issue
+npx --yes github:EShener/agent-ready improve --preset team --dry-run --format issue
 npx --yes github:EShener/agent-ready snapshot --write --dry-run
+npx --yes github:EShener/agent-ready fix --preset team --dry-run
 npx --yes github:EShener/agent-ready fix --dry-run
 npx --yes github:EShener/agent-ready fix --level team --dry-run
 npx --yes github:EShener/agent-ready leaderboard ../repo-a ../repo-b
@@ -102,5 +104,5 @@ agent-ready adds a score, AGENTS.md generation, CI annotations, a compatibility 
 
 Try it:
 
-npx --yes github:EShener/agent-ready improve --dry-run --format issue
+npx --yes github:EShener/agent-ready improve --preset team --dry-run
 ```

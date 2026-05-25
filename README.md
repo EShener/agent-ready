@@ -13,7 +13,7 @@ Make any repository ready for AI coding agents in 60 seconds.
 It is for developers using Codex, Claude Code, Cursor, Gemini CLI, GitHub Copilot, or any coding agent that needs repository instructions before editing safely.
 
 ```bash
-npx --yes github:EShener/agent-ready improve --dry-run
+npx --yes github:EShener/agent-ready improve --preset team --dry-run
 ```
 
 Preview exactly which files will be added and the estimated score gain before anything is written.
@@ -37,7 +37,7 @@ On a 2026-05-23 sample of six public AI/devtool repositories, the average Agent 
 Use the GitHub Action immediately:
 
 ```yaml
-- uses: EShener/agent-ready@v0.1.21
+- uses: EShener/agent-ready@v0.1.22
   with:
     fail-under: 80
 ```
@@ -51,11 +51,14 @@ npx --yes github:EShener/agent-ready explain
 npx --yes github:EShener/agent-ready matrix
 npx --yes github:EShener/agent-ready comment
 npx --yes github:EShener/agent-ready compare --before before.json --after after.json
+npx --yes github:EShener/agent-ready improve --preset team --dry-run
 npx --yes github:EShener/agent-ready improve --dry-run
 npx --yes github:EShener/agent-ready improve --dry-run --format issue
 npx --yes github:EShener/agent-ready improve --level team
+npx --yes github:EShener/agent-ready fix --preset team --dry-run
 npx --yes github:EShener/agent-ready fix --dry-run
 npx --yes github:EShener/agent-ready fix --level team --dry-run
+npx --yes github:EShener/agent-ready init --preset oss --dry-run
 npx --yes github:EShener/agent-ready init --dry-run
 npx --yes github:EShener/agent-ready score --fail-under 80
 npx --yes github:EShener/agent-ready ci
@@ -97,6 +100,22 @@ npx --yes github:EShener/agent-ready init --targets codex,claude,cursor,gemini,c
 
 The tool-specific files are intentionally small shims that point back to `AGENTS.md`, so instructions do not drift across tools.
 
+## Presets
+
+Use presets when you want an opinionated starter instead of assembling flags by hand.
+
+| Preset | Best for | Adds |
+| --- | --- | --- |
+| `oss` | Public projects and contributor-friendly repos | All agent docs plus team collaboration starters |
+| `team` | Internal teams that want CI feedback on PRs | `oss` plus the Agent Ready workflow with PR comments |
+| `enterprise` | Larger repos that need governance defaults | `team` plus `.env.example`, CODEOWNERS, issue templates, and security policy |
+
+```bash
+agent-ready improve --preset team --dry-run
+agent-ready fix --preset enterprise
+agent-ready init --preset oss --dry-run
+```
+
 ## Commands
 
 ### `doctor`
@@ -124,6 +143,8 @@ Plans or writes agent instruction files. Existing files are skipped unless `--fo
 
 ```bash
 agent-ready init --dry-run
+agent-ready init --preset oss --dry-run
+agent-ready init --preset enterprise --dry-run
 agent-ready init --targets codex,claude,cursor
 agent-ready init --interactive
 agent-ready init --force
@@ -138,6 +159,8 @@ Use `--level team` to add collaboration starters such as PR templates, contribut
 ```bash
 agent-ready fix --dry-run
 agent-ready fix
+agent-ready fix --preset team --dry-run
+agent-ready fix --preset enterprise
 agent-ready fix --level team
 agent-ready fix --level full --dry-run
 agent-ready fix --targets codex,cursor --no-ci
@@ -151,6 +174,8 @@ Runs scan, applies staged fixes, rescans, and prints a before/after improvement 
 ```bash
 agent-ready improve --dry-run
 agent-ready improve
+agent-ready improve --preset team --dry-run
+agent-ready improve --preset enterprise --dry-run --format issue
 agent-ready improve --level team
 agent-ready improve --level full --comment
 agent-ready improve --dry-run --format issue
@@ -355,7 +380,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: EShener/agent-ready@v0.1.21
+      - uses: EShener/agent-ready@v0.1.22
         with:
           fail-under: 80
 ```
@@ -372,7 +397,7 @@ permissions:
 
 steps:
   - uses: actions/checkout@v4
-  - uses: EShener/agent-ready@v0.1.21
+  - uses: EShener/agent-ready@v0.1.22
     with:
       fail-under: 80
       comment: true

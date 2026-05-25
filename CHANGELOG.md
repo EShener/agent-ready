@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.22
+
+- Added `--preset oss|team|enterprise` for `init`, `fix`, and `improve`.
+- Added preset-aware CI generation so team and enterprise presets can create pull request comment workflows.
+- Updated README, showcase, and launch kit copy around the shorter preset quick start.
+
 ## 0.1.21
 
 - Added `agent-ready examples` for a terminal-friendly example gallery.

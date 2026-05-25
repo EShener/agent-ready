@@ -41,6 +41,20 @@ test("init CLI uses configured targets when --targets is omitted", async () => {
   assert.doesNotMatch(stdout, /CLAUDE\.md/);
 });
 
+test("init CLI can use enterprise preset readiness artifacts", async () => {
+  const temp = await fs.mkdtemp(path.join(os.tmpdir(), "agent-ready-init-preset-"));
+  await fs.writeFile(path.join(temp, "package.json"), JSON.stringify({ name: "init-preset", scripts: { test: "node --test" } }), "utf8");
+
+  const { stdout } = await execFileAsync(process.execPath, [bin, "init", "--root", temp, "--preset", "enterprise", "--dry-run"], { cwd: root });
+
+  assert.match(stdout, /planned: AGENTS\.md/);
+  assert.match(stdout, /planned: \.github\/pull_request_template\.md/);
+  assert.match(stdout, /planned: \.env\.example/);
+  assert.match(stdout, /planned: SECURITY\.md/);
+  assert.doesNotMatch(stdout, /\.github\/workflows\/agent-ready\.yml/);
+  await assert.rejects(fs.access(path.join(temp, "SECURITY.md")));
+});
+
 test("init CLI interactive defaults to dry-run planning", async () => {
   const { stdout } = await runWithInput(["init", "--root", fixture("node-app"), "--interactive"], "\n\n");
 
@@ -78,6 +92,20 @@ test("fix CLI can plan team and full readiness artifacts", async () => {
   assert.match(full.stdout, /planned: \.github\/ISSUE_TEMPLATE\/agent-readiness\.md/);
 });
 
+test("fix CLI team preset writes PR comment workflow", async () => {
+  const temp = await fs.mkdtemp(path.join(os.tmpdir(), "agent-ready-fix-preset-"));
+  await fs.writeFile(path.join(temp, "package.json"), JSON.stringify({ name: "fix-preset", scripts: { test: "node --test" } }), "utf8");
+
+  const { stdout } = await execFileAsync(process.execPath, [bin, "fix", "--root", temp, "--preset", "team"], { cwd: root });
+  const workflow = await fs.readFile(path.join(temp, ".github", "workflows", "agent-ready.yml"), "utf8");
+
+  assert.match(stdout, /created: AGENTS\.md/);
+  assert.match(stdout, /created: \.github\/pull_request_template\.md/);
+  assert.match(stdout, /written: \.github\/workflows\/agent-ready\.yml/);
+  assert.match(workflow, /pull-requests: write/);
+  assert.match(workflow, /comment: true/);
+});
+
 test("fix CLI writes docs and can skip CI", async () => {
   const temp = await fs.mkdtemp(path.join(os.tmpdir(), "agent-ready-fix-write-"));
   await fs.writeFile(path.join(temp, "package.json"), JSON.stringify({ scripts: { test: "node --test" } }), "utf8");
@@ -101,6 +129,20 @@ test("improve CLI dry-run reports planned changes without writing", async () => 
   assert.match(stdout, /\| planned \| AGENTS\.md \| codex \|/);
   assert.match(stdout, /\| planned \| \.github\/pull_request_template\.md \| pull-request-template \|/);
   await assert.rejects(fs.access(path.join(temp, "AGENTS.md")));
+});
+
+test("improve CLI enterprise preset emits JSON with full governance plan", async () => {
+  const temp = await fs.mkdtemp(path.join(os.tmpdir(), "agent-ready-improve-preset-"));
+  await fs.writeFile(path.join(temp, "package.json"), JSON.stringify({ name: "improve-preset", scripts: { test: "node --test" } }), "utf8");
+
+  const { stdout } = await execFileAsync(process.execPath, [bin, "improve", "--root", temp, "--preset", "enterprise", "--dry-run", "--format", "json"], { cwd: root });
+  const payload = JSON.parse(stdout);
+
+  assert.equal(payload.preset, "enterprise");
+  assert.equal(payload.level, "full");
+  assert.equal(payload.ci.action, "planned");
+  assert.ok(payload.artifacts.some((item) => item.file === ".env.example"));
+  assert.ok(payload.artifacts.some((item) => item.file === ".github/CODEOWNERS"));
 });
 
 test("improve CLI applies changes and reports a score delta", async () => {
@@ -347,7 +389,7 @@ test("roadmap CLI emits JSON when requested", async () => {
 
 test("ci CLI emits reusable GitHub Action workflow by default", async () => {
   const { stdout } = await execFileAsync(process.execPath, [bin, "ci", "--fail-under", "85"], { cwd: root });
-  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.21/);
+  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.22/);
   assert.match(stdout, /fail-under: 85/);
 });
 

@@ -6,14 +6,14 @@ export function buildExamplesCatalog() {
         id: "single-repo-improvement",
         title: "Single repository improvement",
         file: "docs/examples/single-repo-improvement.md",
-        command: "npx --yes github:EShener/agent-ready improve --dry-run",
+        command: "npx --yes github:EShener/agent-ready improve --preset team --dry-run",
         useCase: "Show the before/after score and planned files before writing anything.",
       },
       {
         id: "issue-checklist",
         title: "GitHub issue checklist",
         file: "docs/examples/issue-checklist.md",
-        command: "npx --yes github:EShener/agent-ready improve --dry-run --format issue",
+        command: "npx --yes github:EShener/agent-ready improve --preset team --dry-run --format issue",
         useCase: "Turn readiness gaps into a contributor-friendly GitHub issue body.",
       },
       {
