@@ -225,6 +225,7 @@ Use `--fail-under` in CI to fail a build when repository instructions regress.
 ### `examples`
 
 Prints the example gallery with commands and links to copy-ready output samples.
+The gallery includes real-world repository shapes such as Next.js apps, Docker Compose services, monorepos, and CLI/devtools.
 
 ```bash
 agent-ready examples

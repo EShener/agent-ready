@@ -205,10 +205,11 @@ test("examples catalog links copy-ready sample files", () => {
   const catalog = buildExamplesCatalog();
   const markdown = renderExamplesCatalog(catalog);
 
-  assert.equal(catalog.examples.length, 4);
+  assert.equal(catalog.examples.length, 5);
   assert.ok(catalog.examples.every((example) => example.file.startsWith("docs/examples/")));
   assert.match(markdown, /agent-ready Examples/);
   assert.match(markdown, /issue-checklist\.md/);
+  assert.match(markdown, /real-world-snapshots\.md/);
 });
 
 test("explanation report ranks fixes by score impact", async () => {

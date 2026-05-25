@@ -24,6 +24,13 @@ export function buildExamplesCatalog() {
         useCase: "Create a complete AGENT_READINESS.md report for a repository.",
       },
       {
+        id: "real-world-snapshots",
+        title: "Real-world readiness snapshots",
+        file: "docs/examples/real-world-snapshots.md",
+        command: "npx --yes @eshen_fox_mie/agent-ready scan --root <repo>",
+        useCase: "Compare scanner output across frontend, Docker Compose, monorepo, and CLI/devtool repository shapes.",
+      },
+      {
         id: "multi-repo-roadmap",
         title: "Multi-repository roadmap",
         file: "docs/examples/multi-repo-roadmap.md",

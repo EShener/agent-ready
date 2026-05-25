@@ -5,6 +5,7 @@
 - Added stronger Next.js and Astro detection from config files, router conventions, and `.astro` files.
 - Added fixture coverage for Next.js App Router and Astro projects.
 - Added Docker and Docker Compose detection, including generated `AGENTS.md` local service guidance.
+- Added real-world readiness snapshots to the examples gallery.
 
 ## 0.1.25
 
