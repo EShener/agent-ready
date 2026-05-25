@@ -32,6 +32,9 @@ export async function scanRepo(root = process.cwd(), options = {}) {
     pyproject,
     cargoToml,
     goMod,
+    pomXml,
+    gradleBuild,
+    gradleBuildKts,
     gemfile,
     composerJson,
     readmeText,
@@ -43,6 +46,9 @@ export async function scanRepo(root = process.cwd(), options = {}) {
     readTextIfExists(path.join(absoluteRoot, "pyproject.toml")),
     readTextIfExists(path.join(absoluteRoot, "Cargo.toml")),
     readTextIfExists(path.join(absoluteRoot, "go.mod")),
+    readTextIfExists(path.join(absoluteRoot, "pom.xml")),
+    readTextIfExists(path.join(absoluteRoot, "build.gradle")),
+    readTextIfExists(path.join(absoluteRoot, "build.gradle.kts")),
     readTextIfExists(path.join(absoluteRoot, "Gemfile")),
     readJsonIfExists(path.join(absoluteRoot, "composer.json")),
     readTextIfExists(path.join(absoluteRoot, "README.md")),
@@ -51,6 +57,7 @@ export async function scanRepo(root = process.cwd(), options = {}) {
     topLevelEntries(absoluteRoot),
   ]);
 
+  const mergedGradleBuild = [gradleBuild, gradleBuildKts].filter(Boolean).join("\n");
   const languageCounts = countLanguages(files);
   const packageManager = await detectPackageManager(absoluteRoot);
   const detectedCommands = await detectCommands({
@@ -60,6 +67,8 @@ export async function scanRepo(root = process.cwd(), options = {}) {
     pyproject,
     cargoToml,
     goMod,
+    pomXml,
+    gradleBuild: mergedGradleBuild,
     gemfile,
     composerJson,
     files,
@@ -77,10 +86,10 @@ export async function scanRepo(root = process.cwd(), options = {}) {
   return {
     schemaVersion: 1,
     root: absoluteRoot,
-    name: detectName({ packageJson, pyproject, cargoToml, goMod, composerJson, root: absoluteRoot }),
+    name: detectName({ packageJson, pyproject, cargoToml, goMod, pomXml, composerJson, root: absoluteRoot }),
     languages: languageCounts,
     primaryLanguage: languageCounts[0]?.name || "Unknown",
-    frameworks: detectFrameworks({ packageJson, pyproject, cargoToml, goMod, gemfile, composerJson, files }),
+    frameworks: detectFrameworks({ packageJson, pyproject, cargoToml, goMod, pomXml, gradleBuild: mergedGradleBuild, gemfile, composerJson, files }),
     monorepo: detectMonorepo({ packageJson, pnpmWorkspace, files }),
     packageManager,
     commands,
@@ -131,12 +140,14 @@ async function detectPackageManager(root) {
   if (await pathExists(path.join(root, "pyproject.toml"))) return "python";
   if (await pathExists(path.join(root, "Cargo.toml"))) return "cargo";
   if (await pathExists(path.join(root, "go.mod"))) return "go";
+  if (await pathExists(path.join(root, "mvnw")) || await pathExists(path.join(root, "pom.xml"))) return "maven";
+  if (await pathExists(path.join(root, "gradlew")) || await pathExists(path.join(root, "build.gradle")) || await pathExists(path.join(root, "build.gradle.kts"))) return "gradle";
   if (await pathExists(path.join(root, "Gemfile"))) return "bundler";
   if (await pathExists(path.join(root, "composer.json"))) return "composer";
   return "unknown";
 }
 
-async function detectCommands({ root, packageJson, packageManager, pyproject, cargoToml, goMod, gemfile, composerJson, files }) {
+async function detectCommands({ root, packageJson, packageManager, pyproject, cargoToml, goMod, pomXml, gradleBuild, gemfile, composerJson, files }) {
   const commands = {};
   const scripts = packageJson?.scripts || {};
 
@@ -173,6 +184,18 @@ async function detectCommands({ root, packageJson, packageManager, pyproject, ca
     commands.test ||= "go test ./...";
     commands.lint ||= "go vet ./...";
     commands.format ||= "gofmt -w .";
+  }
+
+  if (hasMavenSignals({ pomXml, files })) {
+    const mvn = files.includes("mvnw") ? "./mvnw" : "mvn";
+    commands.build ||= `${mvn} package`;
+    commands.test ||= `${mvn} test`;
+  }
+
+  if (hasGradleSignals({ gradleBuild, files })) {
+    const gradle = files.includes("gradlew") ? "./gradlew" : "gradle";
+    commands.build ||= `${gradle} build`;
+    commands.test ||= `${gradle} test`;
   }
 
   if (hasRailsSignals({ gemfile, files })) {
@@ -220,19 +243,21 @@ function hasPythonTool(pyproject, tool) {
   return new RegExp(`(^|[^a-zA-Z0-9_-])${escapeRegExp(tool)}([^a-zA-Z0-9_-]|$)`, "i").test(pyproject);
 }
 
-function detectName({ packageJson, pyproject, cargoToml, goMod, composerJson, root }) {
+function detectName({ packageJson, pyproject, cargoToml, goMod, pomXml, composerJson, root }) {
   if (packageJson?.name) return packageJson.name;
   const pyName = parseTomlValue(pyproject, "name");
   if (pyName) return pyName;
   const cargoName = parseTomlValue(cargoToml, "name");
   if (cargoName) return cargoName;
   if (composerJson?.name) return composerJson.name.split("/").pop();
+  const artifactId = parseXmlTagValue(pomXml, "artifactId");
+  if (artifactId) return artifactId;
   const moduleLine = goMod.split("\n").find((line) => line.startsWith("module "));
   if (moduleLine) return moduleLine.replace(/^module\s+/, "").trim().split("/").pop();
   return path.basename(root);
 }
 
-function detectFrameworks({ packageJson, pyproject, cargoToml, goMod, gemfile, composerJson, files }) {
+function detectFrameworks({ packageJson, pyproject, cargoToml, goMod, pomXml, gradleBuild, gemfile, composerJson, files }) {
   const deps = {
     ...(packageJson?.dependencies || {}),
     ...(packageJson?.devDependencies || {}),
@@ -274,12 +299,28 @@ function detectFrameworks({ packageJson, pyproject, cargoToml, goMod, gemfile, c
   if (hasPythonTool(pyproject, "pytest")) names.push("Pytest");
   if (hasRailsSignals({ gemfile, files })) names.push("Rails");
   if (hasLaravelSignals({ composerJson, files })) names.push("Laravel");
+  if (hasSpringBootSignals({ pomXml, gradleBuild })) names.push("Spring Boot");
   if (/actix|axum|rocket/i.test(cargoToml)) names.push("Rust Web");
   if (/github\.com\/gin-gonic\/gin/i.test(goMod)) names.push("Gin");
   if (hasNextAppRouter) names.push("Next.js App Router");
   if (hasDockerfile(files)) names.push("Docker");
   if (hasDockerComposeFile(files)) names.push("Docker Compose");
   return unique(names);
+}
+
+function hasMavenSignals({ pomXml, files }) {
+  return Boolean(pomXml || files.includes("mvnw"));
+}
+
+function hasGradleSignals({ gradleBuild, files }) {
+  return Boolean(gradleBuild || files.includes("gradlew"));
+}
+
+function hasSpringBootSignals({ pomXml, gradleBuild }) {
+  return Boolean(
+    /spring-boot/i.test(pomXml)
+    || /spring-boot/i.test(gradleBuild)
+  );
 }
 
 function hasRailsSignals({ gemfile, files }) {
@@ -392,6 +433,12 @@ function parseTomlValue(text, key) {
   if (!text) return "";
   const match = text.match(new RegExp(`^\\s*${escapeRegExp(key)}\\s*=\\s*["']([^"']+)["']`, "m"));
   return match?.[1] || "";
+}
+
+function parseXmlTagValue(text, tag) {
+  if (!text) return "";
+  const match = text.match(new RegExp(`<${escapeRegExp(tag)}>\\s*([^<]+?)\\s*</${escapeRegExp(tag)}>`, "i"));
+  return match?.[1]?.trim() || "";
 }
 
 function escapeRegExp(value) {

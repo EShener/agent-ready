@@ -72,6 +72,25 @@ test("scan detects Rails and Laravel project signals", async () => {
   assert.equal(laravel.commands.test, "php artisan test");
 });
 
+test("scan detects Spring Boot Maven and Gradle project signals", async () => {
+  const maven = await scanRepo(fixture("spring-maven-app"));
+  const gradle = await scanRepo(fixture("spring-gradle-app"));
+
+  assert.equal(maven.name, "spring-maven-app");
+  assert.equal(maven.primaryLanguage, "Java");
+  assert.equal(maven.packageManager, "maven");
+  assert.ok(maven.frameworks.includes("Spring Boot"));
+  assert.equal(maven.commands.build, "./mvnw package");
+  assert.equal(maven.commands.test, "./mvnw test");
+
+  assert.equal(gradle.name, "spring-gradle-app");
+  assert.equal(gradle.primaryLanguage, "Kotlin");
+  assert.equal(gradle.packageManager, "gradle");
+  assert.ok(gradle.frameworks.includes("Spring Boot"));
+  assert.equal(gradle.commands.build, "./gradlew build");
+  assert.equal(gradle.commands.test, "./gradlew test");
+});
+
 test("scan detects monorepo workspace signals", async () => {
   const profile = await scanRepo(fixture("monorepo"));
 
