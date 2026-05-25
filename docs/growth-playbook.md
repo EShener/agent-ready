@@ -97,16 +97,29 @@ I am collecting missing framework detectors and readiness rules for `agent-ready
 Useful examples: Next.js, Astro, SvelteKit, Rails, Django, Docker Compose, monorepo CI, generated SDKs.
 ```
 
-## Metrics
+## Weekly Metrics Tracking
 
-Track weekly:
+Use [growth-metrics.md](growth-metrics.md) as the weekly log. Capture the raw numbers first, then write one short interpretation and one next experiment.
 
-- GitHub stars
-- npm downloads
-- Discussion replies
+Core metrics:
+
+- GitHub stars and watchers
+- npm latest version and last-week downloads
+- Discussion count and replies
 - New issues opened by non-maintainers
-- Repos that mention `agent-ready`
+- Repos or posts that mention `agent-ready`
 - Repeated detector requests
+
+Collection commands:
+
+```bash
+gh repo view EShener/agent-ready --json stargazerCount,watchers,repositoryTopics
+npm view @eshen_fox_mie/agent-ready version
+curl -sS https://api.npmjs.org/downloads/point/last-week/%40eshen_fox_mie%2Fagent-ready
+gh api graphql -f query='query($owner:String!,$repo:String!){repository(owner:$owner,name:$repo){discussions(first:10,orderBy:{field:UPDATED_AT,direction:DESC}){totalCount nodes{number title url comments{totalCount}}} issues(states:OPEN,first:20){totalCount nodes{number title author{login} url}}}}}' -F owner=EShener -F repo=agent-ready
+```
+
+Avoid vanity-only interpretation. Each weekly note should end with one action, such as shipping a detector, improving examples, sharing a GIF, or asking for a specific framework request.
 
 ## Distribution Checklist
 

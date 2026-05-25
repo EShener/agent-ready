@@ -6,6 +6,7 @@
 - Added fixture coverage for Next.js App Router and Astro projects.
 - Added Docker and Docker Compose detection, including generated `AGENTS.md` local service guidance.
 - Added real-world readiness snapshots to the examples gallery.
+- Added weekly growth metrics tracking with collection commands and a baseline launch log.
 
 ## 0.1.25
 
