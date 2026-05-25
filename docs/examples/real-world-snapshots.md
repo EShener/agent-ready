@@ -22,6 +22,86 @@ Commands: install=npm install; dev=npm run dev; build=npm run build; test=npm ru
 
 Why it matters: modern frontend repositories often expose framework intent through `next.config.*`, `app/`, and `pages/`, not only through dependencies.
 
+## Frontend app: SvelteKit
+
+Command:
+
+```bash
+npx --yes @eshen_fox_mie/agent-ready scan --root test/fixtures/sveltekit-app
+```
+
+Output excerpt:
+
+```text
+fixture-sveltekit-app
+Primary language: Svelte
+Frameworks: Vite, Svelte, SvelteKit, Vitest
+Package manager: npm
+Commands: install=npm install; dev=npm run dev; build=npm run build; test=npm run test
+```
+
+Why it matters: SvelteKit repositories reveal app structure through `svelte.config.*` and `src/routes/+page.svelte` conventions.
+
+## Frontend app: Nuxt
+
+Command:
+
+```bash
+npx --yes @eshen_fox_mie/agent-ready scan --root test/fixtures/nuxt-app
+```
+
+Output excerpt:
+
+```text
+fixture-nuxt-app
+Primary language: Vue
+Frameworks: Vue, Nuxt, Vitest
+Package manager: npm
+Commands: install=npm install; dev=npm run dev; build=npm run build; test=npm run test
+```
+
+Why it matters: Nuxt repositories may expose framework identity through `nuxt.config.*`, `app.vue`, `pages/`, and `server/`.
+
+## Backend app: Rails
+
+Command:
+
+```bash
+npx --yes @eshen_fox_mie/agent-ready scan --root test/fixtures/rails-app
+```
+
+Output excerpt:
+
+```text
+rails-app
+Primary language: Ruby
+Frameworks: Rails
+Package manager: bundler
+Commands: install=bundle install; dev=bin/rails server; test=bin/rails test
+```
+
+Why it matters: Rails repositories need agents to use framework entrypoints like `bin/rails` instead of guessing generic Ruby commands.
+
+## Backend app: Laravel
+
+Command:
+
+```bash
+npx --yes @eshen_fox_mie/agent-ready scan --root test/fixtures/laravel-app
+```
+
+Output excerpt:
+
+```text
+fixture-laravel-app
+Primary language: PHP
+Frameworks: Laravel
+Package manager: composer
+Commands: install=composer install; dev=php artisan serve; test=php artisan test
+```
+
+Why it matters: Laravel repositories often rely on Composer and `artisan` commands that should be explicit in generated agent instructions.
+
 ## Service app: Docker Compose
 
 Command:

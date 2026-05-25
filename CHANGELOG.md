@@ -9,6 +9,7 @@
 - Added weekly growth metrics tracking with collection commands and a baseline launch log.
 - Added SvelteKit and Nuxt detection from framework configs, route conventions, and `.svelte`/`.vue` files.
 - Added Rails and Laravel detection with Bundler and Composer command inference.
+- Expanded real-world readiness snapshots with SvelteKit, Nuxt, Rails, and Laravel examples.
 
 ## 0.1.25
 
