@@ -6,12 +6,13 @@ import { fileURLToPath } from "node:url";
 import { benchmarkRepos } from "../src/benchmark.mjs";
 import { buildShareComment } from "../src/comment.mjs";
 import { compareReadiness } from "../src/compare.mjs";
+import { buildExamplesCatalog } from "../src/examples.mjs";
 import { explainRepo } from "../src/explainer.mjs";
 import { buildAgentsMd, planGeneratedArtifacts } from "../src/generator.mjs";
 import { improveRepo } from "../src/improver.mjs";
 import { lintRepo, scoreRepo } from "../src/linter.mjs";
 import { buildAgentMatrix } from "../src/matrix.mjs";
-import { renderAgentMatrix, renderAnnotations, renderBenchmarkReport, renderComparison, renderDoctor, renderExplanation, renderImprovement, renderImprovementIssue, renderLeaderboard, renderMarkdownReport, renderRoadmap, renderShareComment } from "../src/reporter.mjs";
+import { renderAgentMatrix, renderAnnotations, renderBenchmarkReport, renderComparison, renderDoctor, renderExamplesCatalog, renderExplanation, renderImprovement, renderImprovementIssue, renderLeaderboard, renderMarkdownReport, renderRoadmap, renderShareComment } from "../src/reporter.mjs";
 import { scanRepo } from "../src/scanner.mjs";
 import { snapshotRepo } from "../src/snapshot.mjs";
 import { renderCiWorkflow, writeCiWorkflow } from "../src/workflow.mjs";
@@ -149,6 +150,16 @@ test("snapshot summarizes score, compatibility, and findings", async () => {
   assert.equal(snapshot.matrix.summary.total, 5);
   assert.equal(typeof snapshot.score.score, "number");
   assert.equal(snapshot.summary.findings, snapshot.findings.length);
+});
+
+test("examples catalog links copy-ready sample files", () => {
+  const catalog = buildExamplesCatalog();
+  const markdown = renderExamplesCatalog(catalog);
+
+  assert.equal(catalog.examples.length, 4);
+  assert.ok(catalog.examples.every((example) => example.file.startsWith("docs/examples/")));
+  assert.match(markdown, /agent-ready Examples/);
+  assert.match(markdown, /issue-checklist\.md/);
 });
 
 test("explanation report ranks fixes by score impact", async () => {
@@ -333,7 +344,7 @@ test("scan applies agent-ready.json command and doc overrides", async () => {
 });
 
 test("workflow renderer validates mode and fail-under values", () => {
-  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.20/);
+  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.21/);
   assert.match(renderCiWorkflow({ mode: "action", comment: true }), /comment: true/);
   assert.match(renderCiWorkflow({ mode: "action", comment: true }), /pull-requests: write/);
   assert.match(renderCiWorkflow({ mode: "npx", failUnder: "70" }), /npx agent-ready score --fail-under 70/);

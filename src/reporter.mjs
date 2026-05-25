@@ -219,6 +219,23 @@ ${rows}
 `;
 }
 
+export function renderExamplesCatalog(catalog) {
+  const rows = catalog.examples.length
+    ? catalog.examples.map((example) => `| ${escapePipe(example.title)} | \`${example.command}\` | [${escapePipe(example.file)}](${example.file}) | ${escapePipe(example.useCase)} |`).join("\n")
+    : "| none |  |  | No examples available. |";
+
+  return `# agent-ready Examples
+
+Use these examples to understand the output before running \`agent-ready\` on a real repository.
+
+| Example | Command | File | Use case |
+| --- | --- | --- | --- |
+${rows}
+
+Tip: start with \`agent-ready improve --dry-run\` for a safe preview, then use \`agent-ready improve --format issue\` when you want a GitHub-ready checklist.
+`;
+}
+
 export function renderComparison(comparison) {
   const sign = comparison.delta.score > 0 ? "+" : "";
   const fixedRows = comparison.fixed.length

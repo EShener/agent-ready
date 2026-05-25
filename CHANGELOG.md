@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.21
+
+- Added `agent-ready examples` for a terminal-friendly example gallery.
+- Added `docs/examples/` with copy-ready output samples for improvement, issue checklist, snapshot, and roadmap workflows.
+
 ## 0.1.20
 
 - Added `agent-ready snapshot` to generate a complete static `AGENT_READINESS.md` report.

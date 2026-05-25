@@ -2,13 +2,14 @@ import { scanRepo } from "./scanner.mjs";
 import { benchmarkRepos } from "./benchmark.mjs";
 import { buildShareComment } from "./comment.mjs";
 import { compareReadinessFiles } from "./compare.mjs";
+import { buildExamplesCatalog } from "./examples.mjs";
 import { explainRepo } from "./explainer.mjs";
 import { parseTargets, writeGeneratedArtifacts } from "./generator.mjs";
 import { improveRepo } from "./improver.mjs";
 import { promptInitOptions } from "./interactive.mjs";
 import { lintRepo, scoreRepo } from "./linter.mjs";
 import { buildAgentMatrix } from "./matrix.mjs";
-import { renderAgentMatrix, renderAnnotations, renderBadge, renderBenchmarkReport, renderComparison, renderDoctor, renderExplanation, renderFindings, renderImprovement, renderImprovementIssue, renderLeaderboard, renderMarkdownReport, renderRoadmap, renderScanSummary, renderScore, renderShareComment, renderSnapshot } from "./reporter.mjs";
+import { renderAgentMatrix, renderAnnotations, renderBadge, renderBenchmarkReport, renderComparison, renderDoctor, renderExamplesCatalog, renderExplanation, renderFindings, renderImprovement, renderImprovementIssue, renderLeaderboard, renderMarkdownReport, renderRoadmap, renderScanSummary, renderScore, renderShareComment, renderSnapshot } from "./reporter.mjs";
 import { snapshotRepo, writeSnapshotFile } from "./snapshot.mjs";
 import { renderCiWorkflow, writeCiWorkflow } from "./workflow.mjs";
 
@@ -24,6 +25,7 @@ Usage:
   agent-ready lint [--root PATH] [--config PATH] [--format json|text]
   agent-ready annotations [--root PATH] [--config PATH] [--format github|json]
   agent-ready score [--root PATH] [--config PATH] [--format json|text] [--fail-under N]
+  agent-ready examples [--format markdown|json]
   agent-ready explain [--root PATH] [--config PATH] [--format markdown|json]
   agent-ready matrix [--root PATH] [--config PATH] [--format markdown|json]
   agent-ready comment [--root PATH] [--config PATH] [--format markdown|json] [--max-fixes N]
@@ -46,6 +48,7 @@ Examples:
   npx agent-ready improve --level team
   npx agent-ready init --interactive
   npx agent-ready doctor
+  npx agent-ready examples
   npx agent-ready explain
   npx agent-ready matrix
   npx agent-ready comment
@@ -177,6 +180,17 @@ export async function runCli(argv) {
     if (flags.format === "json" || flags.json) console.log(JSON.stringify(score, null, 2));
     else console.log(renderScore(score));
     applyFailUnder(score, flags["fail-under"]);
+    return;
+  }
+
+  if (command === "examples") {
+    const catalog = buildExamplesCatalog();
+    if (flags.format === "json" || flags.json) {
+      console.log(JSON.stringify(catalog, null, 2));
+    } else {
+      if (flags.format && flags.format !== "markdown") throw new Error("Examples format must be markdown or json.");
+      console.log(renderExamplesCatalog(catalog));
+    }
     return;
   }
 
