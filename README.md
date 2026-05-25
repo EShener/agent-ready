@@ -434,7 +434,7 @@ Current detectors cover common JavaScript/TypeScript, Python, Rust, Go, and mono
 ## Roadmap
 
 - More framework detectors and fixture coverage
-- npm package publishing
+- Release automation and provenance hardening
 - MCP server for editor and agent integrations
 - Repository badge automation
 - Benchmarks on real open-source repositories
