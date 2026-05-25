@@ -13,7 +13,7 @@ Make any repository ready for AI coding agents in 60 seconds.
 It is for developers using Codex, Claude Code, Cursor, Gemini CLI, GitHub Copilot, or any coding agent that needs repository instructions before editing safely.
 
 ```bash
-npx --yes github:EShener/agent-ready improve --preset team --dry-run
+npx --yes @eshen_fox_mie/agent-ready improve --preset team --dry-run
 ```
 
 Preview exactly which files will be added and the estimated score gain before anything is written.
@@ -37,37 +37,37 @@ On a 2026-05-23 sample of six public AI/devtool repositories, the average Agent 
 Use the GitHub Action immediately:
 
 ```yaml
-- uses: EShener/agent-ready@v0.1.22
+- uses: EShener/agent-ready@v0.1.23
   with:
     fail-under: 80
 ```
 
-Use the CLI from GitHub until the npm package is published:
+Use the CLI from npm:
 
 ```bash
-npx --yes github:EShener/agent-ready doctor
-npx --yes github:EShener/agent-ready examples
-npx --yes github:EShener/agent-ready explain
-npx --yes github:EShener/agent-ready matrix
-npx --yes github:EShener/agent-ready comment
-npx --yes github:EShener/agent-ready compare --before before.json --after after.json
-npx --yes github:EShener/agent-ready improve --preset team --dry-run
-npx --yes github:EShener/agent-ready improve --dry-run
-npx --yes github:EShener/agent-ready improve --dry-run --format issue
-npx --yes github:EShener/agent-ready improve --level team
-npx --yes github:EShener/agent-ready fix --preset team --dry-run
-npx --yes github:EShener/agent-ready fix --dry-run
-npx --yes github:EShener/agent-ready fix --level team --dry-run
-npx --yes github:EShener/agent-ready init --preset oss --dry-run
-npx --yes github:EShener/agent-ready init --dry-run
-npx --yes github:EShener/agent-ready score --fail-under 80
-npx --yes github:EShener/agent-ready ci
-npx --yes github:EShener/agent-ready ci --comment
-npx --yes github:EShener/agent-ready ci --write --dry-run
-npx --yes github:EShener/agent-ready snapshot --write --dry-run
-npx --yes github:EShener/agent-ready benchmark ../repo-a ../repo-b
-npx --yes github:EShener/agent-ready leaderboard ../repo-a ../repo-b
-npx --yes github:EShener/agent-ready roadmap ../repo-a ../repo-b
+npx --yes @eshen_fox_mie/agent-ready doctor
+npx --yes @eshen_fox_mie/agent-ready examples
+npx --yes @eshen_fox_mie/agent-ready explain
+npx --yes @eshen_fox_mie/agent-ready matrix
+npx --yes @eshen_fox_mie/agent-ready comment
+npx --yes @eshen_fox_mie/agent-ready compare --before before.json --after after.json
+npx --yes @eshen_fox_mie/agent-ready improve --preset team --dry-run
+npx --yes @eshen_fox_mie/agent-ready improve --dry-run
+npx --yes @eshen_fox_mie/agent-ready improve --dry-run --format issue
+npx --yes @eshen_fox_mie/agent-ready improve --level team
+npx --yes @eshen_fox_mie/agent-ready fix --preset team --dry-run
+npx --yes @eshen_fox_mie/agent-ready fix --dry-run
+npx --yes @eshen_fox_mie/agent-ready fix --level team --dry-run
+npx --yes @eshen_fox_mie/agent-ready init --preset oss --dry-run
+npx --yes @eshen_fox_mie/agent-ready init --dry-run
+npx --yes @eshen_fox_mie/agent-ready score --fail-under 80
+npx --yes @eshen_fox_mie/agent-ready ci
+npx --yes @eshen_fox_mie/agent-ready ci --comment
+npx --yes @eshen_fox_mie/agent-ready ci --write --dry-run
+npx --yes @eshen_fox_mie/agent-ready snapshot --write --dry-run
+npx --yes @eshen_fox_mie/agent-ready benchmark ../repo-a ../repo-b
+npx --yes @eshen_fox_mie/agent-ready leaderboard ../repo-a ../repo-b
+npx --yes @eshen_fox_mie/agent-ready roadmap ../repo-a ../repo-b
 ```
 
 Example output:
@@ -87,7 +87,7 @@ Top fixes:
 After review, generate the files:
 
 ```bash
-npx --yes github:EShener/agent-ready init --targets codex,claude,cursor,gemini,copilot
+npx --yes @eshen_fox_mie/agent-ready init --targets codex,claude,cursor,gemini,copilot
 ```
 
 ## What It Generates
@@ -380,7 +380,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: EShener/agent-ready@v0.1.22
+      - uses: EShener/agent-ready@v0.1.23
         with:
           fail-under: 80
 ```
@@ -397,7 +397,7 @@ permissions:
 
 steps:
   - uses: actions/checkout@v4
-  - uses: EShener/agent-ready@v0.1.22
+  - uses: EShener/agent-ready@v0.1.23
     with:
       fail-under: 80
       comment: true
@@ -406,10 +406,10 @@ steps:
 Generate this workflow with:
 
 ```bash
-npx --yes github:EShener/agent-ready ci > .github/workflows/agent-ready.yml
-npx --yes github:EShener/agent-ready ci --comment
-npx --yes github:EShener/agent-ready ci --comment --write
-npx --yes github:EShener/agent-ready ci --write
+npx --yes @eshen_fox_mie/agent-ready ci > .github/workflows/agent-ready.yml
+npx --yes @eshen_fox_mie/agent-ready ci --comment
+npx --yes @eshen_fox_mie/agent-ready ci --comment --write
+npx --yes @eshen_fox_mie/agent-ready ci --write
 ```
 
 ## Supported Detection

@@ -1,6 +1,6 @@
 {
-  "name": "agent-ready",
-  "version": "0.1.22",
+  "name": "@eshen_fox_mie/agent-ready",
+  "version": "0.1.23",
   "description": "Make any repository ready for AI coding agents in 60 seconds.",
   "type": "module",
   "bin": {

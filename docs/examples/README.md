@@ -12,5 +12,5 @@ These examples show what `agent-ready` produces before you run it on a real repo
 Run the gallery from a terminal:
 
 ```bash
-npx --yes github:EShener/agent-ready examples
+npx --yes @eshen_fox_mie/agent-ready examples
 ```

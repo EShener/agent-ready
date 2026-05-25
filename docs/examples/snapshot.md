@@ -3,7 +3,7 @@
 Command:
 
 ```bash
-npx --yes github:EShener/agent-ready snapshot
+npx --yes @eshen_fox_mie/agent-ready snapshot
 ```
 
 Example output:

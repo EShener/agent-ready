@@ -41,32 +41,32 @@ Usage:
   agent-ready ci [--mode action|npx] [--fail-under N] [--comment] [--write] [--dry-run] [--force] [--output PATH]
 
 Examples:
-  npx agent-ready scan
-  npx agent-ready init --targets codex,claude,cursor
-  npx agent-ready init --preset oss --dry-run
-  npx agent-ready fix --dry-run
-  npx agent-ready fix --preset team --dry-run
-  npx agent-ready fix --level team --dry-run
-  npx agent-ready improve --dry-run
-  npx agent-ready improve --preset team --dry-run
-  npx agent-ready improve --level team
-  npx agent-ready init --interactive
-  npx agent-ready doctor
-  npx agent-ready examples
-  npx agent-ready explain
-  npx agent-ready matrix
-  npx agent-ready comment
-  npx agent-ready compare --before before.json --after after.json
-  npx agent-ready annotations
-  npx agent-ready score --fail-under 80
-  npx agent-ready ci
-  npx agent-ready ci --write
-  npx agent-ready ci --comment
-  npx agent-ready report --format markdown
-  npx agent-ready snapshot --write
-  npx agent-ready benchmark ../repo-a ../repo-b
-  npx agent-ready leaderboard ../repo-a ../repo-b
-  npx agent-ready roadmap ../repo-a ../repo-b
+  npx @eshen_fox_mie/agent-ready scan
+  npx @eshen_fox_mie/agent-ready init --targets codex,claude,cursor
+  npx @eshen_fox_mie/agent-ready init --preset oss --dry-run
+  npx @eshen_fox_mie/agent-ready fix --dry-run
+  npx @eshen_fox_mie/agent-ready fix --preset team --dry-run
+  npx @eshen_fox_mie/agent-ready fix --level team --dry-run
+  npx @eshen_fox_mie/agent-ready improve --dry-run
+  npx @eshen_fox_mie/agent-ready improve --preset team --dry-run
+  npx @eshen_fox_mie/agent-ready improve --level team
+  npx @eshen_fox_mie/agent-ready init --interactive
+  npx @eshen_fox_mie/agent-ready doctor
+  npx @eshen_fox_mie/agent-ready examples
+  npx @eshen_fox_mie/agent-ready explain
+  npx @eshen_fox_mie/agent-ready matrix
+  npx @eshen_fox_mie/agent-ready comment
+  npx @eshen_fox_mie/agent-ready compare --before before.json --after after.json
+  npx @eshen_fox_mie/agent-ready annotations
+  npx @eshen_fox_mie/agent-ready score --fail-under 80
+  npx @eshen_fox_mie/agent-ready ci
+  npx @eshen_fox_mie/agent-ready ci --write
+  npx @eshen_fox_mie/agent-ready ci --comment
+  npx @eshen_fox_mie/agent-ready report --format markdown
+  npx @eshen_fox_mie/agent-ready snapshot --write
+  npx @eshen_fox_mie/agent-ready benchmark ../repo-a ../repo-b
+  npx @eshen_fox_mie/agent-ready leaderboard ../repo-a ../repo-b
+  npx @eshen_fox_mie/agent-ready roadmap ../repo-a ../repo-b
 `;
 
 export async function runCli(argv) {

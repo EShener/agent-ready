@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: EShener/agent-ready@v0.1.22
+      - uses: EShener/agent-ready@v0.1.23
         with:
           fail-under: 80
           comment: true
@@ -62,26 +62,26 @@ jobs:
 Generate the same workflow from the CLI:
 
 ```bash
-npx --yes github:EShener/agent-ready ci --comment --write
+npx --yes @eshen_fox_mie/agent-ready ci --comment --write
 ```
 
 ## 60 Second CLI Path
 
 ```bash
-npx --yes github:EShener/agent-ready doctor
-npx --yes github:EShener/agent-ready examples
-npx --yes github:EShener/agent-ready explain
-npx --yes github:EShener/agent-ready improve --preset team --dry-run
-npx --yes github:EShener/agent-ready improve --level team --dry-run
-npx --yes github:EShener/agent-ready improve --preset team --dry-run --format issue
-npx --yes github:EShener/agent-ready snapshot --write --dry-run
-npx --yes github:EShener/agent-ready fix --preset team --dry-run
-npx --yes github:EShener/agent-ready fix --dry-run
-npx --yes github:EShener/agent-ready fix --level team --dry-run
-npx --yes github:EShener/agent-ready leaderboard ../repo-a ../repo-b
-npx --yes github:EShener/agent-ready roadmap ../repo-a ../repo-b
-npx --yes github:EShener/agent-ready fix
-npx --yes github:EShener/agent-ready comment
+npx --yes @eshen_fox_mie/agent-ready doctor
+npx --yes @eshen_fox_mie/agent-ready examples
+npx --yes @eshen_fox_mie/agent-ready explain
+npx --yes @eshen_fox_mie/agent-ready improve --preset team --dry-run
+npx --yes @eshen_fox_mie/agent-ready improve --level team --dry-run
+npx --yes @eshen_fox_mie/agent-ready improve --preset team --dry-run --format issue
+npx --yes @eshen_fox_mie/agent-ready snapshot --write --dry-run
+npx --yes @eshen_fox_mie/agent-ready fix --preset team --dry-run
+npx --yes @eshen_fox_mie/agent-ready fix --dry-run
+npx --yes @eshen_fox_mie/agent-ready fix --level team --dry-run
+npx --yes @eshen_fox_mie/agent-ready leaderboard ../repo-a ../repo-b
+npx --yes @eshen_fox_mie/agent-ready roadmap ../repo-a ../repo-b
+npx --yes @eshen_fox_mie/agent-ready fix
+npx --yes @eshen_fox_mie/agent-ready comment
 ```
 
 ## Why It Is Different
@@ -104,5 +104,5 @@ agent-ready adds a score, AGENTS.md generation, CI annotations, a compatibility 
 
 Try it:
 
-npx --yes github:EShener/agent-ready improve --preset team --dry-run
+npx --yes @eshen_fox_mie/agent-ready improve --preset team --dry-run
 ```

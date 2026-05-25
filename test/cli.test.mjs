@@ -389,7 +389,7 @@ test("roadmap CLI emits JSON when requested", async () => {
 
 test("ci CLI emits reusable GitHub Action workflow by default", async () => {
   const { stdout } = await execFileAsync(process.execPath, [bin, "ci", "--fail-under", "85"], { cwd: root });
-  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.22/);
+  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.23/);
   assert.match(stdout, /fail-under: 85/);
 });
 
@@ -420,7 +420,7 @@ test("ci CLI can write the reusable GitHub Action workflow", async () => {
 test("ci CLI can emit npx-based workflow", async () => {
   const { stdout } = await execFileAsync(process.execPath, [bin, "ci", "--mode", "npx", "--fail-under", "75"], { cwd: root });
   assert.match(stdout, /actions\/setup-node@v4/);
-  assert.match(stdout, /npx agent-ready score --fail-under 75/);
+  assert.match(stdout, /npx @eshen_fox_mie\/agent-ready score --fail-under 75/);
 });
 
 test("score CLI fail-under exits non-zero below threshold", async () => {

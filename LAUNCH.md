@@ -49,9 +49,9 @@ It runs fully locally, needs no API key, and is meant to be useful before you ad
 ```text
 I built agent-ready: a local-first CLI that makes any repository ready for AI coding agents.
 
-npx agent-ready scan
-npx agent-ready init
-npx agent-ready score
+npx @eshen_fox_mie/agent-ready scan
+npx @eshen_fox_mie/agent-ready init
+npx @eshen_fox_mie/agent-ready score
 
 It generates AGENTS.md plus shims for Claude, Cursor, Gemini, and Copilot, then gives the repo an explainable readiness score.
 ```

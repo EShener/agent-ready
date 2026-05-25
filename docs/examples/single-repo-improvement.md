@@ -3,7 +3,7 @@
 Command:
 
 ```bash
-npx --yes github:EShener/agent-ready improve --preset team --dry-run
+npx --yes @eshen_fox_mie/agent-ready improve --preset team --dry-run
 ```
 
 Example output:

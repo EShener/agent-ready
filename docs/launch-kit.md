@@ -24,7 +24,7 @@ AI coding agents fail when repositories do not tell them how to build, test, and
 Try it:
 
 ```bash
-npx --yes github:EShener/agent-ready improve --preset team --dry-run
+npx --yes @eshen_fox_mie/agent-ready improve --preset team --dry-run
 ```
 
 ## Community Post
@@ -55,7 +55,7 @@ It can:
 Quick start:
 
 ```bash
-npx --yes github:EShener/agent-ready improve --preset team --dry-run
+npx --yes @eshen_fox_mie/agent-ready improve --preset team --dry-run
 ```
 
 Repo: https://github.com/EShener/agent-ready
@@ -69,7 +69,7 @@ AI coding agents should not have to rediscover every repo from scratch.
 `agent-ready` scans a codebase, scores its readiness for coding agents, generates `AGENTS.md`, and shows exactly what to fix next.
 
 ```bash
-npx --yes github:EShener/agent-ready improve --preset team --dry-run
+npx --yes @eshen_fox_mie/agent-ready improve --preset team --dry-run
 ```
 
 https://github.com/EShener/agent-ready
@@ -81,7 +81,7 @@ New in `agent-ready`: multi-repo readiness leaderboards and cleanup roadmaps.
 Useful if a team wants to see which repos are ready for Codex, Claude Code, Cursor, Gemini CLI, and Copilot.
 
 ```bash
-npx --yes github:EShener/agent-ready roadmap ../repo-a ../repo-b
+npx --yes @eshen_fox_mie/agent-ready roadmap ../repo-a ../repo-b
 ```
 
 Post 3:
@@ -104,7 +104,7 @@ I noticed this repo may benefit from explicit AI coding agent instructions.
 Dry-run command:
 
 ```bash
-npx --yes github:EShener/agent-ready improve --preset team --dry-run --format issue
+npx --yes @eshen_fox_mie/agent-ready improve --preset team --dry-run --format issue
 ```
 
 No network calls or API keys are required by the CLI.

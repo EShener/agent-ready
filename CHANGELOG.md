@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.23
+
+- Switched the npm package name to `@eshen_fox_mie/agent-ready` after the unscoped `agent-ready` name was rejected by npm name similarity rules.
+- Updated npm quick-start commands to use the scoped package while keeping the CLI binary name as `agent-ready`.
+- Updated generated npx workflows to install the scoped npm package.
+
 ## 0.1.22
 
 - Added `--preset oss|team|enterprise` for `init`, `fix`, and `improve`.

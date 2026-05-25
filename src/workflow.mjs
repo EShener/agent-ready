@@ -59,7 +59,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: EShener/agent-ready@v0.1.22
+      - uses: EShener/agent-ready@v0.1.23
         with:
           fail-under: ${failUnder}
 ${commentInput}`;
@@ -81,7 +81,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npx agent-ready score --fail-under ${failUnder}
+      - run: npx @eshen_fox_mie/agent-ready score --fail-under ${failUnder}
 `;
 }
 

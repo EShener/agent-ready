@@ -163,7 +163,7 @@ This scan covered ${benchmark.count} repositories. Average Agent Readiness Score
 Run:
 
 \`\`\`bash
-npx --yes github:EShener/agent-ready leaderboard <repo-a> <repo-b>
+npx --yes @eshen_fox_mie/agent-ready leaderboard <repo-a> <repo-b>
 \`\`\`
 `;
 }

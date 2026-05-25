@@ -3,7 +3,7 @@
 Command:
 
 ```bash
-npx --yes github:EShener/agent-ready roadmap ../repo-a ../repo-b
+npx --yes @eshen_fox_mie/agent-ready roadmap ../repo-a ../repo-b
 ```
 
 Example output:
