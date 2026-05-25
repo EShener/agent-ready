@@ -203,6 +203,9 @@ async function detectCommands({ root, packageJson, packageManager, pyproject, ca
     else commands.install = "bundle install";
     commands.dev ||= files.includes("bin/rails") ? "bin/rails server" : "bundle exec rails server";
     commands.test ||= files.includes("bin/rails") ? "bin/rails test" : "bundle exec rails test";
+  } else if (gemfile) {
+    if (commands.install) commands["backend:install"] ||= "bundle install";
+    else commands.install = "bundle install";
   }
 
   if (hasLaravelSignals({ composerJson, files })) {
@@ -210,6 +213,9 @@ async function detectCommands({ root, packageJson, packageManager, pyproject, ca
     else commands.install = "composer install";
     commands.dev ||= "php artisan serve";
     commands.test ||= "php artisan test";
+  } else if (composerJson) {
+    if (commands.install) commands["backend:install"] ||= "composer install";
+    else commands.install = "composer install";
   }
 
   if (hasDockerComposeFile(files)) {

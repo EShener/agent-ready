@@ -1,0 +1,6 @@
+{
+  "name": "fixture/plain-composer",
+  "require": {
+    "monolog/monolog": "^3.0"
+  }
+}

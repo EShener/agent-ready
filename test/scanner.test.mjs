@@ -91,6 +91,37 @@ test("scan detects Spring Boot Maven and Gradle project signals", async () => {
   assert.equal(gradle.commands.test, "./gradlew test");
 });
 
+test("scan handles Ruby and PHP package manager edge cases", async () => {
+  const railsHybrid = await scanRepo(fixture("rails-with-frontend"));
+  const railsAgents = buildAgentsMd(railsHybrid);
+  const laravelHybrid = await scanRepo(fixture("laravel-with-frontend"));
+  const laravelAgents = buildAgentsMd(laravelHybrid);
+  const plainGemfile = await scanRepo(fixture("plain-gemfile"));
+  const plainComposer = await scanRepo(fixture("plain-composer"));
+
+  assert.equal(railsHybrid.packageManager, "npm");
+  assert.ok(railsHybrid.frameworks.includes("Rails"));
+  assert.equal(railsHybrid.commands.install, "npm install");
+  assert.equal(railsHybrid.commands["backend:install"], "bundle install");
+  assert.equal(railsHybrid.commands.test, "npm run test");
+  assert.match(railsAgents, /backend:install: `bundle install`/);
+
+  assert.equal(laravelHybrid.packageManager, "npm");
+  assert.ok(laravelHybrid.frameworks.includes("Laravel"));
+  assert.equal(laravelHybrid.commands.install, "npm install");
+  assert.equal(laravelHybrid.commands["backend:install"], "composer install");
+  assert.equal(laravelHybrid.commands.test, "npm run test");
+  assert.match(laravelAgents, /backend:install: `composer install`/);
+
+  assert.equal(plainGemfile.packageManager, "bundler");
+  assert.equal(plainGemfile.commands.install, "bundle install");
+  assert.equal(plainGemfile.frameworks.includes("Rails"), false);
+
+  assert.equal(plainComposer.packageManager, "composer");
+  assert.equal(plainComposer.commands.install, "composer install");
+  assert.equal(plainComposer.frameworks.includes("Laravel"), false);
+});
+
 test("scan detects monorepo workspace signals", async () => {
   const profile = await scanRepo(fixture("monorepo"));
 
