@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.25
+
+- Added a distribution checklist to the growth playbook for repeatable release promotion.
+- Refreshed generated workflow examples for the latest release tag.
+
 ## 0.1.24
 
 - Added npm badges and a growth playbook to make the project easier to evaluate and share.

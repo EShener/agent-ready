@@ -358,7 +358,7 @@ test("scan applies agent-ready.json command and doc overrides", async () => {
 });
 
 test("workflow renderer validates mode and fail-under values", () => {
-  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.24/);
+  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.25/);
   assert.match(renderCiWorkflow({ mode: "action", comment: true }), /comment: true/);
   assert.match(renderCiWorkflow({ mode: "action", comment: true }), /pull-requests: write/);
   assert.match(renderCiWorkflow({ mode: "npx", failUnder: "70" }), /npx @eshen_fox_mie\/agent-ready score --fail-under 70/);

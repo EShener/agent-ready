@@ -108,6 +108,16 @@ Track weekly:
 - Repos that mention `agent-ready`
 - Repeated detector requests
 
+## Distribution Checklist
+
+Before sharing a release:
+
+- Verify npm points at the latest version: `npm view @eshen_fox_mie/agent-ready version`
+- Verify the quick start from a clean directory.
+- Link the current GitHub release, npm package, showcase, and examples gallery.
+- Pin one clear ask: try the dry-run command, star the repo, or request a detector.
+- Follow up with a small shipped improvement within 24 hours.
+
 ## Guardrails
 
 - Do not claim official vendor support from OpenAI, Anthropic, Cursor, Google, or GitHub.

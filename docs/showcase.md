@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: EShener/agent-ready@v0.1.24
+      - uses: EShener/agent-ready@v0.1.25
         with:
           fail-under: 80
           comment: true
