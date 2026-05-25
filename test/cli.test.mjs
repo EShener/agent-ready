@@ -389,7 +389,7 @@ test("roadmap CLI emits JSON when requested", async () => {
 
 test("ci CLI emits reusable GitHub Action workflow by default", async () => {
   const { stdout } = await execFileAsync(process.execPath, [bin, "ci", "--fail-under", "85"], { cwd: root });
-  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.23/);
+  assert.match(stdout, /uses: EShener\/agent-ready@v0\.1\.24/);
   assert.match(stdout, /fail-under: 85/);
 });
 

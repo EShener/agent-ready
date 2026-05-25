@@ -11,6 +11,7 @@ Use it when a repo needs clear instructions for Codex, Claude Code, Cursor, Gemi
 ## Primary Links
 
 - Repository: https://github.com/EShener/agent-ready
+- npm: https://www.npmjs.com/package/@eshen_fox_mie/agent-ready
 - Showcase: https://github.com/EShener/agent-ready/blob/main/docs/showcase.md
 - Benchmark: https://github.com/EShener/agent-ready/blob/main/BENCHMARK.md
 - Latest release: https://github.com/EShener/agent-ready/releases/latest
@@ -122,7 +123,7 @@ No network calls or API keys are required by the CLI.
 
 ## What Not To Claim
 
-- Do not claim npm install is available until the package is actually published.
+- Do not claim the unscoped `agent-ready` npm name is available. The published package is `@eshen_fox_mie/agent-ready`.
 - Do not claim a repository was changed unless `agent-ready fix` or `agent-ready improve` was actually applied.
 - Do not claim official support from any coding-agent vendor.
 - Keep outreach project-focused; do not invent affiliation, endorsement, or personal usage.

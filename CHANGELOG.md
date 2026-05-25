@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.24
+
+- Added npm badges and a growth playbook to make the project easier to evaluate and share.
+- Updated launch messaging now that the scoped npm package is published.
+- Added clearer guardrails for non-spammy, project-focused outreach.
+
 ## 0.1.23
 
 - Switched the npm package name to `@eshen_fox_mie/agent-ready` after the unscoped `agent-ready` name was rejected by npm name similarity rules.

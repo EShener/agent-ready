@@ -3,10 +3,12 @@
 Make any repository ready for AI coding agents in 60 seconds.
 
 [![CI](https://github.com/EShener/agent-ready/actions/workflows/ci.yml/badge.svg)](https://github.com/EShener/agent-ready/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/@eshen_fox_mie/agent-ready.svg)](https://www.npmjs.com/package/@eshen_fox_mie/agent-ready)
+[![npm downloads](https://img.shields.io/npm/dm/@eshen_fox_mie/agent-ready.svg)](https://www.npmjs.com/package/@eshen_fox_mie/agent-ready)
 ![agent-ready](https://img.shields.io/badge/agent--ready-100%2F100-brightgreen)
 ![license](https://img.shields.io/badge/license-MIT-blue)
 
-[Showcase](docs/showcase.md) · [Examples](docs/examples/README.md) · [Benchmark](BENCHMARK.md) · [Launch kit](docs/launch-kit.md) · [Launch notes](LAUNCH.md)
+[Showcase](docs/showcase.md) · [Examples](docs/examples/README.md) · [Benchmark](BENCHMARK.md) · [Growth playbook](docs/growth-playbook.md) · [Launch kit](docs/launch-kit.md) · [Launch notes](LAUNCH.md)
 
 `agent-ready` is a zero-dependency CLI that scans a codebase, generates canonical AI agent instructions, checks them for drift and missing verification steps, and gives the repository an explainable Agent Readiness Score.
 
@@ -17,6 +19,8 @@ npx --yes @eshen_fox_mie/agent-ready improve --preset team --dry-run
 ```
 
 Preview exactly which files will be added and the estimated score gain before anything is written.
+
+If this saves you setup time, star the repo so other maintainers can find it.
 
 <p align="center">
   <img src="docs/assets/agent-ready-pr-comment.gif" alt="agent-ready posts a pull request comment with score, compatibility, and top fixes" width="820">
@@ -37,7 +41,7 @@ On a 2026-05-23 sample of six public AI/devtool repositories, the average Agent 
 Use the GitHub Action immediately:
 
 ```yaml
-- uses: EShener/agent-ready@v0.1.23
+- uses: EShener/agent-ready@v0.1.24
   with:
     fail-under: 80
 ```
@@ -380,7 +384,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: EShener/agent-ready@v0.1.23
+      - uses: EShener/agent-ready@v0.1.24
         with:
           fail-under: 80
 ```
@@ -397,7 +401,7 @@ permissions:
 
 steps:
   - uses: actions/checkout@v4
-  - uses: EShener/agent-ready@v0.1.23
+  - uses: EShener/agent-ready@v0.1.24
     with:
       fail-under: 80
       comment: true
