@@ -13,6 +13,7 @@ import { lintRepo, scoreRepo } from "../src/linter.mjs";
 import { buildAgentMatrix } from "../src/matrix.mjs";
 import { renderAgentMatrix, renderAnnotations, renderBenchmarkReport, renderComparison, renderDoctor, renderExplanation, renderImprovement, renderImprovementIssue, renderLeaderboard, renderMarkdownReport, renderRoadmap, renderShareComment } from "../src/reporter.mjs";
 import { scanRepo } from "../src/scanner.mjs";
+import { snapshotRepo } from "../src/snapshot.mjs";
 import { renderCiWorkflow, writeCiWorkflow } from "../src/workflow.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -139,6 +140,15 @@ test("markdown report includes commands, docs, and findings", async () => {
   assert.match(report, /Agent Readiness Report/);
   assert.match(report, /fixture-node-app/);
   assert.match(report, /npm run test/);
+});
+
+test("snapshot summarizes score, compatibility, and findings", async () => {
+  const snapshot = await snapshotRepo(fixture("node-app"));
+
+  assert.equal(snapshot.repository.name, "fixture-node-app");
+  assert.equal(snapshot.matrix.summary.total, 5);
+  assert.equal(typeof snapshot.score.score, "number");
+  assert.equal(snapshot.summary.findings, snapshot.findings.length);
 });
 
 test("explanation report ranks fixes by score impact", async () => {
@@ -323,7 +333,7 @@ test("scan applies agent-ready.json command and doc overrides", async () => {
 });
 
 test("workflow renderer validates mode and fail-under values", () => {
-  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.19/);
+  assert.match(renderCiWorkflow({ mode: "action", failUnder: "90" }), /uses: EShener\/agent-ready@v0\.1\.20/);
   assert.match(renderCiWorkflow({ mode: "action", comment: true }), /comment: true/);
   assert.match(renderCiWorkflow({ mode: "action", comment: true }), /pull-requests: write/);
   assert.match(renderCiWorkflow({ mode: "npx", failUnder: "70" }), /npx agent-ready score --fail-under 70/);

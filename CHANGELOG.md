@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.20
+
+- Added `agent-ready snapshot` to generate a complete static `AGENT_READINESS.md` report.
+- Added `docs/launch-kit.md` with copy-ready launch, community, and outreach material.
+
 ## 0.1.19
 
 - Added `agent-ready roadmap` to turn multi-repository readiness gaps into a phased cleanup plan.

@@ -6,7 +6,7 @@ Make any repository ready for AI coding agents in 60 seconds.
 ![agent-ready](https://img.shields.io/badge/agent--ready-100%2F100-brightgreen)
 ![license](https://img.shields.io/badge/license-MIT-blue)
 
-[Showcase](docs/showcase.md) · [Benchmark](BENCHMARK.md) · [Launch notes](LAUNCH.md)
+[Showcase](docs/showcase.md) · [Benchmark](BENCHMARK.md) · [Launch kit](docs/launch-kit.md) · [Launch notes](LAUNCH.md)
 
 `agent-ready` is a zero-dependency CLI that scans a codebase, generates canonical AI agent instructions, checks them for drift and missing verification steps, and gives the repository an explainable Agent Readiness Score.
 
@@ -37,7 +37,7 @@ On a 2026-05-23 sample of six public AI/devtool repositories, the average Agent 
 Use the GitHub Action immediately:
 
 ```yaml
-- uses: EShener/agent-ready@v0.1.19
+- uses: EShener/agent-ready@v0.1.20
   with:
     fail-under: 80
 ```
@@ -60,6 +60,7 @@ npx --yes github:EShener/agent-ready score --fail-under 80
 npx --yes github:EShener/agent-ready ci
 npx --yes github:EShener/agent-ready ci --comment
 npx --yes github:EShener/agent-ready ci --write --dry-run
+npx --yes github:EShener/agent-ready snapshot --write --dry-run
 npx --yes github:EShener/agent-ready benchmark ../repo-a ../repo-b
 npx --yes github:EShener/agent-ready leaderboard ../repo-a ../repo-b
 npx --yes github:EShener/agent-ready roadmap ../repo-a ../repo-b
@@ -239,6 +240,19 @@ Creates a Markdown or JSON report for issues, PRs, or README updates.
 agent-ready report --format markdown
 ```
 
+### `snapshot`
+
+Creates a complete static `AGENT_READINESS.md` report with score, commands, agent compatibility, findings, and next actions.
+
+```bash
+agent-ready snapshot
+agent-ready snapshot --write
+agent-ready snapshot --write --dry-run
+agent-ready snapshot --write --force
+agent-ready snapshot --output docs/agent-readiness.md --write
+agent-ready snapshot --format json
+```
+
 ### `badge`
 
 Prints a Shields-compatible static badge for README files.
@@ -331,7 +345,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: EShener/agent-ready@v0.1.19
+      - uses: EShener/agent-ready@v0.1.20
         with:
           fail-under: 80
 ```
@@ -348,7 +362,7 @@ permissions:
 
 steps:
   - uses: actions/checkout@v4
-  - uses: EShener/agent-ready@v0.1.19
+  - uses: EShener/agent-ready@v0.1.20
     with:
       fail-under: 80
       comment: true

@@ -8,7 +8,8 @@ import { improveRepo } from "./improver.mjs";
 import { promptInitOptions } from "./interactive.mjs";
 import { lintRepo, scoreRepo } from "./linter.mjs";
 import { buildAgentMatrix } from "./matrix.mjs";
-import { renderAgentMatrix, renderAnnotations, renderBadge, renderBenchmarkReport, renderComparison, renderDoctor, renderExplanation, renderFindings, renderImprovement, renderImprovementIssue, renderLeaderboard, renderMarkdownReport, renderRoadmap, renderScanSummary, renderScore, renderShareComment } from "./reporter.mjs";
+import { renderAgentMatrix, renderAnnotations, renderBadge, renderBenchmarkReport, renderComparison, renderDoctor, renderExplanation, renderFindings, renderImprovement, renderImprovementIssue, renderLeaderboard, renderMarkdownReport, renderRoadmap, renderScanSummary, renderScore, renderShareComment, renderSnapshot } from "./reporter.mjs";
+import { snapshotRepo, writeSnapshotFile } from "./snapshot.mjs";
 import { renderCiWorkflow, writeCiWorkflow } from "./workflow.mjs";
 
 const HELP = `agent-ready
@@ -29,6 +30,7 @@ Usage:
   agent-ready compare --before before.json --after after.json [--format markdown|json]
   agent-ready doctor [--root PATH] [--config PATH] [--format json|text] [--fail-under N]
   agent-ready report [--root PATH] [--config PATH] [--format markdown|json]
+  agent-ready snapshot [--root PATH] [--config PATH] [--format markdown|json] [--write] [--dry-run] [--force] [--output PATH]
   agent-ready badge [--root PATH] [--config PATH] [--format markdown|url|json] [--fail-under N]
   agent-ready benchmark [PATH...] [--root PATH] [--config PATH] [--format markdown|json]
   agent-ready leaderboard [PATH...] [--root PATH] [--config PATH] [--format markdown|json]
@@ -54,6 +56,7 @@ Examples:
   npx agent-ready ci --write
   npx agent-ready ci --comment
   npx agent-ready report --format markdown
+  npx agent-ready snapshot --write
   npx agent-ready benchmark ../repo-a ../repo-b
   npx agent-ready leaderboard ../repo-a ../repo-b
   npx agent-ready roadmap ../repo-a ../repo-b
@@ -248,6 +251,28 @@ export async function runCli(argv) {
     const score = scoreRepo(profile, findings);
     if (flags.format === "json" || flags.json) console.log(JSON.stringify({ profile, findings, score }, null, 2));
     else console.log(renderMarkdownReport(profile, findings, score));
+    return;
+  }
+
+  if (command === "snapshot") {
+    const snapshot = await snapshotRepo(root, scanOptions);
+    if (flags.format === "json" || flags.json) {
+      console.log(JSON.stringify(snapshot, null, 2));
+      return;
+    }
+    if (flags.format && flags.format !== "markdown") throw new Error("Snapshot format must be markdown or json.");
+    const content = renderSnapshot(snapshot);
+    if (flags.write) {
+      const result = await writeSnapshotFile(snapshot, content, {
+        root,
+        output: typeof flags.output === "string" ? flags.output : undefined,
+        dryRun: Boolean(flags["dry-run"]),
+        force: Boolean(flags.force),
+      });
+      console.log(`${result.action}: ${result.file}`);
+    } else {
+      console.log(content);
+    }
     return;
   }
 
