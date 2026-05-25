@@ -426,8 +426,8 @@ Current detectors cover common JavaScript/TypeScript, Python, Rust, Go, and mono
 - docs: README, architecture docs, ADR directories, existing agent docs
 - CI: GitHub Actions workflows
 - monorepos: npm/pnpm workspaces, Turborepo, Nx, Lerna, Rush
-- frameworks/tools: React, Vite, Next.js, Next.js App Router, Vue, Astro, Svelte, Express, NestJS, Playwright, Storybook, FastAPI, Django, Flask, Pytest, Rust web frameworks, Gin, Docker, Docker Compose
-- framework signals: package dependencies, framework config files, and common route/component conventions such as `app/`, `pages/`, and `.astro` files
+- frameworks/tools: React, Vite, Next.js, Next.js App Router, Vue, Nuxt, Astro, Svelte, SvelteKit, Express, NestJS, Playwright, Storybook, FastAPI, Django, Flask, Pytest, Rust web frameworks, Gin, Docker, Docker Compose
+- framework signals: package dependencies, framework config files, and common route/component conventions such as `app/`, `pages/`, `src/routes/`, and `.astro` files
 
 ## Design Principles
 

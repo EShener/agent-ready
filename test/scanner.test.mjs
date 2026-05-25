@@ -95,6 +95,28 @@ test("scan detects Next.js and Astro project signals", async () => {
   assert.equal(astro.commands.test, "npm run test");
 });
 
+test("scan detects SvelteKit and Nuxt project signals", async () => {
+  const sveltekit = await scanRepo(fixture("sveltekit-app"));
+  const nuxt = await scanRepo(fixture("nuxt-app"));
+
+  assert.equal(sveltekit.name, "fixture-sveltekit-app");
+  assert.equal(sveltekit.primaryLanguage, "Svelte");
+  assert.ok(sveltekit.frameworks.includes("Svelte"));
+  assert.ok(sveltekit.frameworks.includes("SvelteKit"));
+  assert.ok(sveltekit.frameworks.includes("Vite"));
+  assert.equal(sveltekit.commands.dev, "npm run dev");
+  assert.equal(sveltekit.commands.build, "npm run build");
+  assert.equal(sveltekit.commands.test, "npm run test");
+
+  assert.equal(nuxt.name, "fixture-nuxt-app");
+  assert.equal(nuxt.primaryLanguage, "Vue");
+  assert.ok(nuxt.frameworks.includes("Vue"));
+  assert.ok(nuxt.frameworks.includes("Nuxt"));
+  assert.equal(nuxt.commands.dev, "npm run dev");
+  assert.equal(nuxt.commands.build, "npm run build");
+  assert.equal(nuxt.commands.test, "npm run test");
+});
+
 test("scan detects Docker Compose verification context", async () => {
   const profile = await scanRepo(fixture("docker-compose-app"));
   const content = buildAgentsMd(profile);

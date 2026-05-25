@@ -20,6 +20,8 @@ const LANGUAGE_BY_EXTENSION = new Map([
   [".rb", "Ruby"],
   [".php", "PHP"],
   [".astro", "Astro"],
+  [".svelte", "Svelte"],
+  [".vue", "Vue"],
 ]);
 
 export async function scanRepo(root = process.cwd(), options = {}) {
@@ -219,13 +221,20 @@ function detectFrameworks({ packageJson, pyproject, cargoToml, goMod, files }) {
   const hasNextPagesRouter = files.some((file) => /^(src\/)?pages\/.*\.[jt]sx?$/.test(file));
   const hasAstroConfig = files.some((file) => /^astro\.config\.[cm]?[jt]s$/.test(file));
   const hasAstroFiles = files.some((file) => /^(src\/)?(pages|layouts|components)\/.*\.astro$/.test(file));
+  const hasSvelteConfig = files.some((file) => /^svelte\.config\.[cm]?[jt]s$/.test(file));
+  const hasSvelteFiles = files.some((file) => /\.svelte$/.test(file));
+  const hasSvelteKitRoutes = files.some((file) => /^(src\/)?routes\/(?:.*\/)?\+(page|layout|server|error)\.(svelte|[jt]s)$/.test(file));
+  const hasNuxtConfig = files.some((file) => /^nuxt\.config\.[cm]?[jt]s$/.test(file));
+  const hasNuxtRoutes = files.some((file) => /^(pages|app|server)\/.+\.(vue|[jt]s)$/.test(file) || file === "app.vue");
 
   if (deps.next || hasNextConfig || hasNextAppRouter || hasNextPagesRouter) names.push("Next.js");
   if (deps.react) names.push("React");
-  if (deps.vue) names.push("Vue");
+  if (deps.vue || deps.nuxt || hasNuxtConfig || hasNuxtRoutes) names.push("Vue");
   if (deps.vite) names.push("Vite");
   if (deps.astro || hasAstroConfig || hasAstroFiles) names.push("Astro");
-  if (deps.svelte) names.push("Svelte");
+  if (deps.svelte || deps["@sveltejs/kit"] || hasSvelteConfig || hasSvelteFiles) names.push("Svelte");
+  if (deps["@sveltejs/kit"] || hasSvelteConfig || hasSvelteKitRoutes) names.push("SvelteKit");
+  if (deps.nuxt || deps["@nuxt/kit"] || hasNuxtConfig || hasNuxtRoutes) names.push("Nuxt");
   if (deps.express) names.push("Express");
   if (deps["@nestjs/core"]) names.push("NestJS");
   if (deps.vitest) names.push("Vitest");

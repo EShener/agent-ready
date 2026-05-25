@@ -1,0 +1,15 @@
+{
+  "name": "fixture-nuxt-app",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "nuxt": "4.0.0",
+    "vue": "3.5.0"
+  },
+  "devDependencies": {
+    "vitest": "2.0.0"
+  }
+}
