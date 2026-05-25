@@ -32,6 +32,8 @@ export async function scanRepo(root = process.cwd(), options = {}) {
     pyproject,
     cargoToml,
     goMod,
+    gemfile,
+    composerJson,
     readmeText,
     pnpmWorkspace,
     files,
@@ -41,6 +43,8 @@ export async function scanRepo(root = process.cwd(), options = {}) {
     readTextIfExists(path.join(absoluteRoot, "pyproject.toml")),
     readTextIfExists(path.join(absoluteRoot, "Cargo.toml")),
     readTextIfExists(path.join(absoluteRoot, "go.mod")),
+    readTextIfExists(path.join(absoluteRoot, "Gemfile")),
+    readJsonIfExists(path.join(absoluteRoot, "composer.json")),
     readTextIfExists(path.join(absoluteRoot, "README.md")),
     readTextIfExists(path.join(absoluteRoot, "pnpm-workspace.yaml")),
     walkFiles(absoluteRoot),
@@ -56,6 +60,8 @@ export async function scanRepo(root = process.cwd(), options = {}) {
     pyproject,
     cargoToml,
     goMod,
+    gemfile,
+    composerJson,
     files,
   });
   const commands = mergeCommands(detectedCommands, config.commands);
@@ -71,10 +77,10 @@ export async function scanRepo(root = process.cwd(), options = {}) {
   return {
     schemaVersion: 1,
     root: absoluteRoot,
-    name: detectName({ packageJson, pyproject, cargoToml, goMod, root: absoluteRoot }),
+    name: detectName({ packageJson, pyproject, cargoToml, goMod, composerJson, root: absoluteRoot }),
     languages: languageCounts,
     primaryLanguage: languageCounts[0]?.name || "Unknown",
-    frameworks: detectFrameworks({ packageJson, pyproject, cargoToml, goMod, files }),
+    frameworks: detectFrameworks({ packageJson, pyproject, cargoToml, goMod, gemfile, composerJson, files }),
     monorepo: detectMonorepo({ packageJson, pnpmWorkspace, files }),
     packageManager,
     commands,
@@ -125,10 +131,12 @@ async function detectPackageManager(root) {
   if (await pathExists(path.join(root, "pyproject.toml"))) return "python";
   if (await pathExists(path.join(root, "Cargo.toml"))) return "cargo";
   if (await pathExists(path.join(root, "go.mod"))) return "go";
+  if (await pathExists(path.join(root, "Gemfile"))) return "bundler";
+  if (await pathExists(path.join(root, "composer.json"))) return "composer";
   return "unknown";
 }
 
-async function detectCommands({ root, packageJson, packageManager, pyproject, cargoToml, goMod, files }) {
+async function detectCommands({ root, packageJson, packageManager, pyproject, cargoToml, goMod, gemfile, composerJson, files }) {
   const commands = {};
   const scripts = packageJson?.scripts || {};
 
@@ -167,6 +175,20 @@ async function detectCommands({ root, packageJson, packageManager, pyproject, ca
     commands.format ||= "gofmt -w .";
   }
 
+  if (hasRailsSignals({ gemfile, files })) {
+    if (commands.install) commands["backend:install"] ||= "bundle install";
+    else commands.install = "bundle install";
+    commands.dev ||= files.includes("bin/rails") ? "bin/rails server" : "bundle exec rails server";
+    commands.test ||= files.includes("bin/rails") ? "bin/rails test" : "bundle exec rails test";
+  }
+
+  if (hasLaravelSignals({ composerJson, files })) {
+    if (commands.install) commands["backend:install"] ||= "composer install";
+    else commands.install = "composer install";
+    commands.dev ||= "php artisan serve";
+    commands.test ||= "php artisan test";
+  }
+
   if (hasDockerComposeFile(files)) {
     commands.services ||= "docker compose up -d";
     commands["services:stop"] ||= "docker compose down";
@@ -198,18 +220,19 @@ function hasPythonTool(pyproject, tool) {
   return new RegExp(`(^|[^a-zA-Z0-9_-])${escapeRegExp(tool)}([^a-zA-Z0-9_-]|$)`, "i").test(pyproject);
 }
 
-function detectName({ packageJson, pyproject, cargoToml, goMod, root }) {
+function detectName({ packageJson, pyproject, cargoToml, goMod, composerJson, root }) {
   if (packageJson?.name) return packageJson.name;
   const pyName = parseTomlValue(pyproject, "name");
   if (pyName) return pyName;
   const cargoName = parseTomlValue(cargoToml, "name");
   if (cargoName) return cargoName;
+  if (composerJson?.name) return composerJson.name.split("/").pop();
   const moduleLine = goMod.split("\n").find((line) => line.startsWith("module "));
   if (moduleLine) return moduleLine.replace(/^module\s+/, "").trim().split("/").pop();
   return path.basename(root);
 }
 
-function detectFrameworks({ packageJson, pyproject, cargoToml, goMod, files }) {
+function detectFrameworks({ packageJson, pyproject, cargoToml, goMod, gemfile, composerJson, files }) {
   const deps = {
     ...(packageJson?.dependencies || {}),
     ...(packageJson?.devDependencies || {}),
@@ -249,12 +272,36 @@ function detectFrameworks({ packageJson, pyproject, cargoToml, goMod, files }) {
   if (hasPythonTool(pyproject, "django")) names.push("Django");
   if (hasPythonTool(pyproject, "flask")) names.push("Flask");
   if (hasPythonTool(pyproject, "pytest")) names.push("Pytest");
+  if (hasRailsSignals({ gemfile, files })) names.push("Rails");
+  if (hasLaravelSignals({ composerJson, files })) names.push("Laravel");
   if (/actix|axum|rocket/i.test(cargoToml)) names.push("Rust Web");
   if (/github\.com\/gin-gonic\/gin/i.test(goMod)) names.push("Gin");
   if (hasNextAppRouter) names.push("Next.js App Router");
   if (hasDockerfile(files)) names.push("Docker");
   if (hasDockerComposeFile(files)) names.push("Docker Compose");
   return unique(names);
+}
+
+function hasRailsSignals({ gemfile, files }) {
+  return Boolean(
+    hasRubyGem(gemfile, "rails")
+    || files.includes("config/application.rb")
+    || files.includes("bin/rails"),
+  );
+}
+
+function hasLaravelSignals({ composerJson, files }) {
+  return Boolean(
+    composerJson?.require?.["laravel/framework"]
+    || composerJson?.["require-dev"]?.["laravel/framework"]
+    || files.includes("artisan")
+    || files.includes("app/Http/Kernel.php"),
+  );
+}
+
+function hasRubyGem(gemfile, gemName) {
+  if (!gemfile) return false;
+  return new RegExp(`(^|\\n)\\s*gem\\s+["']${escapeRegExp(gemName)}["']`, "i").test(gemfile);
 }
 
 function hasDockerfile(files) {

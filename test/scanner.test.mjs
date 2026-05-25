@@ -51,6 +51,27 @@ test("scan detects Python, Rust, and Go repositories", async () => {
   assert.equal(go.commands.test, "go test ./...");
 });
 
+test("scan detects Rails and Laravel project signals", async () => {
+  const rails = await scanRepo(fixture("rails-app"));
+  const laravel = await scanRepo(fixture("laravel-app"));
+
+  assert.equal(rails.name, "rails-app");
+  assert.equal(rails.primaryLanguage, "Ruby");
+  assert.equal(rails.packageManager, "bundler");
+  assert.ok(rails.frameworks.includes("Rails"));
+  assert.equal(rails.commands.install, "bundle install");
+  assert.equal(rails.commands.dev, "bin/rails server");
+  assert.equal(rails.commands.test, "bin/rails test");
+
+  assert.equal(laravel.name, "fixture-laravel-app");
+  assert.equal(laravel.primaryLanguage, "PHP");
+  assert.equal(laravel.packageManager, "composer");
+  assert.ok(laravel.frameworks.includes("Laravel"));
+  assert.equal(laravel.commands.install, "composer install");
+  assert.equal(laravel.commands.dev, "php artisan serve");
+  assert.equal(laravel.commands.test, "php artisan test");
+});
+
 test("scan detects monorepo workspace signals", async () => {
   const profile = await scanRepo(fixture("monorepo"));
 
