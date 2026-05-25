@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Added stronger Next.js and Astro detection from config files, router conventions, and `.astro` files.
+- Added fixture coverage for Next.js App Router and Astro projects.
+- Added Docker and Docker Compose detection, including generated `AGENTS.md` local service guidance.
+
 ## 0.1.25
 
 - Added a distribution checklist to the growth playbook for repeatable release promotion.

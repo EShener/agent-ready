@@ -1,0 +1,6 @@
+{
+  "name": "fixture-docker-compose-app",
+  "scripts": {
+    "test": "node --test"
+  }
+}

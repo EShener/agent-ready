@@ -421,11 +421,12 @@ npx --yes @eshen_fox_mie/agent-ready ci --write
 Current detectors cover common JavaScript/TypeScript, Python, Rust, Go, and monorepo repositories:
 
 - package manager: npm, pnpm, yarn, bun, pip, cargo, go
-- commands: install, dev, start, build, test, lint, format
+- commands: install, dev, start, build, test, lint, format, local services
 - docs: README, architecture docs, ADR directories, existing agent docs
 - CI: GitHub Actions workflows
 - monorepos: npm/pnpm workspaces, Turborepo, Nx, Lerna, Rush
-- frameworks/tools: React, Vite, Next.js, Vue, Astro, Svelte, Express, NestJS, Playwright, Storybook, FastAPI, Django, Flask, Pytest, Rust web frameworks, Gin
+- frameworks/tools: React, Vite, Next.js, Next.js App Router, Vue, Astro, Svelte, Express, NestJS, Playwright, Storybook, FastAPI, Django, Flask, Pytest, Rust web frameworks, Gin, Docker, Docker Compose
+- framework signals: package dependencies, framework config files, and common route/component conventions such as `app/`, `pages/`, and `.astro` files
 
 ## Design Principles
 

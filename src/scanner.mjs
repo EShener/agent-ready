@@ -19,6 +19,7 @@ const LANGUAGE_BY_EXTENSION = new Map([
   [".swift", "Swift"],
   [".rb", "Ruby"],
   [".php", "PHP"],
+  [".astro", "Astro"],
 ]);
 
 export async function scanRepo(root = process.cwd(), options = {}) {
@@ -164,6 +165,11 @@ async function detectCommands({ root, packageJson, packageManager, pyproject, ca
     commands.format ||= "gofmt -w .";
   }
 
+  if (hasDockerComposeFile(files)) {
+    commands.services ||= "docker compose up -d";
+    commands["services:stop"] ||= "docker compose down";
+  }
+
   if (!commands.test && await pathExists(path.join(root, ".github", "workflows"))) {
     commands.test = "";
   }
@@ -208,11 +214,17 @@ function detectFrameworks({ packageJson, pyproject, cargoToml, goMod, files }) {
     ...(packageJson?.peerDependencies || {}),
   };
   const names = [];
-  if (deps.next) names.push("Next.js");
+  const hasNextConfig = files.some((file) => /^next\.config\.[cm]?[jt]s$/.test(file));
+  const hasNextAppRouter = files.some((file) => /^(src\/)?app\/(?:.*\/)?(layout|page|route|loading|error|not-found)\.[jt]sx?$/.test(file));
+  const hasNextPagesRouter = files.some((file) => /^(src\/)?pages\/.*\.[jt]sx?$/.test(file));
+  const hasAstroConfig = files.some((file) => /^astro\.config\.[cm]?[jt]s$/.test(file));
+  const hasAstroFiles = files.some((file) => /^(src\/)?(pages|layouts|components)\/.*\.astro$/.test(file));
+
+  if (deps.next || hasNextConfig || hasNextAppRouter || hasNextPagesRouter) names.push("Next.js");
   if (deps.react) names.push("React");
   if (deps.vue) names.push("Vue");
   if (deps.vite) names.push("Vite");
-  if (deps.astro) names.push("Astro");
+  if (deps.astro || hasAstroConfig || hasAstroFiles) names.push("Astro");
   if (deps.svelte) names.push("Svelte");
   if (deps.express) names.push("Express");
   if (deps["@nestjs/core"]) names.push("NestJS");
@@ -230,8 +242,18 @@ function detectFrameworks({ packageJson, pyproject, cargoToml, goMod, files }) {
   if (hasPythonTool(pyproject, "pytest")) names.push("Pytest");
   if (/actix|axum|rocket/i.test(cargoToml)) names.push("Rust Web");
   if (/github\.com\/gin-gonic\/gin/i.test(goMod)) names.push("Gin");
-  if (files.some((file) => /^src\/app\//.test(file))) names.push("Next.js App Router");
+  if (hasNextAppRouter) names.push("Next.js App Router");
+  if (hasDockerfile(files)) names.push("Docker");
+  if (hasDockerComposeFile(files)) names.push("Docker Compose");
   return unique(names);
+}
+
+function hasDockerfile(files) {
+  return files.some((file) => /(^|\/)Dockerfile$/.test(file));
+}
+
+function hasDockerComposeFile(files) {
+  return files.some((file) => /(^|\/)(docker-compose|compose)\.ya?ml$/.test(file));
 }
 
 function detectMonorepo({ packageJson, pnpmWorkspace, files }) {

@@ -128,6 +128,7 @@ export function buildAgentsMd(profile) {
   const ci = profile.ci.githubActions.length ? profile.ci.githubActions.join(", ") : "No GitHub Actions workflows detected";
   const architecture = profile.docs.architecture || "Not found";
   const adr = profile.docs.adrDirectory || "Not found";
+  const localServices = localServicesSection(profile);
   const monorepo = profile.monorepo?.detected
     ? `${profile.monorepo.tools.join(", ") || "workspaces"} (${profile.monorepo.workspaces.join(", ") || "patterns not declared"})`
     : "Not detected";
@@ -149,6 +150,7 @@ export function buildAgentsMd(profile) {
 
 ## Commands
 ${commands || "- No standard commands detected yet. Add install, test, lint, and build commands when available."}
+${localServices}
 
 ## Agent Workflow
 - Start by reading this file and the README before editing.
@@ -167,6 +169,15 @@ ${commands || "- No standard commands detected yet. Add install, test, lint, and
 - For behavior changes, run the test command before finishing.
 - For formatting or lint-only changes, run the lint command when available.
 - If a command is missing or cannot run locally, document the reason in the handoff.
+`;
+}
+
+function localServicesSection(profile) {
+  if (!profile.frameworks.includes("Docker Compose")) return "";
+  return `
+## Local Services
+- Docker Compose config detected. Start dependent services with \`docker compose up -d\` before tests that need local databases, queues, or service dependencies.
+- Stop local services with \`docker compose down\` when finished.
 `;
 }
 
@@ -403,8 +414,11 @@ Do not commit real credentials, tokens, private keys, or local environment files
 
 function commandLines(commands) {
   const ordered = ["install", "dev", "start", "build", "test", "lint", "format"];
-  return ordered
-    .filter((name) => commands[name])
+  const names = [
+    ...ordered.filter((name) => commands[name]),
+    ...Object.keys(commands).filter((name) => commands[name] && !ordered.includes(name)).sort(),
+  ];
+  return names
     .map((name) => `- ${name}: \`${commands[name]}\``)
     .join("\n");
 }

@@ -73,6 +73,41 @@ test("scan detects frontend test and component tooling", async () => {
   assert.equal(profile.commands.test, "npm run test");
 });
 
+test("scan detects Next.js and Astro project signals", async () => {
+  const next = await scanRepo(fixture("next-app"));
+  const astro = await scanRepo(fixture("astro-app"));
+
+  assert.equal(next.name, "fixture-next-app");
+  assert.equal(next.primaryLanguage, "TypeScript");
+  assert.ok(next.frameworks.includes("Next.js"));
+  assert.ok(next.frameworks.includes("Next.js App Router"));
+  assert.ok(next.frameworks.includes("React"));
+  assert.ok(next.frameworks.includes("Vitest"));
+  assert.equal(next.commands.dev, "npm run dev");
+  assert.equal(next.commands.build, "npm run build");
+  assert.equal(next.commands.lint, "npm run lint");
+
+  assert.equal(astro.name, "fixture-astro-app");
+  assert.equal(astro.primaryLanguage, "Astro");
+  assert.ok(astro.frameworks.includes("Astro"));
+  assert.equal(astro.commands.dev, "npm run dev");
+  assert.equal(astro.commands.build, "npm run build");
+  assert.equal(astro.commands.test, "npm run test");
+});
+
+test("scan detects Docker Compose verification context", async () => {
+  const profile = await scanRepo(fixture("docker-compose-app"));
+  const content = buildAgentsMd(profile);
+
+  assert.equal(profile.name, "fixture-docker-compose-app");
+  assert.ok(profile.frameworks.includes("Docker"));
+  assert.ok(profile.frameworks.includes("Docker Compose"));
+  assert.equal(profile.commands.services, "docker compose up -d");
+  assert.equal(profile.commands["services:stop"], "docker compose down");
+  assert.match(content, /services: `docker compose up -d`/);
+  assert.match(content, /Docker Compose config detected/);
+});
+
 test("generator plans canonical and shim files without writing", async () => {
   const profile = await scanRepo(fixture("node-app"));
   const artifacts = await planGeneratedArtifacts(profile, { targets: ["codex", "cursor"] });

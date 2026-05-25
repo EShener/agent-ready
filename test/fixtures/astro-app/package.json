@@ -1,0 +1,9 @@
+{
+  "name": "fixture-astro-app",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "test": "node --test"
+  },
+  "devDependencies": {}
+}
