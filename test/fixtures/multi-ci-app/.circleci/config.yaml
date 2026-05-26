@@ -1,0 +1,9 @@
+version: 2.1
+
+jobs:
+  lint:
+    docker:
+      - image: cimg/node:20.0
+    steps:
+      - checkout
+      - run: npm run lint

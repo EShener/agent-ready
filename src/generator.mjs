@@ -125,7 +125,7 @@ export function buildAgentsMd(profile) {
   const languages = profile.languages.length
     ? profile.languages.map((language) => `${language.name} (${language.files} files)`).join(", ")
     : "No source files detected";
-  const ci = profile.ci.githubActions.length ? profile.ci.githubActions.join(", ") : "No GitHub Actions workflows detected";
+  const ci = formatCi(profile.ci);
   const architecture = profile.docs.architecture || "Not found";
   const adr = profile.docs.adrDirectory || "Not found";
   const localServices = localServicesSection(profile);
@@ -285,7 +285,7 @@ ${profile.name} is primarily a ${profile.primaryLanguage} repository. This docum
 - Frameworks/tools: ${frameworks}
 - Package manager: ${profile.packageManager}
 - Monorepo: ${profile.monorepo?.detected ? "yes" : "no"}
-- CI: ${profile.ci.githubActions.length ? profile.ci.githubActions.join(", ") : "No GitHub Actions workflows detected"}
+- CI: ${formatCi(profile.ci)}
 
 ## Repository Layout
 
@@ -421,6 +421,15 @@ function commandLines(commands) {
   return names
     .map((name) => `- ${name}: \`${commands[name]}\``)
     .join("\n");
+}
+
+function formatCi(ci) {
+  const files = [
+    ...(ci?.githubActions || []),
+    ...(ci?.gitlabCi || []),
+    ...(ci?.circleCi || []),
+  ];
+  return files.length ? files.join(", ") : "No CI workflows detected";
 }
 
 function verificationChecklist(profile) {

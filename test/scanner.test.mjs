@@ -13,7 +13,7 @@ import { improveRepo } from "../src/improver.mjs";
 import { lintRepo, scoreRepo } from "../src/linter.mjs";
 import { buildAgentMatrix } from "../src/matrix.mjs";
 import { resolvePreset } from "../src/presets.mjs";
-import { renderAgentMatrix, renderAnnotations, renderBenchmarkReport, renderComparison, renderDoctor, renderExamplesCatalog, renderExplanation, renderImprovement, renderImprovementIssue, renderLeaderboard, renderMarkdownReport, renderRoadmap, renderShareComment } from "../src/reporter.mjs";
+import { renderAgentMatrix, renderAnnotations, renderBenchmarkReport, renderComparison, renderDoctor, renderExamplesCatalog, renderExplanation, renderImprovement, renderImprovementIssue, renderLeaderboard, renderMarkdownReport, renderRoadmap, renderShareComment, renderSnapshot } from "../src/reporter.mjs";
 import { scanRepo } from "../src/scanner.mjs";
 import { snapshotRepo } from "../src/snapshot.mjs";
 import { renderCiWorkflow, writeCiWorkflow } from "../src/workflow.mjs";
@@ -33,6 +33,14 @@ test("scan detects a Node app profile", async () => {
   assert.equal(profile.commands.lint, "npm run lint");
   assert.equal(profile.docs.readme, true);
   assert.deepEqual(profile.ci.githubActions, [".github/workflows/ci.yml"]);
+});
+
+test("scan detects GitHub Actions, GitLab CI, and CircleCI files", async () => {
+  const profile = await scanRepo(fixture("multi-ci-app"));
+
+  assert.deepEqual(profile.ci.githubActions, [".github/workflows/ci.yml"]);
+  assert.deepEqual(profile.ci.gitlabCi, [".gitlab-ci.yml", ".gitlab-ci.yaml"]);
+  assert.deepEqual(profile.ci.circleCi, [".circleci/config.yml", ".circleci/config.yaml"]);
 });
 
 test("scan detects Python, Rust, and Go repositories", async () => {
@@ -306,23 +314,28 @@ test("score is explainable and bounded", async () => {
 });
 
 test("markdown report includes commands, docs, and findings", async () => {
-  const profile = await scanRepo(fixture("node-app"));
+  const profile = await scanRepo(fixture("multi-ci-app"));
   const findings = await lintRepo(profile);
   const score = scoreRepo(profile, findings);
   const report = renderMarkdownReport(profile, findings, score);
 
   assert.match(report, /Agent Readiness Report/);
-  assert.match(report, /fixture-node-app/);
+  assert.match(report, /fixture-multi-ci-app/);
   assert.match(report, /npm run test/);
+  assert.match(report, /\.gitlab-ci\.yml/);
+  assert.match(report, /\.circleci\/config\.yml/);
 });
 
 test("snapshot summarizes score, compatibility, and findings", async () => {
-  const snapshot = await snapshotRepo(fixture("node-app"));
+  const snapshot = await snapshotRepo(fixture("multi-ci-app"));
+  const report = renderSnapshot(snapshot);
 
-  assert.equal(snapshot.repository.name, "fixture-node-app");
+  assert.equal(snapshot.repository.name, "fixture-multi-ci-app");
   assert.equal(snapshot.matrix.summary.total, 5);
   assert.equal(typeof snapshot.score.score, "number");
   assert.equal(snapshot.summary.findings, snapshot.findings.length);
+  assert.match(report, /\.gitlab-ci\.yml/);
+  assert.match(report, /\.circleci\/config\.yml/);
 });
 
 test("examples catalog links copy-ready sample files", () => {

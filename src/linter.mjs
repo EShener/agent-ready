@@ -23,8 +23,8 @@ export async function lintRepo(profile) {
   if (!profile.docs.readme) {
     findings.push(finding("warning", "missing-readme", "README.md is missing.", "README.md", "Add a README with install, usage, and contribution basics."));
   }
-  if (!profile.ci.githubActions.length) {
-    findings.push(finding("info", "missing-ci", "No GitHub Actions workflow was detected.", ".github/workflows", "Add CI so agents can trust the verification path."));
+  if (!ciFiles(profile.ci).length) {
+    findings.push(finding("info", "missing-ci", "No CI workflow was detected.", ".github/workflows", "Add CI so agents can trust the verification path."));
   }
 
   findings.push(...await validatePackageScripts(profile));
@@ -152,6 +152,14 @@ function extractBacktickPaths(text) {
 function packageScriptName(command) {
   const match = command.match(/^(?:npm run|pnpm|yarn|bun run)\s+([A-Za-z0-9:_-]+)$/);
   return match?.[1] || "";
+}
+
+function ciFiles(ci) {
+  return [
+    ...(ci?.githubActions || []),
+    ...(ci?.gitlabCi || []),
+    ...(ci?.circleCi || []),
+  ];
 }
 
 function finding(severity, ruleId, message, file, fixSuggestion) {
