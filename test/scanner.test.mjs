@@ -117,6 +117,11 @@ test("scan detects .NET and C# project signals", async () => {
   assert.equal(profile.primaryLanguage, "C#");
   assert.equal(profile.packageManager, "dotnet");
   assert.ok(profile.frameworks.includes(".NET"));
+  assert.ok(profile.frameworks.includes("ASP.NET Core"));
+  assert.ok(profile.frameworks.includes(".NET Test SDK"));
+  assert.ok(profile.frameworks.includes("xUnit"));
+  assert.ok(profile.frameworks.includes("NUnit"));
+  assert.ok(profile.frameworks.includes("MSTest"));
   assert.equal(profile.commands.install, "dotnet restore");
   assert.equal(profile.commands.build, "dotnet build");
   assert.equal(profile.commands.test, "dotnet test");
