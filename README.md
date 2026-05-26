@@ -8,7 +8,7 @@ Make any repository ready for AI coding agents in 60 seconds.
 ![agent-ready](https://img.shields.io/badge/agent--ready-100%2F100-brightgreen)
 ![license](https://img.shields.io/badge/license-MIT-blue)
 
-[Showcase](docs/showcase.md) · [Examples](docs/examples/README.md) · [Detectors](docs/detectors.md) · [Benchmark](BENCHMARK.md) · [Growth playbook](docs/growth-playbook.md) · [Launch kit](docs/launch-kit.md) · [Launch notes](LAUNCH.md)
+[Showcase](docs/showcase.md) · [Examples](docs/examples/README.md) · [Detectors](docs/detectors.md) · [Benchmark](BENCHMARK.md) · [Publishing](docs/npm-publishing.md) · [Growth playbook](docs/growth-playbook.md) · [Launch kit](docs/launch-kit.md) · [Launch notes](LAUNCH.md)
 
 `agent-ready` is a zero-dependency CLI that scans a codebase, generates canonical AI agent instructions, checks them for drift and missing verification steps, and gives the repository an explainable Agent Readiness Score.
 

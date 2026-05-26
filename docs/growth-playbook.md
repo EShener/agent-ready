@@ -126,6 +126,7 @@ Avoid vanity-only interpretation. Each weekly note should end with one action, s
 Before sharing a release:
 
 - Prepare the release notes draft under `docs/releases/`.
+- Confirm npm Trusted Publishing is configured as described in `docs/npm-publishing.md`.
 - Verify npm points at the latest version: `npm view @eshen_fox_mie/agent-ready version`
 - Verify the quick start from a clean directory.
 - Link the current GitHub release, npm package, showcase, and examples gallery.

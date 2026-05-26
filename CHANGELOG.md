@@ -16,6 +16,7 @@
 - Added .NET and C# detection with `dotnet` command inference.
 - Added Go Gin and Rust workspace web framework edge-case fixtures.
 - Added draft v0.1.26 release notes for the next npm publish.
+- Prepared npm publishing docs and workflow settings for Trusted Publishing.
 
 ## 0.1.25
 
