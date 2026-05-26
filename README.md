@@ -421,7 +421,7 @@ npx --yes @eshen_fox_mie/agent-ready ci --write
 
 Current detectors cover common JavaScript/TypeScript, Python, Ruby, PHP, C#, Java, Kotlin, Rust, Go, and monorepo repositories:
 
-- package manager: npm, pnpm, yarn, bun, pip, bundler, composer, dotnet, maven, gradle, cargo, go
+- package manager: npm, pnpm, yarn, bun, Python/pip, Poetry, PDM, uv, bundler, composer, dotnet, maven, gradle, cargo, go
 - commands: install, dev, start, build, test, lint, format, backend install, local services
 - docs: README, architecture docs, ADR directories, existing agent docs
 - CI: GitHub Actions workflows

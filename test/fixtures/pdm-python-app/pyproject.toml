@@ -1,0 +1,11 @@
+[project]
+name = "fixture-pdm-python-app"
+version = "0.1.0"
+dependencies = ["flask"]
+
+[dependency-groups]
+dev = ["pytest", "ruff"]
+
+[tool.pdm]
+distribution = false
+

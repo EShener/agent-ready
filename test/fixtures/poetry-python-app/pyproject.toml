@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "fixture-poetry-python-app"
+version = "0.1.0"
+description = "Fixture for Poetry package manager detection."
+authors = ["Fixture <fixture@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.115.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+ruff = "^0.8.0"
+
