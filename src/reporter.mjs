@@ -8,6 +8,7 @@ export function renderScanSummary(profile) {
     `Monorepo: ${formatMonorepo(profile.monorepo)}`,
     `Package manager: ${profile.packageManager}`,
     `Commands: ${Object.entries(profile.commands).filter(([, value]) => value).map(([key, value]) => `${key}=${value}`).join("; ") || "none"}`,
+    `CI: ${formatCi(profile.ci)}`,
     `Agent docs: ${profile.agentDocs.map((doc) => doc.file).join(", ") || "none"}`,
   ].join("\n");
 }
@@ -425,6 +426,7 @@ export function renderMarkdownReport(profile, findings, score) {
 - Frameworks: ${profile.frameworks.join(", ") || "none"}
 - Monorepo: ${formatMonorepo(profile.monorepo)}
 - Package manager: ${profile.packageManager}
+- CI: ${formatCi(profile.ci)}
 
 ${score.summary}
 
@@ -469,6 +471,7 @@ export function renderSnapshot(snapshot) {
 - Primary language: ${profile.primaryLanguage}
 - Package manager: ${profile.packageManager}
 - Monorepo: ${formatMonorepo(profile.monorepo)}
+- CI: ${formatCi(profile.ci)}
 
 ${score.summary}
 
@@ -537,6 +540,15 @@ function formatMonorepo(monorepo) {
   const tools = monorepo.tools.length ? monorepo.tools.join(", ") : "workspaces";
   const workspaces = monorepo.workspaces.length ? ` (${monorepo.workspaces.join(", ")})` : "";
   return `${tools}${workspaces}`;
+}
+
+function formatCi(ci) {
+  const files = [
+    ...(ci?.githubActions || []),
+    ...(ci?.gitlabCi || []),
+    ...(ci?.circleCi || []),
+  ];
+  return files.length ? files.join(", ") : "none";
 }
 
 function badgeColor(score) {

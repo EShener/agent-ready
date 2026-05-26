@@ -18,7 +18,7 @@ This page summarizes the current detector coverage. Claims here should stay alig
 | Go | `go.mod` | Gin | `go build ./...`, `go test ./...`, `go vet ./...`, `gofmt -w .` |
 | Containers | `Dockerfile`, `docker-compose.yml`, `docker-compose.yaml`, `compose.yml`, `compose.yaml` | Docker, Docker Compose | `docker compose up -d`, `docker compose down` |
 | Monorepos | `workspaces`, `pnpm-workspace.yaml`, `turbo.json`, `nx.json`, `lerna.json`, `rush.json` | npm workspaces, pnpm workspaces, Turborepo, Nx, Lerna, Rush | root package manager scripts when present |
-| CI and docs | `.github/workflows/*.yml`, `README.md`, architecture docs, `docs/adr/`, existing agent docs | GitHub Actions, AGENTS.md, Claude, Cursor, Gemini, Copilot shims | readiness reporting and generated instructions reference detected paths |
+| CI and docs | `.github/workflows/*.yml`, `.github/workflows/*.yaml`, `.gitlab-ci.yml`, `.gitlab-ci.yaml`, `.circleci/config.yml`, `.circleci/config.yaml`, `README.md`, architecture docs, `docs/adr/`, existing agent docs | GitHub Actions, GitLab CI, CircleCI, AGENTS.md, Claude, Cursor, Gemini, Copilot shims | readiness reporting and generated instructions reference detected paths |
 
 ## Framework Signals
 

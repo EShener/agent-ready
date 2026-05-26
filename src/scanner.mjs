@@ -457,7 +457,17 @@ async function detectCi(root) {
     .sort();
   return {
     githubActions: workflows,
+    gitlabCi: await detectExistingFiles(root, [".gitlab-ci.yml", ".gitlab-ci.yaml"]),
+    circleCi: await detectExistingFiles(root, [".circleci/config.yml", ".circleci/config.yaml"]),
   };
+}
+
+async function detectExistingFiles(root, candidates) {
+  const results = [];
+  for (const candidate of candidates) {
+    if (await pathExists(path.join(root, candidate))) results.push(candidate);
+  }
+  return results;
 }
 
 function parseTomlValue(text, key) {
