@@ -133,12 +133,19 @@ async function detectPackageManager(root, files = []) {
     ["bun", "bun.lockb"],
     ["bun", "bun.lock"],
     ["npm", "package-lock.json"],
+    ["poetry", "poetry.lock"],
+    ["pdm", "pdm.lock"],
+    ["uv", "uv.lock"],
   ];
   for (const [name, file] of checks) {
     if (await pathExists(path.join(root, file))) return name;
   }
   if (await pathExists(path.join(root, "package.json"))) return "npm";
-  if (await pathExists(path.join(root, "pyproject.toml"))) return "python";
+  const pyproject = await readTextIfExists(path.join(root, "pyproject.toml"));
+  if (hasPythonToolConfig(pyproject, "poetry")) return "poetry";
+  if (hasPythonToolConfig(pyproject, "pdm")) return "pdm";
+  if (hasPythonToolConfig(pyproject, "uv")) return "uv";
+  if (pyproject) return "python";
   if (await pathExists(path.join(root, "Cargo.toml"))) return "cargo";
   if (await pathExists(path.join(root, "go.mod"))) return "go";
   if (await pathExists(path.join(root, "mvnw")) || await pathExists(path.join(root, "pom.xml"))) return "maven";
@@ -164,13 +171,13 @@ async function detectCommands({ root, packageJson, packageManager, pyproject, ca
   }
 
   if (pyproject || files.includes("requirements.txt") || files.includes("setup.py")) {
-    commands.install ||= pyproject ? "python3 -m pip install -e ." : "python3 -m pip install -r requirements.txt";
+    commands.install ||= pythonInstallCommand(packageManager, Boolean(pyproject));
     if (hasPythonTool(pyproject, "pytest") || files.some((file) => /^tests?\//.test(file))) {
-      commands.test ||= "python3 -m pytest";
+      commands.test ||= pythonRunCommand(packageManager, "pytest");
     }
     if (hasPythonTool(pyproject, "ruff")) {
-      commands.lint ||= "python3 -m ruff check .";
-      commands.format ||= "python3 -m ruff format .";
+      commands.lint ||= pythonRunCommand(packageManager, "ruff check .");
+      commands.format ||= pythonRunCommand(packageManager, "ruff format .");
     }
   }
 
@@ -252,9 +259,28 @@ function runScriptCommand(packageManager, script) {
   return `npm run ${script}`;
 }
 
+function pythonInstallCommand(packageManager, hasPyproject) {
+  if (packageManager === "poetry") return "poetry install";
+  if (packageManager === "pdm") return "pdm install";
+  if (packageManager === "uv") return "uv sync";
+  return hasPyproject ? "python3 -m pip install -e ." : "python3 -m pip install -r requirements.txt";
+}
+
+function pythonRunCommand(packageManager, command) {
+  if (packageManager === "poetry") return `poetry run ${command}`;
+  if (packageManager === "pdm") return `pdm run ${command}`;
+  if (packageManager === "uv") return `uv run ${command}`;
+  return `python3 -m ${command}`;
+}
+
 function hasPythonTool(pyproject, tool) {
   if (!pyproject) return false;
   return new RegExp(`(^|[^a-zA-Z0-9_-])${escapeRegExp(tool)}([^a-zA-Z0-9_-]|$)`, "i").test(pyproject);
+}
+
+function hasPythonToolConfig(pyproject, tool) {
+  if (!pyproject) return false;
+  return new RegExp(`^\\s*\\[tool\\.${escapeRegExp(tool)}(?:\\.|\\])`, "im").test(pyproject);
 }
 
 function detectName({ packageJson, pyproject, cargoToml, goMod, pomXml, composerJson, files, root }) {

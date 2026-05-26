@@ -51,6 +51,28 @@ test("scan detects Python, Rust, and Go repositories", async () => {
   assert.equal(go.commands.test, "go test ./...");
 });
 
+test("scan detects Python package managers", async () => {
+  const poetry = await scanRepo(fixture("poetry-python-app"));
+  const pdm = await scanRepo(fixture("pdm-python-app"));
+  const uv = await scanRepo(fixture("uv-python-app"));
+
+  assert.equal(poetry.packageManager, "poetry");
+  assert.equal(poetry.commands.install, "poetry install");
+  assert.equal(poetry.commands.test, "poetry run pytest");
+  assert.equal(poetry.commands.lint, "poetry run ruff check .");
+  assert.equal(poetry.commands.format, "poetry run ruff format .");
+
+  assert.equal(pdm.packageManager, "pdm");
+  assert.equal(pdm.commands.install, "pdm install");
+  assert.equal(pdm.commands.test, "pdm run pytest");
+  assert.equal(pdm.commands.lint, "pdm run ruff check .");
+
+  assert.equal(uv.packageManager, "uv");
+  assert.equal(uv.commands.install, "uv sync");
+  assert.equal(uv.commands.test, "uv run pytest");
+  assert.equal(uv.commands.lint, "uv run ruff check .");
+});
+
 test("scan handles Go and Rust web framework edge cases", async () => {
   const goGin = await scanRepo(fixture("go-gin-cmd-app"));
   const rustWorkspace = await scanRepo(fixture("rust-workspace-web"));

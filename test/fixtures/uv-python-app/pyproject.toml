@@ -1,0 +1,11 @@
+[project]
+name = "fixture-uv-python-app"
+version = "0.1.0"
+dependencies = ["django"]
+
+[dependency-groups]
+dev = ["pytest", "ruff"]
+
+[tool.uv]
+package = true
+
