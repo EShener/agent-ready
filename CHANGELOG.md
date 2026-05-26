@@ -15,6 +15,7 @@
 - Added Ruby and PHP package manager edge-case coverage for hybrid and non-framework projects.
 - Added .NET and C# detection with `dotnet` command inference.
 - Added Go Gin and Rust workspace web framework edge-case fixtures.
+- Added draft v0.1.26 release notes for the next npm publish.
 
 ## 0.1.25
 
