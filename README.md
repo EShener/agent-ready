@@ -423,6 +423,7 @@ Current detectors cover common JavaScript/TypeScript, Python, Ruby, PHP, C#, Jav
 
 - package manager: npm, pnpm, yarn, bun, pip, bundler, composer, dotnet, maven, gradle, cargo, go
 - commands: install, dev, start, build, test, lint, format, backend install, local services
+- .NET tooling: ASP.NET Core, xUnit, NUnit, MSTest, Microsoft.NET.Test.Sdk
 - docs: README, architecture docs, ADR directories, existing agent docs
 - CI: GitHub Actions workflows
 - monorepos: npm/pnpm workspaces, Turborepo, Nx, Lerna, Rush

@@ -60,6 +60,7 @@ export async function scanRepo(root = process.cwd(), options = {}) {
 
   const mergedGradleBuild = [gradleBuild, gradleBuildKts].filter(Boolean).join("\n");
   const languageCounts = countLanguages(files);
+  const dotnetFiles = await readDotnetFiles(absoluteRoot, files);
   const packageManager = await detectPackageManager(absoluteRoot, files);
   const detectedCommands = await detectCommands({
     root: absoluteRoot,
@@ -90,7 +91,7 @@ export async function scanRepo(root = process.cwd(), options = {}) {
     name: detectName({ packageJson, pyproject, cargoToml, goMod, pomXml, composerJson, files, root: absoluteRoot }),
     languages: languageCounts,
     primaryLanguage: languageCounts[0]?.name || "Unknown",
-    frameworks: detectFrameworks({ packageJson, pyproject, cargoToml, goMod, pomXml, gradleBuild: mergedGradleBuild, gemfile, composerJson, files }),
+    frameworks: detectFrameworks({ packageJson, pyproject, cargoToml, goMod, pomXml, gradleBuild: mergedGradleBuild, gemfile, composerJson, files, dotnetFiles }),
     monorepo: detectMonorepo({ packageJson, pnpmWorkspace, files }),
     packageManager,
     commands,
@@ -273,7 +274,7 @@ function detectName({ packageJson, pyproject, cargoToml, goMod, pomXml, composer
   return path.basename(root);
 }
 
-function detectFrameworks({ packageJson, pyproject, cargoToml, goMod, pomXml, gradleBuild, gemfile, composerJson, files }) {
+function detectFrameworks({ packageJson, pyproject, cargoToml, goMod, pomXml, gradleBuild, gemfile, composerJson, files, dotnetFiles = [] }) {
   const deps = {
     ...(packageJson?.dependencies || {}),
     ...(packageJson?.devDependencies || {}),
@@ -317,6 +318,8 @@ function detectFrameworks({ packageJson, pyproject, cargoToml, goMod, pomXml, gr
   if (hasLaravelSignals({ composerJson, files })) names.push("Laravel");
   if (hasSpringBootSignals({ pomXml, gradleBuild })) names.push("Spring Boot");
   if (hasDotnetSignals(files)) names.push(".NET");
+  if (hasAspNetCoreSignals(dotnetFiles)) names.push("ASP.NET Core");
+  names.push(...detectDotnetTestTools(dotnetFiles));
   if (/actix|axum|rocket/i.test(cargoToml)) names.push("Rust Web");
   if (/github\.com\/gin-gonic\/gin/i.test(goMod)) names.push("Gin");
   if (hasNextAppRouter) names.push("Next.js App Router");
@@ -332,6 +335,32 @@ function hasDotnetSignals(files) {
     || file === "global.json"
     || /(^|\/)Program\.cs$/.test(file)
   ));
+}
+
+async function readDotnetFiles(root, files) {
+  const dotnetFiles = files.filter((file) => file.endsWith(".csproj") || /(^|\/)Program\.cs$/.test(file));
+  return Promise.all(dotnetFiles.map(async (file) => ({
+    file,
+    text: await readTextIfExists(path.join(root, file)),
+  })));
+}
+
+function hasAspNetCoreSignals(dotnetFiles) {
+  return dotnetFiles.some(({ file, text }) => (
+    file.endsWith(".csproj") && /<Project\s+Sdk=["']Microsoft\.NET\.Sdk\.Web["']/i.test(text)
+  ) || (
+    /(^|\/)Program\.cs$/.test(file) && /\bWebApplication\.CreateBuilder\b|\bMap(Get|Post|Put|Delete|Patch)\b/.test(text)
+  ));
+}
+
+function detectDotnetTestTools(dotnetFiles) {
+  const text = dotnetFiles.map((item) => item.text).join("\n");
+  const tools = [];
+  if (/<PackageReference\s+Include=["']xunit(?:\.[^"']+)?["']/i.test(text)) tools.push("xUnit");
+  if (/<PackageReference\s+Include=["']NUnit(?:\.[^"']+)?["']/i.test(text)) tools.push("NUnit");
+  if (/<PackageReference\s+Include=["']MSTest(?:\.[^"']+)?["']/i.test(text)) tools.push("MSTest");
+  if (/<PackageReference\s+Include=["']Microsoft\.NET\.Test\.Sdk["']/i.test(text)) tools.push(".NET Test SDK");
+  return tools;
 }
 
 function firstProjectStem(files, extension) {
