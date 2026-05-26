@@ -51,6 +51,25 @@ test("scan detects Python, Rust, and Go repositories", async () => {
   assert.equal(go.commands.test, "go test ./...");
 });
 
+test("scan handles Go and Rust web framework edge cases", async () => {
+  const goGin = await scanRepo(fixture("go-gin-cmd-app"));
+  const rustWorkspace = await scanRepo(fixture("rust-workspace-web"));
+
+  assert.equal(goGin.name, "fixture-go-gin-cmd-app");
+  assert.equal(goGin.primaryLanguage, "Go");
+  assert.equal(goGin.packageManager, "go");
+  assert.ok(goGin.frameworks.includes("Gin"));
+  assert.equal(goGin.commands.build, "go build ./cmd/api");
+  assert.equal(goGin.commands.test, "go test ./cmd/api ./internal/...");
+
+  assert.equal(rustWorkspace.name, "rust-workspace-web");
+  assert.equal(rustWorkspace.primaryLanguage, "Rust");
+  assert.equal(rustWorkspace.packageManager, "cargo");
+  assert.ok(rustWorkspace.frameworks.includes("Rust Web"));
+  assert.equal(rustWorkspace.commands.build, "cargo build");
+  assert.equal(rustWorkspace.commands.test, "cargo test");
+});
+
 test("scan detects Rails and Laravel project signals", async () => {
   const rails = await scanRepo(fixture("rails-app"));
   const laravel = await scanRepo(fixture("laravel-app"));

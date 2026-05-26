@@ -1,0 +1,6 @@
+{
+  "commands": {
+    "build": "go build ./cmd/api",
+    "test": "go test ./cmd/api ./internal/..."
+  }
+}

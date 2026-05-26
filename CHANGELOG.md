@@ -14,6 +14,7 @@
 - Added a detector coverage table grouped by ecosystem.
 - Added Ruby and PHP package manager edge-case coverage for hybrid and non-framework projects.
 - Added .NET and C# detection with `dotnet` command inference.
+- Added Go Gin and Rust workspace web framework edge-case fixtures.
 
 ## 0.1.25
 
