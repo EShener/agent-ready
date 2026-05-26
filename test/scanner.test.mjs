@@ -91,6 +91,18 @@ test("scan detects Spring Boot Maven and Gradle project signals", async () => {
   assert.equal(gradle.commands.test, "./gradlew test");
 });
 
+test("scan detects .NET and C# project signals", async () => {
+  const profile = await scanRepo(fixture("dotnet-app"));
+
+  assert.equal(profile.name, "Fixture.Api");
+  assert.equal(profile.primaryLanguage, "C#");
+  assert.equal(profile.packageManager, "dotnet");
+  assert.ok(profile.frameworks.includes(".NET"));
+  assert.equal(profile.commands.install, "dotnet restore");
+  assert.equal(profile.commands.build, "dotnet build");
+  assert.equal(profile.commands.test, "dotnet test");
+});
+
 test("scan handles Ruby and PHP package manager edge cases", async () => {
   const railsHybrid = await scanRepo(fixture("rails-with-frontend"));
   const railsAgents = buildAgentsMd(railsHybrid);

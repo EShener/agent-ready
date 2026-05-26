@@ -16,6 +16,7 @@ const LANGUAGE_BY_EXTENSION = new Map([
   [".go", "Go"],
   [".java", "Java"],
   [".kt", "Kotlin"],
+  [".cs", "C#"],
   [".swift", "Swift"],
   [".rb", "Ruby"],
   [".php", "PHP"],
@@ -59,7 +60,7 @@ export async function scanRepo(root = process.cwd(), options = {}) {
 
   const mergedGradleBuild = [gradleBuild, gradleBuildKts].filter(Boolean).join("\n");
   const languageCounts = countLanguages(files);
-  const packageManager = await detectPackageManager(absoluteRoot);
+  const packageManager = await detectPackageManager(absoluteRoot, files);
   const detectedCommands = await detectCommands({
     root: absoluteRoot,
     packageJson,
@@ -86,7 +87,7 @@ export async function scanRepo(root = process.cwd(), options = {}) {
   return {
     schemaVersion: 1,
     root: absoluteRoot,
-    name: detectName({ packageJson, pyproject, cargoToml, goMod, pomXml, composerJson, root: absoluteRoot }),
+    name: detectName({ packageJson, pyproject, cargoToml, goMod, pomXml, composerJson, files, root: absoluteRoot }),
     languages: languageCounts,
     primaryLanguage: languageCounts[0]?.name || "Unknown",
     frameworks: detectFrameworks({ packageJson, pyproject, cargoToml, goMod, pomXml, gradleBuild: mergedGradleBuild, gemfile, composerJson, files }),
@@ -124,7 +125,7 @@ function countLanguages(files) {
     .sort((a, b) => b.files - a.files || a.name.localeCompare(b.name));
 }
 
-async function detectPackageManager(root) {
+async function detectPackageManager(root, files = []) {
   const checks = [
     ["pnpm", "pnpm-lock.yaml"],
     ["pnpm", "pnpm-workspace.yaml"],
@@ -142,6 +143,7 @@ async function detectPackageManager(root) {
   if (await pathExists(path.join(root, "go.mod"))) return "go";
   if (await pathExists(path.join(root, "mvnw")) || await pathExists(path.join(root, "pom.xml"))) return "maven";
   if (await pathExists(path.join(root, "gradlew")) || await pathExists(path.join(root, "build.gradle")) || await pathExists(path.join(root, "build.gradle.kts"))) return "gradle";
+  if (hasDotnetSignals(files)) return "dotnet";
   if (await pathExists(path.join(root, "Gemfile"))) return "bundler";
   if (await pathExists(path.join(root, "composer.json"))) return "composer";
   return "unknown";
@@ -198,6 +200,12 @@ async function detectCommands({ root, packageJson, packageManager, pyproject, ca
     commands.test ||= `${gradle} test`;
   }
 
+  if (hasDotnetSignals(files)) {
+    commands.install ||= "dotnet restore";
+    commands.build ||= "dotnet build";
+    commands.test ||= "dotnet test";
+  }
+
   if (hasRailsSignals({ gemfile, files })) {
     if (commands.install) commands["backend:install"] ||= "bundle install";
     else commands.install = "bundle install";
@@ -249,7 +257,7 @@ function hasPythonTool(pyproject, tool) {
   return new RegExp(`(^|[^a-zA-Z0-9_-])${escapeRegExp(tool)}([^a-zA-Z0-9_-]|$)`, "i").test(pyproject);
 }
 
-function detectName({ packageJson, pyproject, cargoToml, goMod, pomXml, composerJson, root }) {
+function detectName({ packageJson, pyproject, cargoToml, goMod, pomXml, composerJson, files, root }) {
   if (packageJson?.name) return packageJson.name;
   const pyName = parseTomlValue(pyproject, "name");
   if (pyName) return pyName;
@@ -258,6 +266,8 @@ function detectName({ packageJson, pyproject, cargoToml, goMod, pomXml, composer
   if (composerJson?.name) return composerJson.name.split("/").pop();
   const artifactId = parseXmlTagValue(pomXml, "artifactId");
   if (artifactId) return artifactId;
+  const csprojName = firstProjectStem(files, ".csproj");
+  if (csprojName) return csprojName;
   const moduleLine = goMod.split("\n").find((line) => line.startsWith("module "));
   if (moduleLine) return moduleLine.replace(/^module\s+/, "").trim().split("/").pop();
   return path.basename(root);
@@ -306,12 +316,27 @@ function detectFrameworks({ packageJson, pyproject, cargoToml, goMod, pomXml, gr
   if (hasRailsSignals({ gemfile, files })) names.push("Rails");
   if (hasLaravelSignals({ composerJson, files })) names.push("Laravel");
   if (hasSpringBootSignals({ pomXml, gradleBuild })) names.push("Spring Boot");
+  if (hasDotnetSignals(files)) names.push(".NET");
   if (/actix|axum|rocket/i.test(cargoToml)) names.push("Rust Web");
   if (/github\.com\/gin-gonic\/gin/i.test(goMod)) names.push("Gin");
   if (hasNextAppRouter) names.push("Next.js App Router");
   if (hasDockerfile(files)) names.push("Docker");
   if (hasDockerComposeFile(files)) names.push("Docker Compose");
   return unique(names);
+}
+
+function hasDotnetSignals(files) {
+  return files.some((file) => (
+    file.endsWith(".csproj")
+    || file.endsWith(".sln")
+    || file === "global.json"
+    || /(^|\/)Program\.cs$/.test(file)
+  ));
+}
+
+function firstProjectStem(files, extension) {
+  const file = files.find((item) => item.endsWith(extension));
+  return file ? path.basename(file, extension) : "";
 }
 
 function hasMavenSignals({ pomXml, files }) {

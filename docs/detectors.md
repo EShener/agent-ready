@@ -12,6 +12,7 @@ This page summarizes the current detector coverage. Claims here should stay alig
 | Python | `pyproject.toml`, `requirements.txt`, `setup.py`, `tests/` | FastAPI, Django, Flask, Pytest, Ruff | `python3 -m pip install ...`, `python3 -m pytest`, Ruff lint/format |
 | Ruby | `Gemfile`, `config/application.rb`, `bin/rails` | Rails | `bundle install`, `bin/rails server`, `bin/rails test` |
 | PHP | `composer.json`, `artisan`, `app/Http/Kernel.php` | Laravel | `composer install`, `php artisan serve`, `php artisan test` |
+| C# / .NET | `*.csproj`, `*.sln`, `global.json`, `Program.cs` | .NET | `dotnet restore`, `dotnet build`, `dotnet test` |
 | Java / Kotlin | `pom.xml`, `mvnw`, `build.gradle`, `build.gradle.kts`, `gradlew`, Spring Boot plugins/dependencies | Spring Boot | `./mvnw package`, `./mvnw test`, `./gradlew build`, `./gradlew test` |
 | Rust | `Cargo.toml` | Actix, Axum, Rocket as Rust Web | `cargo build`, `cargo test`, `cargo clippy --all-targets --all-features`, `cargo fmt` |
 | Go | `go.mod` | Gin | `go build ./...`, `go test ./...`, `go vet ./...`, `gofmt -w .` |
@@ -30,6 +31,7 @@ This page summarizes the current detector coverage. Claims here should stay alig
 | Nuxt | `nuxt`, `@nuxt/kit`, `nuxt.config.*`, `app.vue`, `pages/`, `app/`, or `server/` conventions |
 | Rails | `Gemfile` containing `rails`, `config/application.rb`, `bin/rails` |
 | Laravel | `composer.json` with `laravel/framework`, `artisan`, `app/Http/Kernel.php` |
+| .NET | `*.csproj`, `*.sln`, `global.json`, `Program.cs` |
 | Spring Boot | Spring Boot references in `pom.xml`, `build.gradle`, or `build.gradle.kts` |
 | Docker Compose | Compose files named `docker-compose.yml`, `docker-compose.yaml`, `compose.yml`, or `compose.yaml` |
 

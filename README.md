@@ -419,14 +419,14 @@ npx --yes @eshen_fox_mie/agent-ready ci --write
 
 ## Supported Detection
 
-Current detectors cover common JavaScript/TypeScript, Python, Ruby, PHP, Java, Kotlin, Rust, Go, and monorepo repositories:
+Current detectors cover common JavaScript/TypeScript, Python, Ruby, PHP, C#, Java, Kotlin, Rust, Go, and monorepo repositories:
 
-- package manager: npm, pnpm, yarn, bun, pip, bundler, composer, maven, gradle, cargo, go
+- package manager: npm, pnpm, yarn, bun, pip, bundler, composer, dotnet, maven, gradle, cargo, go
 - commands: install, dev, start, build, test, lint, format, backend install, local services
 - docs: README, architecture docs, ADR directories, existing agent docs
 - CI: GitHub Actions workflows
 - monorepos: npm/pnpm workspaces, Turborepo, Nx, Lerna, Rush
-- frameworks/tools: React, Vite, Next.js, Next.js App Router, Vue, Nuxt, Astro, Svelte, SvelteKit, Express, NestJS, Playwright, Storybook, FastAPI, Django, Flask, Pytest, Rails, Laravel, Spring Boot, Rust web frameworks, Gin, Docker, Docker Compose
+- frameworks/tools: React, Vite, Next.js, Next.js App Router, Vue, Nuxt, Astro, Svelte, SvelteKit, Express, NestJS, Playwright, Storybook, FastAPI, Django, Flask, Pytest, Rails, Laravel, .NET, Spring Boot, Rust web frameworks, Gin, Docker, Docker Compose
 - framework signals: package dependencies, framework config files, and common route/component conventions such as `app/`, `pages/`, `src/routes/`, and `.astro` files
 
 See [detector coverage](docs/detectors.md) for the ecosystem-by-ecosystem table of signals and inferred commands.

@@ -13,6 +13,7 @@
 - Added Spring Boot detection with Maven and Gradle wrapper command inference.
 - Added a detector coverage table grouped by ecosystem.
 - Added Ruby and PHP package manager edge-case coverage for hybrid and non-framework projects.
+- Added .NET and C# detection with `dotnet` command inference.
 
 ## 0.1.25
 
