@@ -144,6 +144,7 @@ function extractBacktickPaths(text) {
   const matches = [...text.matchAll(/`([^`\n]+)`/g)].map((match) => match[1].trim());
   return [...new Set(matches.filter((value) => {
     if (!value || value.includes(" ")) return false;
+    if (/^(~\/|\$HOME\/|%USERPROFILE%[\\/]|\/)/i.test(value)) return false;
     if (/^(https?:|npm|pnpm|yarn|bun|node|python|python3|cargo|go|git|npx)\b/.test(value)) return false;
     if (/^[A-Z_]+$/.test(value)) return false;
     return /[/.]/.test(value);

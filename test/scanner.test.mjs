@@ -333,6 +333,25 @@ test("lint detects missing agent docs and stale references", async () => {
   assert.ok(findings.some((finding) => finding.ruleId === "stale-path-reference"));
 });
 
+test("lint ignores user-home paths in agent docs", async () => {
+  const temp = await fs.mkdtemp(path.join("/tmp", "agent-ready-home-paths-"));
+  await fs.writeFile(path.join(temp, "AGENTS.md"), `# AGENTS.md
+
+## Safety Boundaries
+
+Do not overwrite user hook configs such as \`~/.claude/settings.json\` or \`$HOME/.copilot/hooks-config.json\` without explicit review.
+
+## Verification
+
+Run the documented manual notification checks before changing hook behavior.
+`, "utf8");
+
+  const profile = await scanRepo(temp);
+  const findings = await lintRepo(profile);
+
+  assert.equal(findings.some((finding) => finding.ruleId === "stale-path-reference"), false);
+});
+
 test("score is explainable and bounded", async () => {
   const profile = await scanRepo(fixture("empty-repo"));
   const findings = await lintRepo(profile);
