@@ -7,6 +7,8 @@
 - Added Docker and Docker Compose detection, including generated `AGENTS.md` local service guidance.
 - Added real-world readiness snapshots to the examples gallery.
 - Added weekly growth metrics tracking with collection commands and a baseline launch log.
+- Added a local outreach operator that periodically discovers relevant GitHub repositories, generates draft-only maintainer replies, and keeps a local outreach inbox/ledger.
+- Added macOS LaunchAgent documentation for daily draft generation with explicit public-posting guardrails.
 - Added SvelteKit and Nuxt detection from framework configs, route conventions, and `.svelte`/`.vue` files.
 - Added Rails and Laravel detection with Bundler and Composer command inference.
 - Expanded real-world readiness snapshots with SvelteKit, Nuxt, Rails, and Laravel examples.

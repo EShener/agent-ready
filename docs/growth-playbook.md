@@ -79,6 +79,14 @@ Use the repo-specific draft first:
 npx --yes @eshen_fox_mie/agent-ready outreach --root .
 ````
 
+For recurring discovery, run the local outreach operator:
+
+```bash
+npm run outreach:operator
+```
+
+It writes a draft-only inbox under `.agent-ready/outreach/`. See [outreach-automation.md](outreach-automation.md) for the local schedule and public-posting guardrails.
+
 ### Discussion Prompt
 
 ```md
