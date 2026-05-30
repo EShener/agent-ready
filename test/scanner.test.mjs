@@ -63,6 +63,30 @@ test("scan detects Python, Rust, and Go repositories", async () => {
   assert.equal(go.commands.test, "go test ./...");
 });
 
+test("scan prefers Poetry, PDM, and uv commands for Python repositories", async () => {
+  const poetry = await scanRepo(fixture("python-poetry-app"));
+  const pdm = await scanRepo(fixture("python-pdm-app"));
+  const uv = await scanRepo(fixture("python-uv-app"));
+
+  assert.equal(poetry.packageManager, "poetry");
+  assert.equal(poetry.commands.install, "poetry install");
+  assert.equal(poetry.commands.test, "poetry run pytest");
+  assert.equal(poetry.commands.lint, "poetry run ruff check .");
+  assert.ok(poetry.frameworks.includes("FastAPI"));
+
+  assert.equal(pdm.packageManager, "pdm");
+  assert.equal(pdm.commands.install, "pdm install");
+  assert.equal(pdm.commands.test, "pdm run pytest");
+  assert.equal(pdm.commands.lint, "pdm run ruff check .");
+  assert.ok(pdm.frameworks.includes("Flask"));
+
+  assert.equal(uv.packageManager, "uv");
+  assert.equal(uv.commands.install, "uv sync");
+  assert.equal(uv.commands.test, "uv run pytest");
+  assert.equal(uv.commands.lint, "uv run ruff check .");
+  assert.ok(uv.frameworks.includes("Django"));
+});
+
 test("scan handles Go and Rust web framework edge cases", async () => {
   const goGin = await scanRepo(fixture("go-gin-cmd-app"));
   const rustWorkspace = await scanRepo(fixture("rust-workspace-web"));

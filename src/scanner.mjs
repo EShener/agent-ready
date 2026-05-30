@@ -60,7 +60,7 @@ export async function scanRepo(root = process.cwd(), options = {}) {
 
   const mergedGradleBuild = [gradleBuild, gradleBuildKts].filter(Boolean).join("\n");
   const languageCounts = countLanguages(files);
-  const packageManager = await detectPackageManager(absoluteRoot, files);
+  const packageManager = await detectPackageManager(absoluteRoot, files, pyproject);
   const detectedCommands = await detectCommands({
     root: absoluteRoot,
     packageJson,
@@ -125,7 +125,7 @@ function countLanguages(files) {
     .sort((a, b) => b.files - a.files || a.name.localeCompare(b.name));
 }
 
-async function detectPackageManager(root, files = []) {
+async function detectPackageManager(root, files = [], pyproject = "") {
   const checks = [
     ["pnpm", "pnpm-lock.yaml"],
     ["pnpm", "pnpm-workspace.yaml"],
@@ -133,11 +133,17 @@ async function detectPackageManager(root, files = []) {
     ["bun", "bun.lockb"],
     ["bun", "bun.lock"],
     ["npm", "package-lock.json"],
+    ["poetry", "poetry.lock"],
+    ["pdm", "pdm.lock"],
+    ["uv", "uv.lock"],
   ];
   for (const [name, file] of checks) {
     if (await pathExists(path.join(root, file))) return name;
   }
   if (await pathExists(path.join(root, "package.json"))) return "npm";
+  if (hasPythonToolTable(pyproject, "poetry")) return "poetry";
+  if (hasPythonToolTable(pyproject, "pdm")) return "pdm";
+  if (hasPythonToolTable(pyproject, "uv")) return "uv";
   if (await pathExists(path.join(root, "pyproject.toml"))) return "python";
   if (await pathExists(path.join(root, "Cargo.toml"))) return "cargo";
   if (await pathExists(path.join(root, "go.mod"))) return "go";
@@ -164,13 +170,13 @@ async function detectCommands({ root, packageJson, packageManager, pyproject, ca
   }
 
   if (pyproject || files.includes("requirements.txt") || files.includes("setup.py")) {
-    commands.install ||= pyproject ? "python3 -m pip install -e ." : "python3 -m pip install -r requirements.txt";
+    commands.install ||= pythonInstallCommand(packageManager, Boolean(pyproject));
     if (hasPythonTool(pyproject, "pytest") || files.some((file) => /^tests?\//.test(file))) {
-      commands.test ||= "python3 -m pytest";
+      commands.test ||= pythonRunCommand(packageManager, "pytest");
     }
     if (hasPythonTool(pyproject, "ruff")) {
-      commands.lint ||= "python3 -m ruff check .";
-      commands.format ||= "python3 -m ruff format .";
+      commands.lint ||= pythonRunCommand(packageManager, "ruff", "check .");
+      commands.format ||= pythonRunCommand(packageManager, "ruff", "format .");
     }
   }
 
@@ -255,6 +261,26 @@ function runScriptCommand(packageManager, script) {
 function hasPythonTool(pyproject, tool) {
   if (!pyproject) return false;
   return new RegExp(`(^|[^a-zA-Z0-9_-])${escapeRegExp(tool)}([^a-zA-Z0-9_-]|$)`, "i").test(pyproject);
+}
+
+function hasPythonToolTable(pyproject, tool) {
+  if (!pyproject) return false;
+  return new RegExp(`^\\s*\\[tool\\.${escapeRegExp(tool)}(?:\\.|\\])`, "m").test(pyproject);
+}
+
+function pythonInstallCommand(packageManager, hasPyproject) {
+  if (packageManager === "poetry") return "poetry install";
+  if (packageManager === "pdm") return "pdm install";
+  if (packageManager === "uv") return "uv sync";
+  return hasPyproject ? "python3 -m pip install -e ." : "python3 -m pip install -r requirements.txt";
+}
+
+function pythonRunCommand(packageManager, tool, args = "") {
+  const suffix = args ? ` ${args}` : "";
+  if (packageManager === "poetry") return `poetry run ${tool}${suffix}`;
+  if (packageManager === "pdm") return `pdm run ${tool}${suffix}`;
+  if (packageManager === "uv") return `uv run ${tool}${suffix}`;
+  return `python3 -m ${tool}${suffix}`;
 }
 
 function detectName({ packageJson, pyproject, cargoToml, goMod, pomXml, composerJson, files, root }) {

@@ -9,7 +9,7 @@ This page summarizes the current detector coverage. Claims here should stay alig
 | Ecosystem | Detected signals | Frameworks/tools | Inferred commands |
 | --- | --- | --- | --- |
 | JavaScript / TypeScript | `package.json`, lockfiles, package scripts, framework configs, route/component conventions | React, Vite, Next.js, Next.js App Router, Vue, Nuxt, Astro, Svelte, SvelteKit, Express, NestJS, Vitest, Jest, Playwright, Storybook | package manager install, `dev`, `start`, `build`, `test`, `lint`, `format` from scripts |
-| Python | `pyproject.toml`, `requirements.txt`, `setup.py`, `tests/` | FastAPI, Django, Flask, Pytest, Ruff | `python3 -m pip install ...`, `python3 -m pytest`, Ruff lint/format |
+| Python | `pyproject.toml`, `requirements.txt`, `setup.py`, `poetry.lock`, `pdm.lock`, `uv.lock`, `[tool.poetry]`, `[tool.pdm]`, `[tool.uv]`, `tests/` | FastAPI, Django, Flask, Pytest, Ruff, Poetry, PDM, uv | pip/Poetry/PDM/uv install commands, Pytest, Ruff lint/format through the detected package manager |
 | Ruby | `Gemfile`, `config/application.rb`, `bin/rails` | Rails | `bundle install`, `bin/rails server`, `bin/rails test` |
 | PHP | `composer.json`, `artisan`, `app/Http/Kernel.php` | Laravel | `composer install`, `php artisan serve`, `php artisan test` |
 | C# / .NET | `*.csproj`, `*.sln`, `global.json`, `Program.cs` | .NET | `dotnet restore`, `dotnet build`, `dotnet test` |

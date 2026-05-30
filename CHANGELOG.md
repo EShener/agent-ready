@@ -18,6 +18,7 @@
 - Added draft v0.1.26 release notes for the next npm publish.
 - Prepared npm publishing docs and workflow settings for Trusted Publishing.
 - Added GitLab CI and CircleCI workflow detection so non-GitHub repositories do not get false `missing-ci` findings.
+- Added Poetry, PDM, and uv package manager detection with Python install/test/lint command inference.
 
 ## 0.1.25
 

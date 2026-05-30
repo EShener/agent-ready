@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "fixture-python-poetry-app"
+version = "0.1.0"
+description = "Poetry fixture"
+authors = ["agent-ready <agent-ready@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.115.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+ruff = "^0.8.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
