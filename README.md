@@ -426,7 +426,7 @@ Current detectors cover common JavaScript/TypeScript, Python, Ruby, PHP, C#, Jav
 - docs: README, architecture docs, ADR directories, existing agent docs
 - CI: GitHub Actions, GitLab CI, and CircleCI workflow files
 - monorepos: npm/pnpm workspaces, Turborepo, Nx, Lerna, Rush
-- frameworks/tools: React, Vite, Next.js, Next.js App Router, Vue, Nuxt, Astro, Svelte, SvelteKit, Express, NestJS, Playwright, Storybook, FastAPI, Django, Flask, Pytest, Rails, Laravel, .NET, Spring Boot, Rust web frameworks, Gin, Docker, Docker Compose
+- frameworks/tools: React, Vite, Next.js, Next.js App Router, Vue, Nuxt, Astro, Svelte, SvelteKit, Express, NestJS, Playwright, Storybook, FastAPI, Django, Flask, Pytest, Rails, Laravel, .NET, ASP.NET Core, .NET Test SDK, xUnit, NUnit, MSTest, Spring Boot, Rust web frameworks, Gin, Docker, Docker Compose
 - framework signals: package dependencies, framework config files, and common route/component conventions such as `app/`, `pages/`, `src/routes/`, and `.astro` files
 
 See [detector coverage](docs/detectors.md) for the ecosystem-by-ecosystem table of signals and inferred commands.

@@ -19,6 +19,7 @@
 - Prepared npm publishing docs and workflow settings for Trusted Publishing.
 - Added GitLab CI and CircleCI workflow detection so non-GitHub repositories do not get false `missing-ci` findings.
 - Added Poetry, PDM, and uv package manager detection with Python install/test/lint command inference.
+- Added ASP.NET Core and common .NET test framework detection from project and `Program.cs` signals.
 
 ## 0.1.25
 

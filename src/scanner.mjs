@@ -59,6 +59,8 @@ export async function scanRepo(root = process.cwd(), options = {}) {
   ]);
 
   const mergedGradleBuild = [gradleBuild, gradleBuildKts].filter(Boolean).join("\n");
+  const dotnetProjectText = await readJoinedFiles(absoluteRoot, files.filter((file) => file.endsWith(".csproj")));
+  const dotnetProgramText = await readJoinedFiles(absoluteRoot, files.filter((file) => /(^|\/)Program\.cs$/.test(file)));
   const languageCounts = countLanguages(files);
   const packageManager = await detectPackageManager(absoluteRoot, files, pyproject);
   const detectedCommands = await detectCommands({
@@ -90,7 +92,7 @@ export async function scanRepo(root = process.cwd(), options = {}) {
     name: detectName({ packageJson, pyproject, cargoToml, goMod, pomXml, composerJson, files, root: absoluteRoot }),
     languages: languageCounts,
     primaryLanguage: languageCounts[0]?.name || "Unknown",
-    frameworks: detectFrameworks({ packageJson, pyproject, cargoToml, goMod, pomXml, gradleBuild: mergedGradleBuild, gemfile, composerJson, files }),
+    frameworks: detectFrameworks({ packageJson, pyproject, cargoToml, goMod, pomXml, gradleBuild: mergedGradleBuild, gemfile, composerJson, files, dotnetProjectText, dotnetProgramText }),
     monorepo: detectMonorepo({ packageJson, pnpmWorkspace, files }),
     packageManager,
     commands,
@@ -299,7 +301,12 @@ function detectName({ packageJson, pyproject, cargoToml, goMod, pomXml, composer
   return path.basename(root);
 }
 
-function detectFrameworks({ packageJson, pyproject, cargoToml, goMod, pomXml, gradleBuild, gemfile, composerJson, files }) {
+async function readJoinedFiles(root, files) {
+  const texts = await Promise.all(files.map((file) => readTextIfExists(path.join(root, file))));
+  return texts.filter(Boolean).join("\n");
+}
+
+function detectFrameworks({ packageJson, pyproject, cargoToml, goMod, pomXml, gradleBuild, gemfile, composerJson, files, dotnetProjectText, dotnetProgramText }) {
   const deps = {
     ...(packageJson?.dependencies || {}),
     ...(packageJson?.devDependencies || {}),
@@ -343,12 +350,25 @@ function detectFrameworks({ packageJson, pyproject, cargoToml, goMod, pomXml, gr
   if (hasLaravelSignals({ composerJson, files })) names.push("Laravel");
   if (hasSpringBootSignals({ pomXml, gradleBuild })) names.push("Spring Boot");
   if (hasDotnetSignals(files)) names.push(".NET");
+  if (hasAspNetCoreSignals({ dotnetProjectText, dotnetProgramText })) names.push("ASP.NET Core");
+  if (/Microsoft\.NET\.Test\.Sdk/i.test(dotnetProjectText)) names.push(".NET Test SDK");
+  if (/PackageReference\s+Include=["'][^"']*xunit/i.test(dotnetProjectText)) names.push("xUnit");
+  if (/PackageReference\s+Include=["'][^"']*nunit/i.test(dotnetProjectText)) names.push("NUnit");
+  if (/PackageReference\s+Include=["'][^"']*MSTest/i.test(dotnetProjectText)) names.push("MSTest");
   if (/actix|axum|rocket/i.test(cargoToml)) names.push("Rust Web");
   if (/github\.com\/gin-gonic\/gin/i.test(goMod)) names.push("Gin");
   if (hasNextAppRouter) names.push("Next.js App Router");
   if (hasDockerfile(files)) names.push("Docker");
   if (hasDockerComposeFile(files)) names.push("Docker Compose");
   return unique(names);
+}
+
+function hasAspNetCoreSignals({ dotnetProjectText, dotnetProgramText }) {
+  return Boolean(
+    /<Project\s+Sdk=["']Microsoft\.NET\.Sdk\.Web["']/i.test(dotnetProjectText)
+    || /Microsoft\.AspNetCore/i.test(dotnetProjectText)
+    || /WebApplication\.CreateBuilder|\.Map(Get|Post|Put|Delete|Patch)\s*\(/.test(dotnetProgramText)
+  );
 }
 
 function hasDotnetSignals(files) {
