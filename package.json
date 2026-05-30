@@ -37,7 +37,7 @@
   "scripts": {
     "test": "node --test test/*.test.mjs",
     "lint": "npm run check",
-    "check": "node --check bin/agent-ready.mjs && node --check scripts/benchmark-sample.mjs && node --check src/benchmark.mjs && node --check src/cli.mjs && node --check src/comment.mjs && node --check src/compare.mjs && node --check src/config.mjs && node --check src/examples.mjs && node --check src/explainer.mjs && node --check src/generator.mjs && node --check src/improver.mjs && node --check src/interactive.mjs && node --check src/linter.mjs && node --check src/matrix.mjs && node --check src/presets.mjs && node --check src/reporter.mjs && node --check src/scanner.mjs && node --check src/snapshot.mjs && node --check src/workflow.mjs",
+    "check": "node --check bin/agent-ready.mjs && node --check scripts/benchmark-sample.mjs && node --check src/benchmark.mjs && node --check src/ci.mjs && node --check src/cli.mjs && node --check src/comment.mjs && node --check src/compare.mjs && node --check src/config.mjs && node --check src/examples.mjs && node --check src/explainer.mjs && node --check src/generator.mjs && node --check src/improver.mjs && node --check src/interactive.mjs && node --check src/linter.mjs && node --check src/matrix.mjs && node --check src/presets.mjs && node --check src/reporter.mjs && node --check src/scanner.mjs && node --check src/snapshot.mjs && node --check src/workflow.mjs",
     "benchmark:fixtures": "node bin/agent-ready.mjs benchmark test/fixtures/node-app test/fixtures/bad-agent-docs",
     "benchmark:sample": "node scripts/benchmark-sample.mjs"
   },

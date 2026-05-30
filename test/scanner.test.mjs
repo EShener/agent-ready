@@ -35,6 +35,18 @@ test("scan detects a Node app profile", async () => {
   assert.deepEqual(profile.ci.githubActions, [".github/workflows/ci.yml"]);
 });
 
+test("scan detects GitLab CI and CircleCI workflow files", async () => {
+  const profile = await scanRepo(fixture("alternate-ci-app"));
+  const findings = await lintRepo(profile);
+  const agentsMd = buildAgentsMd(profile);
+
+  assert.deepEqual(profile.ci.githubActions, []);
+  assert.deepEqual(profile.ci.gitlabCi, [".gitlab-ci.yml"]);
+  assert.deepEqual(profile.ci.circleCi, [".circleci/config.yml"]);
+  assert.equal(findings.some((finding) => finding.ruleId === "missing-ci"), false);
+  assert.match(agentsMd, /CI: \.gitlab-ci\.yml, \.circleci\/config\.yml/);
+});
+
 test("scan detects Python, Rust, and Go repositories", async () => {
   const python = await scanRepo(fixture("python-app"));
   const rust = await scanRepo(fixture("rust-app"));

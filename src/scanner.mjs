@@ -455,8 +455,18 @@ async function detectCi(root) {
     .filter((entry) => entry.isFile() && /\.(ya?ml)$/.test(entry.name))
     .map((entry) => `.github/workflows/${entry.name}`)
     .sort();
+  const gitlabCi = [];
+  for (const file of [".gitlab-ci.yml", ".gitlab-ci.yaml"]) {
+    if (await pathExists(path.join(root, file))) gitlabCi.push(file);
+  }
+  const circleCi = [];
+  for (const file of [".circleci/config.yml", ".circleci/config.yaml"]) {
+    if (await pathExists(path.join(root, file))) circleCi.push(file);
+  }
   return {
     githubActions: workflows,
+    gitlabCi,
+    circleCi,
   };
 }
 

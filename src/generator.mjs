@@ -1,4 +1,5 @@
 import path from "node:path";
+import { formatCiWorkflows } from "./ci.mjs";
 import { pathExists, writeText } from "./fs-utils.mjs";
 
 const TARGET_FILES = {
@@ -125,7 +126,7 @@ export function buildAgentsMd(profile) {
   const languages = profile.languages.length
     ? profile.languages.map((language) => `${language.name} (${language.files} files)`).join(", ")
     : "No source files detected";
-  const ci = profile.ci.githubActions.length ? profile.ci.githubActions.join(", ") : "No GitHub Actions workflows detected";
+  const ci = formatCiWorkflows(profile.ci);
   const architecture = profile.docs.architecture || "Not found";
   const adr = profile.docs.adrDirectory || "Not found";
   const localServices = localServicesSection(profile);
@@ -285,7 +286,7 @@ ${profile.name} is primarily a ${profile.primaryLanguage} repository. This docum
 - Frameworks/tools: ${frameworks}
 - Package manager: ${profile.packageManager}
 - Monorepo: ${profile.monorepo?.detected ? "yes" : "no"}
-- CI: ${profile.ci.githubActions.length ? profile.ci.githubActions.join(", ") : "No GitHub Actions workflows detected"}
+- CI: ${formatCiWorkflows(profile.ci)}
 
 ## Repository Layout
 

@@ -1,4 +1,5 @@
 import path from "node:path";
+import { hasCiWorkflows } from "./ci.mjs";
 import { pathExists, readJsonIfExists, readTextIfExists } from "./fs-utils.mjs";
 
 const AGENT_DOCS = [
@@ -23,8 +24,8 @@ export async function lintRepo(profile) {
   if (!profile.docs.readme) {
     findings.push(finding("warning", "missing-readme", "README.md is missing.", "README.md", "Add a README with install, usage, and contribution basics."));
   }
-  if (!profile.ci.githubActions.length) {
-    findings.push(finding("info", "missing-ci", "No GitHub Actions workflow was detected.", ".github/workflows", "Add CI so agents can trust the verification path."));
+  if (!hasCiWorkflows(profile.ci)) {
+    findings.push(finding("info", "missing-ci", "No CI workflow was detected.", ".github/workflows", "Add CI so agents can trust the verification path."));
   }
 
   findings.push(...await validatePackageScripts(profile));

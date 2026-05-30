@@ -17,6 +17,7 @@
 - Added Go Gin and Rust workspace web framework edge-case fixtures.
 - Added draft v0.1.26 release notes for the next npm publish.
 - Prepared npm publishing docs and workflow settings for Trusted Publishing.
+- Added GitLab CI and CircleCI workflow detection so non-GitHub repositories do not get false `missing-ci` findings.
 
 ## 0.1.25
 

@@ -1,0 +1,7 @@
+{
+  "name": "fixture-alternate-ci-app",
+  "scripts": {
+    "test": "node --test",
+    "lint": "node --check index.js"
+  }
+}
