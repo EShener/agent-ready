@@ -20,6 +20,7 @@
 - Added GitLab CI and CircleCI workflow detection so non-GitHub repositories do not get false `missing-ci` findings.
 - Added Poetry, PDM, and uv package manager detection with Python install/test/lint command inference.
 - Added ASP.NET Core and common .NET test framework detection from project and `Program.cs` signals.
+- Added `agent-ready outreach` for maintainer-friendly, repo-specific outreach drafts.
 
 ## 0.1.25
 

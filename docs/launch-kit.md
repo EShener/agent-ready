@@ -95,7 +95,13 @@ https://github.com/EShener/agent-ready
 
 ## Maintainer Outreach
 
-Use this when opening a friendly issue or discussion in a repo that might benefit from the tool:
+Generate a repo-specific draft before opening a friendly issue or discussion:
+
+```bash
+npx --yes @eshen_fox_mie/agent-ready outreach --root .
+```
+
+Fallback static copy:
 
 ````md
 I noticed this repo may benefit from explicit AI coding agent instructions.
@@ -116,7 +122,7 @@ No network calls or API keys are required by the CLI.
 - [ ] Add GitHub topics: `ai-agents`, `agents-md`, `agentic-coding`, `developer-tools`, `github-action`, `codex`, `cursor`, `claude-code`.
 - [ ] Share the short pitch in one builder community.
 - [ ] Share the benchmark evidence with one screenshot or GIF.
-- [ ] Open 3-5 helpful issues in relevant repos using `improve --preset team --dry-run --format issue`.
+- [ ] Open 1-2 helpful issues in relevant repos using `outreach` output after checking each repo locally.
 - [ ] Share the preset quick start: `improve --preset team --dry-run`.
 - [ ] Ask early users which detector or framework support is missing.
 - [ ] Convert repeated feedback into small good-first issues.

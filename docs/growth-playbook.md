@@ -48,7 +48,7 @@ npx --yes @eshen_fox_mie/agent-ready improve --preset team --dry-run
 | 1 | Publish announcement discussion and share the npm quick start | One canonical GitHub link |
 | 2 | Share the GIF and PR-comment workflow | Visual proof |
 | 3 | Post the benchmark angle | Evidence that the problem is common |
-| 4 | Open 1-2 helpful issues in relevant repos | Non-spammy targeted outreach |
+| 4 | Run `agent-ready outreach` on 1-2 relevant repos and open only specific, useful issues | Non-spammy targeted outreach |
 | 5 | Ask for detector requests | Community feedback |
 | 6 | Ship one small detector or docs improvement | Visible momentum |
 | 7 | Post a weekly progress note | Reasons to revisit/star |
@@ -74,17 +74,9 @@ Repo: https://github.com/EShener/agent-ready
 ### Maintainer Outreach
 
 ````md
-I noticed this repo may benefit from explicit AI coding agent instructions.
+Use the repo-specific draft first:
 
-`agent-ready` can generate a small `AGENTS.md`, detect missing verification commands, and add a lightweight CI readiness check.
-
-Dry-run command:
-
-```bash
-npx --yes @eshen_fox_mie/agent-ready improve --preset team --dry-run --format issue
-```
-
-No API keys are required by the CLI, and the dry run does not write files.
+npx --yes @eshen_fox_mie/agent-ready outreach --root .
 ````
 
 ### Discussion Prompt
@@ -137,5 +129,5 @@ Before sharing a release:
 
 - Do not claim official vendor support from OpenAI, Anthropic, Cursor, Google, or GitHub.
 - Do not claim a repository was changed unless a write command actually ran.
-- Do not open generic promotional issues. Use the dry-run output and explain a concrete repo-specific gap.
+- Do not open generic promotional issues. Use `agent-ready outreach` output and explain a concrete repo-specific gap.
 - Do not hide automation or invent personal usage stories.

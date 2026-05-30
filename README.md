@@ -54,6 +54,7 @@ npx --yes @eshen_fox_mie/agent-ready examples
 npx --yes @eshen_fox_mie/agent-ready explain
 npx --yes @eshen_fox_mie/agent-ready matrix
 npx --yes @eshen_fox_mie/agent-ready comment
+npx --yes @eshen_fox_mie/agent-ready outreach
 npx --yes @eshen_fox_mie/agent-ready compare --before before.json --after after.json
 npx --yes @eshen_fox_mie/agent-ready improve --preset team --dry-run
 npx --yes @eshen_fox_mie/agent-ready improve --dry-run
@@ -258,6 +259,15 @@ Prints a concise GitHub-ready Markdown summary for PR comments, issues, discussi
 agent-ready comment
 agent-ready comment --max-fixes 5
 agent-ready comment --format json
+```
+
+### `outreach`
+
+Prints a maintainer-friendly issue or discussion draft based on a local dry run. Use this before opening outreach in another repository so the message stays specific, useful, and non-spammy.
+
+```bash
+agent-ready outreach
+agent-ready outreach --format json
 ```
 
 ### `compare`

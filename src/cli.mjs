@@ -9,6 +9,7 @@ import { improveRepo } from "./improver.mjs";
 import { promptInitOptions } from "./interactive.mjs";
 import { lintRepo, scoreRepo } from "./linter.mjs";
 import { buildAgentMatrix } from "./matrix.mjs";
+import { buildOutreachFromFlags, renderOutreach } from "./outreach.mjs";
 import { resolvePreset } from "./presets.mjs";
 import { renderAgentMatrix, renderAnnotations, renderBadge, renderBenchmarkReport, renderComparison, renderDoctor, renderExamplesCatalog, renderExplanation, renderFindings, renderImprovement, renderImprovementIssue, renderLeaderboard, renderMarkdownReport, renderRoadmap, renderScanSummary, renderScore, renderShareComment, renderSnapshot } from "./reporter.mjs";
 import { snapshotRepo, writeSnapshotFile } from "./snapshot.mjs";
@@ -30,6 +31,7 @@ Usage:
   agent-ready explain [--root PATH] [--config PATH] [--format markdown|json]
   agent-ready matrix [--root PATH] [--config PATH] [--format markdown|json]
   agent-ready comment [--root PATH] [--config PATH] [--format markdown|json] [--max-fixes N]
+  agent-ready outreach [--root PATH] [--config PATH] [--format markdown|json] [--preset team] [--targets codex,claude,cursor,gemini,copilot] [--level team] [--mode npx|action] [--fail-under N]
   agent-ready compare --before before.json --after after.json [--format markdown|json]
   agent-ready doctor [--root PATH] [--config PATH] [--format json|text] [--fail-under N]
   agent-ready report [--root PATH] [--config PATH] [--format markdown|json]
@@ -56,6 +58,7 @@ Examples:
   npx @eshen_fox_mie/agent-ready explain
   npx @eshen_fox_mie/agent-ready matrix
   npx @eshen_fox_mie/agent-ready comment
+  npx @eshen_fox_mie/agent-ready outreach
   npx @eshen_fox_mie/agent-ready compare --before before.json --after after.json
   npx @eshen_fox_mie/agent-ready annotations
   npx @eshen_fox_mie/agent-ready score --fail-under 80
@@ -254,6 +257,17 @@ export async function runCli(argv) {
     } else {
       if (flags.format && flags.format !== "markdown") throw new Error("Comment format must be markdown or json.");
       console.log(renderShareComment(comment));
+    }
+    return;
+  }
+
+  if (command === "outreach") {
+    const outreach = await buildOutreachFromFlags(root, scanOptions, flags);
+    if (flags.format === "json" || flags.json) {
+      console.log(JSON.stringify(outreach, null, 2));
+    } else {
+      if (flags.format && flags.format !== "markdown") throw new Error("Outreach format must be markdown or json.");
+      console.log(renderOutreach(outreach));
     }
     return;
   }
